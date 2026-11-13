@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>L'Épicure Gastronomie — Màn Hình Quản Lý Bếp (KDS)</title>
+<!-- Fonts: Playfair Display & Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "secondary-fixed": "#cbedac",
+            "tertiary": "#633500",
+            "primary-fixed-dim": "#ffb4a8",
+            "surface-bright": "#fff8f5",
+            "surface-dim": "#e9d7c8",
+            "surface": "#fff8f5",
+            "on-primary-container": "#ffbfb4",
+            "surface-container-highest": "#f2dfd1",
+            "on-primary-fixed-variant": "#930000",
+            "on-tertiary-container": "#ffc18e",
+            "secondary-container": "#c8eaa9",
+            "on-secondary-container": "#4e6b36",
+            "on-secondary": "#ffffff",
+            "primary-fixed": "#ffdad4",
+            "inverse-surface": "#392e25",
+            "tertiary-fixed": "#ffdcc1",
+            "surface-container-lowest": "#ffffff",
+            "surface-variant": "#f2dfd1",
+            "on-secondary-fixed": "#0c2000",
+            "outline-variant": "#e4beb8",
+            "primary": "#870000",
+            "on-tertiary-fixed": "#2e1500",
+            "on-background": "#231a11",
+            "surface-tint": "#b91d12",
+            "error": "#ba1a1a",
+            "outline": "#906f6a",
+            "on-tertiary": "#ffffff",
+            "on-tertiary-fixed-variant": "#6c3a00",
+            "on-error-container": "#93000a",
+            "on-error": "#ffffff",
+            "surface-container-low": "#fff1e8",
+            "error-container": "#ffdad6",
+            "inverse-on-surface": "#ffeee1",
+            "on-surface-variant": "#5b403c",
+            "tertiary-container": "#844800",
+            "secondary-fixed-dim": "#afd192",
+            "background": "#fff8f5",
+            "tertiary-fixed-dim": "#ffb779",
+            "on-secondary-fixed-variant": "#334e1d",
+            "primary-container": "#af140b",
+            "on-primary": "#ffffff",
+            "inverse-primary": "#ffb4a8",
+            "surface-container": "#feeadc",
+            "on-primary-fixed": "#410000",
+            "surface-container-high": "#f8e5d6",
+            "secondary": "#4a6633",
+            "on-surface": "#231a11"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "margin": "3rem",
+            "gutter-mobile": "1rem",
+            "space-xl": "2.5rem",
+            "space-lg": "1.5rem",
+            "space-sm": "0.5rem",
+            "gutter": "1.5rem",
+            "space-md": "1rem",
+            "space-xxl": "4rem",
+            "margin-mobile": "1.25rem",
+            "space-xs": "0.25rem"
+          },
+          "fontFamily": {
+            "label-sm": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "body-sm": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "headline-sm": ["Playfair Display"],
+            "headline-md": ["Playfair Display"],
+            "headline-lg": ["Playfair Display"],
+            "display-lg": ["Playfair Display"],
+            "headline-md-mobile": ["Playfair Display"],
+            "headline-lg-mobile": ["Playfair Display"],
+            "display-lg-mobile": ["Playfair Display"]
+          },
+          "fontSize": {
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "700" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "body-sm": ["13px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "body-md": ["15px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+            "headline-sm": ["22px", { "lineHeight": "28px", "fontWeight": "500" }],
+            "headline-md": ["32px", { "lineHeight": "40px", "fontWeight": "500" }],
+            "headline-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "display-lg": ["56px", { "lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    /* Warm sensory atmosphere without cluttered lines */
+    body {
+      background-color: #FDEDD7;
+      color: #231A11;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    
+    .touch-target {
+      min-height: 48px;
+    }
+    
+    /* Warm tactile card shadow: soft espresso tint, zero harsh borders */
+    .kds-card {
+      background-color: #FFF9F0;
+      box-shadow: 0 4px 20px -4px rgba(43, 33, 24, 0.05), 0 2px 6px -2px rgba(43, 33, 24, 0.03);
+      transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease;
+    }
+    .kds-card:active {
+      transform: scale(0.995);
+    }
+
+    /* Ambient pulse on urgent cooking table */
+    @keyframes subtle-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.55; }
+    }
+    .amber-dot-pulse {
+      animation: subtle-pulse 2s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col font-body-md text-on-surface select-none">
+<!-- ================= TOP KITCHEN MONITOR HEADER ================= -->
+<header class="sticky top-0 z-40 bg-[#FFF9F0]/95 backdrop-blur-md px-6 md:px-12 py-4 shadow-[0_4px_24px_-8px_rgba(43,33,24,0.06)]">
+<div class="max-w-[1720px] mx-auto flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+<!-- Brand & Kitchen Station Context -->
+<div class="flex items-center gap-6">
+<div>
+<div class="flex items-center gap-3">
+<span class="text-headline-sm font-headline-sm tracking-tight text-primary font-semibold">L'Épicure</span>
+<span class="text-on-surface-variant font-light text-body-sm tracking-widest">•</span>
+<span class="font-label-lg text-label-lg text-tertiary-container tracking-wider uppercase font-semibold">Bếp Trưởng &amp; KDS Monitor</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 flex items-center gap-2">
+<span class="inline-block w-2 h-2 rounded-full bg-secondary amber-dot-pulse"></span>
+<span>Bếp Chính Michelin Service • Đang đồng bộ thời gian thực</span>
+<span class="text-outline-variant font-light">|</span>
+<span class="font-medium text-on-surface" id="live-clock">19:42:15</span>
+</p>
+</div>
+</div>
+<!-- Minimal 3-Metric Pulse (Clean, Uncluttered, Large Typography) -->
+<div class="flex items-center gap-8 py-1 px-5 rounded-2xl bg-surface-container-low">
+<!-- Metric 1: Pending Orders -->
+<div class="flex items-center gap-3 cursor-pointer" onclick="highlightColumn('col-pending')">
+<div class="w-10 h-10 rounded-xl bg-primary-fixed flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]" data-icon="restaurant">restaurant</span>
+</div>
+<div>
+<div class="text-[22px] font-bold text-primary font-headline-sm leading-none" id="count-pending">03</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mt-0.5 tracking-wide">Chờ duyệt</div>
+</div>
+</div>
+<div class="w-px h-8 bg-surface-variant"></div>
+<!-- Metric 2: Cooking Items -->
+<div class="flex items-center gap-3 cursor-pointer" onclick="highlightColumn('col-cooking')">
+<div class="w-10 h-10 rounded-xl bg-secondary-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[22px]" data-icon="skillet">skillet</span>
+</div>
+<div>
+<div class="text-[22px] font-bold text-secondary font-headline-sm leading-none" id="count-cooking">07 món</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mt-0.5 tracking-wide">Đang nấu</div>
+</div>
+</div>
+<div class="w-px h-8 bg-surface-variant"></div>
+<!-- Metric 3: Ready to Serve Dishes -->
+<div class="flex items-center gap-3 cursor-pointer" onclick="highlightColumn('col-ready')">
+<div class="w-10 h-10 rounded-xl bg-tertiary-fixed flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-[22px]" data-icon="room_service">room_service</span>
+</div>
+<div>
+<div class="text-[22px] font-bold text-tertiary font-headline-sm leading-none" id="count-ready">02 đĩa</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mt-0.5 tracking-wide">Sẵn sàng ra bàn</div>
+</div>
+</div>
+</div>
+<!-- Station Filter Tabs (Quiet Luxury Text Minimalist Pill) -->
+<div class="flex items-center gap-1 overflow-x-auto pb-1 lg:pb-0">
+<button class="station-tab px-4 py-2 rounded-xl font-label-md text-label-md font-semibold transition-all bg-primary text-on-primary shadow-sm" onclick="setFilter(this, 'all')">
+          Tất cả
+        </button>
+<button class="station-tab px-4 py-2 rounded-xl font-label-md text-label-md font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" onclick="setFilter(this, 'hot')">
+          Bếp Nóng
+        </button>
+<button class="station-tab px-4 py-2 rounded-xl font-label-md text-label-md font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" onclick="setFilter(this, 'cold')">
+          Bếp Lạnh
+        </button>
+<button class="station-tab px-4 py-2 rounded-xl font-label-md text-label-md font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" onclick="setFilter(this, 'pastry')">
+          Tráng Miệng
+        </button>
+<button class="station-tab px-4 py-2 rounded-xl font-label-md text-label-md font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" onclick="setFilter(this, 'bar')">
+          Bar &amp; Rượu
+        </button>
+</div>
+</div>
+</header>
+<!-- ================= MAIN WORKSPACE: 3 KANBAN COLUMNS ================= -->
+<main class="flex-1 max-w-[1720px] w-full mx-auto p-6 md:p-8">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+<!-- ========================================== -->
+<!-- CỘT 1: CHỜ TIẾP NHẬN (PENDING QUEUE)       -->
+<!-- ========================================== -->
+<section class="flex flex-col gap-5" id="col-pending">
+<!-- Column Header -->
+<div class="flex items-center justify-between pb-2 px-1">
+<div class="flex items-center gap-3">
+<span class="w-3 h-3 rounded-full bg-primary-container"></span>
+<h2 class="font-headline-sm text-headline-sm font-semibold tracking-tight text-on-surface">Chờ Tiếp Nhận</h2>
+<span class="px-2.5 py-0.5 rounded-full bg-primary-fixed text-primary font-label-sm text-label-sm font-bold">3 đơn</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Ưu tiên theo giờ gọi</span>
+</div>
+<!-- TICKET 1: Bàn T-08 Ban Công (Có cảnh báo dị ứng) -->
+<article class="kds-card rounded-2xl p-6 flex flex-col justify-between" id="ticket-pending-1">
+<div>
+<!-- Header Ticket: Bàn & Giờ -->
+<div class="flex items-baseline justify-between">
+<div>
+<span class="font-headline-md text-headline-md font-semibold text-primary tracking-tight">Bàn T-08</span>
+<span class="font-body-md text-body-md text-on-surface-variant ml-2 font-medium">Ban Công Hoàng Hôn</span>
+</div>
+<div class="flex items-center gap-1.5 text-[#FD8F00] font-semibold text-label-md font-label-md">
+<span class="material-symbols-outlined text-[18px]" data-icon="schedule">schedule</span>
+<span>7 phút trước</span>
+</div>
+</div>
+<!-- Phục vụ & Ghi chú khách -->
+<div class="mt-2 text-body-sm font-body-sm text-on-surface-variant">
+              Phục vụ: <strong class="font-medium text-on-surface">Antoine Lâm</strong> • Khách: 04 người
+            </div>
+<!-- Cảnh Báo Dị Ứng Tinh Tế (Bản sắc Fine Dining) -->
+<div class="mt-4 p-3.5 rounded-xl bg-[#FDEDD7] border-l-4 border-primary flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5" data-icon="warning">warning</span>
+<div>
+<span class="font-label-md text-label-md uppercase tracking-wider text-primary font-bold">Lưu ý dị ứng nghiêm trọng:</span>
+<p class="font-body-md text-body-md text-on-surface font-semibold mt-0.5">Khách dị ứng tiêu sọ &amp; hàu sống (Bếp dùng tiêu đen hạt xay riêng biệt)</p>
+</div>
+</div>
+<!-- Danh sách món đặt (Typography rõ ràng đọc từ xa) -->
+<div class="mt-5 space-y-3.5">
+<div class="flex items-start justify-between">
+<div>
+<p class="font-headline-sm text-headline-sm font-medium text-on-surface">2× Thịt Cừu Nướng Xốt Lá Xạ Hương</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Độ chín: Medium Rare (54°C) • Khoai tây nghiền nấm truffle</p>
+</div>
+<span class="font-label-md text-label-md text-tertiary font-medium">Bếp Nóng</span>
+</div>
+<div class="w-full h-px bg-surface-container"></div>
+<div class="flex items-start justify-between">
+<div>
+<p class="font-headline-sm text-headline-sm font-medium text-on-surface">1× Salad Cua Tuyết &amp; Trứng Cá Tầm</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Xốt kem chua bưởi hồng • KHÔNG tiêu sọ</p>
+</div>
+<span class="font-label-md text-label-md text-secondary font-medium">Bếp Lạnh</span>
+</div>
+<div class="w-full h-px bg-surface-container"></div>
+<div class="flex items-start justify-between">
+<div>
+<p class="font-headline-sm text-headline-sm font-medium text-on-surface">1× Súp Nấm Rừng Truffle Đen</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Bánh mì brioche bơ tỏi ăn kèm</p>
+</div>
+<span class="font-label-md text-label-md text-tertiary font-medium">Bếp Nóng</span>
+</div>
+</div>
+</div>
+<!-- One-Touch Primary CTA -->
+<div class="mt-6 pt-4 border-t border-surface-container flex items-center justify-between gap-4">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Ticket #2081</span>
+<button class="touch-target px-6 py-3 rounded-xl bg-primary-container hover:bg-primary text-on-primary font-label-lg text-label-lg font-semibold flex items-center gap-2 transition-all shadow-[0_6px_20px_rgba(175,20,11,0.25)] active:scale-95" onclick="acceptOrder('ticket-pending-1', 'Bàn T-08 Ban Công')">
+<span class="material-symbols-outlined text-[20px]" data-icon="check_circle">check_circle</span>
+<span>Nhận nấu đơn này</span>
+</button>
+</div>
+</article>
+<!-- TICKET 2: Bàn VIP Bordeaux -->
+<article class="kds-card rounded-2xl p-6 flex flex-col justify-between" id="ticket-pending-2">
+<div>
+<div class="flex items-baseline justify-between">
+<div>
+<span class="font-headline-md text-headline-md font-semibold text-primary tracking-tight">Bàn VIP Bordeaux</span>
+<span class="font-body-md text-body-md text-on-surface-variant ml-2 font-medium">Phòng Riêng Lầu 2</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant font-medium text-label-md font-label-md">
+<span class="material-symbols-outlined text-[18px]" data-icon="schedule">schedule</span>
+<span>3 phút trước</span>
+</div>
+</div>
+<div class="mt-2 text-body-sm font-body-sm text-on-surface-variant">
+              Phục vụ: <strong class="font-medium text-on-surface">Sommelier Jean-Paul</strong> • Khách: 06 người VIP
+            </div>
+<!-- Danh sách món -->
+<div class="mt-5 space-y-3.5">
+<div class="flex items-start justify-between">
+<div>
+<p class="font-headline-sm text-headline-sm font-medium text-on-surface">2× Bò Wagyu A5 Áp Chảo Xốt Rượu Vang</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Độ chín: Medium • Yêu cầu dao thái riêng</p>
+</div>
+<span class="font-label-md text-label-md text-tertiary font-medium">Bếp Nóng</span>
+</div>
+<div class="w-full h-px bg-surface-container"></div>
+<div class="flex items-start justify-between">
+<div>
+<p class="font-headline-sm text-headline-sm font-medium text-on-surface">1× Gan Ngỗng Áp Chảo Quả Vả Caramélisé</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Bánh mì brioche nướng nóng</p>
+</div>
+<span class="font-label-md text-label-md text-tertiary font-medium">Bếp Nóng</span>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-surface-container flex items-center justify-between gap-4">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Ticket #2082</span>
+<button class="touch-target px-6 py-3 rounded-xl bg-primary-container hover:bg-primary text-on-primary font-label-lg text-label-lg font-semibold flex items-center gap-2 transition-all shadow-[0_6px_20px_rgba(175,20,11,0.25)] active:scale-95" onclick="acceptOrder('ticket-pending-2', 'Bàn VIP Bordeaux')">
+<span class="material-symbols-outlined text-[20px]" data-icon="check_circle">check_circle</span>
+<span>Nhận nấu đơn này</span>
+</button>
+</div>
+</article>
+<!-- TICKET 3: Bàn C-02 Sân Vườn -->
+<article class="kds-card rounded-2xl p-6 flex flex-col justify-between" id="ticket-pending-3">
+<div>
+<div class="flex items-baseline justify-between">
+<div>
+<span class="font-headline-md text-headline-md font-semibold text-on-surface tracking-tight">Bàn C-02</span>
+<span class="font-body-md text-body-md text-on-surface-variant ml-2 font-medium">Sân Vườn Lãng Mạn</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant font-medium text-label-md font-label-md">
+<span class="material-symbols-outlined text-[18px]" data-icon="schedule">schedule</span>
+<span>Vừa gọi</span>
+</div>
+</div>
+<div class="mt-2 text-body-sm font-body-sm text-on-surface-variant">
+              Phục vụ: <strong class="font-medium text-on-surface">Mai Thu Thảo</strong> • Khách: 02 người (Kỷ niệm ngày cưới)
+            </div>
+<div class="mt-5 space-y-3.5">
+<div class="flex items-start justify-between">
+<div>
+<p class="font-headline-sm text-headline-sm font-medium text-on-surface">2× Ức Vịt Nướng Sốt Cam Tươi &amp; Hương Thảo</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Da giòn đều • Củ cải đỏ baby ngâm rượu</p>
+</div>
+<span class="font-label-md text-label-md text-tertiary font-medium">Bếp Nóng</span>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-surface-container flex items-center justify-between gap-4">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Ticket #2083</span>
+<button class="touch-target px-6 py-3 rounded-xl bg-primary-container hover:bg-primary text-on-primary font-label-lg text-label-lg font-semibold flex items-center gap-2 transition-all shadow-[0_6px_20px_rgba(175,20,11,0.25)] active:scale-95" onclick="acceptOrder('ticket-pending-3', 'Bàn C-02 Sân Vườn')">
+<span class="material-symbols-outlined text-[20px]" data-icon="check_circle">check_circle</span>
+<span>Nhận nấu đơn này</span>
+</button>
+</div>
+</article>
+</section>
+<!-- ========================================== -->
+<!-- CỘT 2: ĐANG CHẾ BIẾN (IN PREPARATION)       -->
+<!-- ========================================== -->
+<section class="flex flex-col gap-5" id="col-cooking">
+<!-- Column Header -->
+<div class="flex items-center justify-between pb-2 px-1">
+<div class="flex items-center gap-3">
+<span class="w-3 h-3 rounded-full bg-secondary"></span>
+<h2 class="font-headline-sm text-headline-sm font-semibold tracking-tight text-on-surface">Đang Chế Biến</h2>
+<span class="px-2.5 py-0.5 rounded-full bg-secondary-container text-secondary font-label-sm text-label-sm font-bold">3 đơn (7 món)</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Kiểm soát nhiệt &amp; thời gian</span>
+</div>
+<!-- COOKING CARD 1: Bàn T-04 Quầy Chef Table -->
+<article class="kds-card rounded-2xl p-6 flex flex-col justify-between" id="ticket-cooking-1">
+<div>
+<div class="flex items-baseline justify-between">
+<div>
+<span class="font-headline-md text-headline-md font-semibold text-secondary tracking-tight">Bàn Chef-01</span>
+<span class="font-body-md text-body-md text-on-surface-variant ml-2 font-medium">Bếp Mở Trực Tiếp</span>
+</div>
+<div class="flex items-center gap-1.5 text-secondary font-semibold text-label-md font-label-md">
+<span class="material-symbols-outlined text-[18px]" data-icon="timer">timer</span>
+<span>Đã nấu 12 phút</span>
+</div>
+</div>
+<div class="mt-2 text-body-sm font-body-sm text-on-surface-variant">
+              Phục vụ: <strong class="font-medium text-on-surface">Bếp Phó Hoàng Nam</strong> • Khách: 02 người
+            </div>
+<!-- Items With Clear Cooking Status -->
+<div class="mt-5 space-y-4">
+<!-- Dish 1: Thăn bò Rossini -->
+<div class="p-3.5 rounded-xl bg-surface-container-low flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm font-medium text-on-surface">Thăn Bò Rossini &amp; Foie Gras</span>
+<span class="px-2.5 py-1 rounded-lg bg-[#FDEDD7] text-primary font-label-sm text-label-sm font-bold">Đã áp chảo 62°C</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Đang nghỉ thịt (rest) trong lò ấm 3 phút trước khi lên đĩa</p>
+<!-- Mini Progress Bar -->
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full w-4/5"></div>
+</div>
+</div>
+<!-- Dish 2: Tôm hùm bỏ lò -->
+<div class="p-3.5 rounded-xl bg-surface-container-low flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm font-medium text-on-surface">Tôm Hùm Nha Trang Đút Lò Bơ Tỏi</span>
+<span class="px-2.5 py-1 rounded-lg bg-[#FDEDD7] text-[#FD8F00] font-label-sm text-label-sm font-bold">Còn 3 phút</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Nướng vàng bề mặt pho-mát Gruyère</p>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+<div class="bg-[#FD8F00] h-full rounded-full w-2/3"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- One-Touch Ready CTA -->
+<div class="mt-6 pt-4 border-t border-surface-container flex items-center justify-between gap-4">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Line Bếp Nóng #1</span>
+<button class="touch-target px-6 py-3 rounded-xl bg-secondary hover:opacity-90 text-on-secondary font-label-lg text-label-lg font-semibold flex items-center gap-2 transition-all shadow-[0_6px_20px_rgba(60,88,38,0.25)] active:scale-95" onclick="finishOrder('ticket-cooking-1', 'Bàn Chef-01', 'Thăn Bò Rossini &amp; Tôm Hùm')">
+<span class="material-symbols-outlined text-[20px]" data-icon="done_all">done_all</span>
+<span>Xong món / Báo phục vụ</span>
+</button>
+</div>
+</article>
+<!-- COOKING CARD 2: Bàn T-12 Sảnh Chính -->
+<article class="kds-card rounded-2xl p-6 flex flex-col justify-between" id="ticket-cooking-2">
+<div>
+<div class="flex items-baseline justify-between">
+<div>
+<span class="font-headline-md text-headline-md font-semibold text-secondary tracking-tight">Bàn T-12</span>
+<span class="font-body-md text-body-md text-on-surface-variant ml-2 font-medium">Sảnh Pha Lê</span>
+</div>
+<div class="flex items-center gap-1.5 text-secondary font-semibold text-label-md font-label-md">
+<span class="material-symbols-outlined text-[18px]" data-icon="timer">timer</span>
+<span>Đã nấu 8 phút</span>
+</div>
+</div>
+<div class="mt-2 text-body-sm font-body-sm text-on-surface-variant">
+              Phục vụ: <strong class="font-medium text-on-surface">Trần Khánh</strong> • Khách: 04 người
+            </div>
+<div class="mt-5 space-y-4">
+<!-- Dish: Tráng miệng Mille-Feuille -->
+<div class="p-3.5 rounded-xl bg-surface-container-low flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm font-medium text-on-surface">Bánh Mille-Feuille Vani Bourbon</span>
+<span class="px-2.5 py-1 rounded-lg bg-surface-container text-tertiary-container font-label-sm text-label-sm font-bold">Đang decor đĩa</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Phủ vàng lá 24k và kem diplomat vani Madagascar</p>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full w-11/12"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-surface-container flex items-center justify-between gap-4">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Line Bánh Ngọt</span>
+<button class="touch-target px-6 py-3 rounded-xl bg-secondary hover:opacity-90 text-on-secondary font-label-lg text-label-lg font-semibold flex items-center gap-2 transition-all shadow-[0_6px_20px_rgba(60,88,38,0.25)] active:scale-95" onclick="finishOrder('ticket-cooking-2', 'Bàn T-12', 'Bánh Mille-Feuille Vani')">
+<span class="material-symbols-outlined text-[20px]" data-icon="done_all">done_all</span>
+<span>Xong món / Báo phục vụ</span>
+</button>
+</div>
+</article>
+<!-- COOKING CARD 3: Bàn R-05 Hầm Rượu -->
+<article class="kds-card rounded-2xl p-6 flex flex-col justify-between" id="ticket-cooking-3">
+<div>
+<div class="flex items-baseline justify-between">
+<div>
+<span class="font-headline-md text-headline-md font-semibold text-secondary tracking-tight">Bàn R-05</span>
+<span class="font-body-md text-body-md text-on-surface-variant ml-2 font-medium">Hầm Rượu Cổ</span>
+</div>
+<div class="flex items-center gap-1.5 text-secondary font-semibold text-label-md font-label-md">
+<span class="material-symbols-outlined text-[18px]" data-icon="timer">timer</span>
+<span>Đã nấu 5 phút</span>
+</div>
+</div>
+<div class="mt-2 text-body-sm font-body-sm text-on-surface-variant">
+              Phục vụ: <strong class="font-medium text-on-surface">Lê Quang</strong> • Khách: 02 người
+            </div>
+<div class="mt-5 space-y-4">
+<div class="p-3.5 rounded-xl bg-surface-container-low flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm font-medium text-on-surface">Cá Tuyết Nam Cực Hấp Dầu Oliu &amp; Nghệ Tây</span>
+<span class="px-2.5 py-1 rounded-lg bg-[#FDEDD7] text-[#FD8F00] font-label-sm text-label-sm font-bold">Còn 4 phút</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Hấp nhiệt độ thấp 68°C giữ độ ẩm sớ thịt cá</p>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+<div class="bg-[#FD8F00] h-full rounded-full w-3/5"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-surface-container flex items-center justify-between gap-4">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Line Bếp Cá</span>
+<button class="touch-target px-6 py-3 rounded-xl bg-secondary hover:opacity-90 text-on-secondary font-label-lg text-label-lg font-semibold flex items-center gap-2 transition-all shadow-[0_6px_20px_rgba(60,88,38,0.25)] active:scale-95" onclick="finishOrder('ticket-cooking-3', 'Bàn R-05', 'Cá Tuyết Nam Cực Hấp')">
+<span class="material-symbols-outlined text-[20px]" data-icon="done_all">done_all</span>
+<span>Xong món / Báo phục vụ</span>
+</button>
+</div>
+</article>
+</section>
+<!-- ========================================== -->
+<!-- CỘT 3: SẴN SÀNG RA BÀN (READY TO SERVE)    -->
+<!-- ========================================== -->
+<section class="flex flex-col gap-5" id="col-ready">
+<!-- Column Header -->
+<div class="flex items-center justify-between pb-2 px-1">
+<div class="flex items-center gap-3">
+<span class="w-3 h-3 rounded-full bg-tertiary-container"></span>
+<h2 class="font-headline-sm text-headline-sm font-semibold tracking-tight text-on-surface">Sẵn Sàng Ra Bàn</h2>
+<span class="px-2.5 py-0.5 rounded-full bg-tertiary-fixed text-tertiary font-label-sm text-label-sm font-bold">2 đơn</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Chờ Runner &amp; Phục vụ nhận</span>
+</div>
+<!-- READY TICKET 1: Bàn VIP Champagne -->
+<article class="kds-card rounded-2xl p-6 flex flex-col justify-between" id="ticket-ready-1">
+<div>
+<div class="flex items-baseline justify-between">
+<div>
+<span class="font-headline-md text-headline-md font-semibold text-tertiary-container tracking-tight">Bàn VIP Lounge</span>
+<span class="font-body-md text-body-md text-on-surface-variant ml-2 font-medium">Khu Champagne Salon</span>
+</div>
+<div class="flex items-center gap-1.5 text-secondary font-semibold text-label-md font-label-md">
+<span class="material-symbols-outlined text-[18px]" data-icon="bell_ringing">notifications_active</span>
+<span>Đã rung chuông 1p</span>
+</div>
+</div>
+<!-- Waiter Card Pill -->
+<div class="mt-3.5 p-3 rounded-xl bg-surface-container flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-tertiary-fixed flex items-center justify-center text-tertiary font-bold text-label-md font-label-md">
+                  GH
+                </div>
+<div>
+<p class="font-label-md text-label-md font-bold text-on-surface">Gia Hân (Waiter phụ trách)</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Thiết bị mang: Beeper #04 đã rung</p>
+</div>
+</div>
+<button class="px-3 py-1.5 rounded-lg border border-tertiary/20 hover:bg-[#FDEDD7] text-tertiary font-label-sm text-label-sm font-medium transition-all" onclick="pingWaiter('Gia Hân')">
+                Nhắc lại
+              </button>
+</div>
+<!-- Completed Dishes Checklist -->
+<div class="mt-5 space-y-3">
+<div class="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-low">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="check_circle" data-weight="fill">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface font-medium">Bồ Câu Pháp Quay Ngũ Vị Xốt Rượu Port</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Nắp chuông bạc #01</span>
+</div>
+<div class="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-low">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="check_circle" data-weight="fill">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface font-medium">Rau Củ Non Hữu Cơ Hấp Bơ Thảo Mộc</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Nắp chuông bạc #02</span>
+</div>
+</div>
+</div>
+<!-- One-touch complete action -->
+<div class="mt-6 pt-4 border-t border-surface-container flex items-center justify-between gap-4">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Bàn đón món</span>
+<button class="touch-target px-6 py-3 rounded-xl bg-inverse-surface hover:bg-black text-inverse-on-surface font-label-lg text-label-lg font-semibold flex items-center gap-2 transition-all active:scale-95 shadow-sm" onclick="servedOrder('ticket-ready-1', 'Bàn VIP Lounge')">
+<span class="material-symbols-outlined text-[20px]" data-icon="restaurant_menu">restaurant_menu</span>
+<span>Đã phục vụ lên bàn</span>
+</button>
+</div>
+</article>
+<!-- READY TICKET 2: Bàn T-02 Cạnh Cửa Sổ -->
+<article class="kds-card rounded-2xl p-6 flex flex-col justify-between" id="ticket-ready-2">
+<div>
+<div class="flex items-baseline justify-between">
+<div>
+<span class="font-headline-md text-headline-md font-semibold text-tertiary-container tracking-tight">Bàn T-02</span>
+<span class="font-body-md text-body-md text-on-surface-variant ml-2 font-medium">Cửa Sổ Nhìn Ra Vườn</span>
+</div>
+<div class="flex items-center gap-1.5 text-secondary font-semibold text-label-md font-label-md">
+<span class="material-symbols-outlined text-[18px]" data-icon="schedule">schedule</span>
+<span>Sẵn sàng 2p trước</span>
+</div>
+</div>
+<div class="mt-3.5 p-3 rounded-xl bg-surface-container flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-secondary-fixed flex items-center justify-center text-secondary font-bold text-label-md font-label-md">
+                  TL
+                </div>
+<div>
+<p class="font-label-md text-label-md font-bold text-on-surface">Tuấn Linh (Waiter phụ trách)</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Đang bưng khay tại Pass Station</p>
+</div>
+</div>
+<button class="px-3 py-1.5 rounded-lg border border-tertiary/20 hover:bg-[#FDEDD7] text-tertiary font-label-sm text-label-sm font-medium transition-all" onclick="pingWaiter('Tuấn Linh')">
+                Nhắc lại
+              </button>
+</div>
+<div class="mt-5 space-y-3">
+<div class="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-low">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="check_circle" data-weight="fill">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface font-medium">Sò Điệp Hokkaido Áp Chảo Xốt Chanh Dây</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">2 phần hoàn thiện</span>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-surface-container flex items-center justify-between gap-4">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Bàn đón món</span>
+<button class="touch-target px-6 py-3 rounded-xl bg-inverse-surface hover:bg-black text-inverse-on-surface font-label-lg text-label-lg font-semibold flex items-center gap-2 transition-all active:scale-95 shadow-sm" onclick="servedOrder('ticket-ready-2', 'Bàn T-02')">
+<span class="material-symbols-outlined text-[20px]" data-icon="restaurant_menu">restaurant_menu</span>
+<span>Đã phục vụ lên bàn</span>
+</button>
+</div>
+</article>
+</section>
+</div>
+</main>
+<!-- ================= TACTILE FLOATING KITCHEN CONTROLS ================= -->
+<aside class="fixed bottom-6 right-8 z-30 flex items-center gap-3">
+<!-- Quick Recall Button -->
+<button class="touch-target px-4 py-3 rounded-2xl bg-surface-container-lowest text-on-surface font-label-md text-label-md font-semibold flex items-center gap-2 shadow-[0_8px_24px_-4px_rgba(43,33,24,0.12)] border border-[#FDEDD7] hover:bg-surface-container transition-all" onclick="undoLastAction()">
+<span class="material-symbols-outlined text-[20px]" data-icon="undo">undo</span>
+<span class="hidden sm:inline">Hoàn tác lệnh vừa rồi</span>
+</button>
+<!-- Sound Mute/Alert Toggle -->
+<button class="w-12 h-12 rounded-2xl bg-[#FFF9F0] text-secondary flex items-center justify-center shadow-[0_8px_24px_-4px_rgba(43,33,24,0.12)] border border-[#FDEDD7] hover:bg-surface-container-high transition-all" id="sound-btn" onclick="toggleAudio()" title="Âm thanh chuông báo order">
+<span class="material-symbols-outlined text-[22px]" data-icon="volume_up">volume_up</span>
+</button>
+</aside>
+<!-- Minimal Toast Notification for Kitchen Speed -->
+<div class="fixed top-24 left-1/2 -translate-x-1/2 z-50 transform -translate-y-12 opacity-0 pointer-events-none transition-all duration-300 bg-inverse-surface text-inverse-on-surface px-6 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 font-body-md text-body-md font-medium" id="kitchen-toast">
+<span class="material-symbols-outlined text-secondary-fixed text-[20px]" data-icon="notifications">notifications</span>
+<span id="toast-message">Đã nhận thông tin</span>
+</div>
+<!-- Vanilla JS for Micro-Interactions & Realtime KDS Feeling -->
+<script>
+    // Live Kitchen Clock
+    function updateClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      const el = document.getElementById('live-clock');
+      if (el) el.textContent = `${hours}:${minutes}:${seconds}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Toast Alert
+    function showToast(msg) {
+      const toast = document.getElementById('kitchen-toast');
+      const msgEl = document.getElementById('toast-message');
+      msgEl.textContent = msg;
+      toast.classList.remove('-translate-y-12', 'opacity-0', 'pointer-events-none');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.add('-translate-y-12', 'opacity-0', 'pointer-events-none');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 2500);
+    }
+
+    // Tab Filter
+    function setFilter(button, filter) {
+      document.querySelectorAll('.station-tab').forEach(b => {
+        b.className = 'station-tab px-4 py-2 rounded-xl font-label-md text-label-md font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all';
+      });
+      button.className = 'station-tab px-4 py-2 rounded-xl font-label-md text-label-md font-semibold transition-all bg-primary text-on-primary shadow-sm';
+      showToast(`Đã lọc view trạm: ${button.textContent.trim()}`);
+    }
+
+    // Kanban Actions: Accept order
+    function acceptOrder(ticketId, tableName) {
+      const ticket = document.getElementById(ticketId);
+      if (ticket) {
+        ticket.style.transform = 'scale(0.96)';
+        ticket.style.opacity = '0.4';
+        setTimeout(() => {
+          ticket.remove();
+          updateCounts();
+          showToast(`Đã chuyển ${tableName} sang Line Đang Chế Biến`);
+        }, 180);
+      }
+    }
+
+    // Finish order
+    function finishOrder(ticketId, tableName, dishName) {
+      const ticket = document.getElementById(ticketId);
+      if (ticket) {
+        ticket.style.transform = 'scale(0.96)';
+        ticket.style.opacity = '0.4';
+        setTimeout(() => {
+          ticket.remove();
+          updateCounts();
+          showToast(`Món [${dishName}] - ${tableName} đã xong! Chuông đã rung đến Waiter.`);
+        }, 180);
+      }
+    }
+
+    // Mark Served
+    function servedOrder(ticketId, tableName) {
+      const ticket = document.getElementById(ticketId);
+      if (ticket) {
+        ticket.style.transform = 'scale(0.96)';
+        ticket.style.opacity = '0.4';
+        setTimeout(() => {
+          ticket.remove();
+          updateCounts();
+          showToast(`Hoàn tất phục vụ cho ${tableName}`);
+        }, 180);
+      }
+    }
+
+    function pingWaiter(name) {
+      showToast(`Đã gửi tín hiệu chuông rung gấp đến ${name}`);
+    }
+
+    function undoLastAction() {
+      showToast('Đã khôi phục trạng thái order gần nhất');
+    }
+
+    let isMuted = false;
+    function toggleAudio() {
+      isMuted = !isMuted;
+      const btn = document.getElementById('sound-btn');
+      const icon = btn.querySelector('.material-symbols-outlined');
+      if (isMuted) {
+        icon.textContent = 'volume_off';
+        btn.classList.add('text-on-surface-variant');
+        btn.classList.remove('text-secondary');
+        showToast('Đã tắt chuông cảnh báo KDS');
+      } else {
+        icon.textContent = 'volume_up';
+        btn.classList.remove('text-on-surface-variant');
+        btn.classList.add('text-secondary');
+        showToast('Đã bật chuông cảnh báo âm thanh KDS');
+      }
+    }
+
+    function highlightColumn(colId) {
+      const col = document.getElementById(colId);
+      if (col) {
+        col.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    function updateCounts() {
+      const pendingCount = document.querySelectorAll('#col-pending article').length;
+      const cookingCount = document.querySelectorAll('#col-cooking article').length;
+      const readyCount = document.querySelectorAll('#col-ready article').length;
+
+      const pEl = document.getElementById('count-pending');
+      const cEl = document.getElementById('count-cooking');
+      const rEl = document.getElementById('count-ready');
+
+      if (pEl) pEl.textContent = `0${pendingCount}`;
+      if (cEl) cEl.textContent = `0${cookingCount} đơn`;
+      if (rEl) rEl.textContent = `0${readyCount} đĩa`;
+    }
+  </script>
+</body></html>

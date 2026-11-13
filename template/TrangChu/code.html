@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>L'Épicure | Tinh Hoa Ẩm Thực Pháp &amp; Á Đông Đương Đại</title>
+<!-- Google Fonts & Material Symbols -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Plus+Jakarta+Sans:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..400,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              cream: "#FBF7F2",
+              sand: "#F4ECE1",
+              ruby: "#AF140B",
+              'ruby-dark': "#870000",
+              moss: "#3C5826",
+              gold: "#D4AF37",
+              charcoal: "#231A11",
+              muted: "#7A6E65"
+            }
+          },
+          fontFamily: {
+            serif: ['"Playfair Display"', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    ::selection {
+      background-color: #AF140B;
+      color: #FFFFFF;
+    }
+  </style>
+</head>
+<body class="bg-[#FBF7F2] text-brand-charcoal font-sans antialiased selection:bg-brand-ruby selection:text-white">
+<!-- ==================== 1. MINIMAL LUXURY HEADER ==================== -->
+<header class="sticky top-0 z-50 backdrop-blur-md bg-[#FBF7F2]/90 border-b border-[#231A11]/5 transition-all">
+<div class="max-w-7xl mx-auto px-6 md:px-12 h-24 flex items-center justify-between">
+<!-- Brand Logo -->
+<a class="flex items-center gap-3.5 group" href="#">
+<span class="w-10 h-10 rounded-full border border-brand-ruby/30 text-brand-ruby flex items-center justify-center font-serif text-xl tracking-tight transition-transform group-hover:scale-105">
+          É
+        </span>
+<div class="flex flex-col">
+<span class="font-serif text-2xl tracking-[0.08em] font-medium text-brand-charcoal uppercase">
+            L'Épicure
+          </span>
+<span class="text-[10px] tracking-[0.25em] text-brand-muted uppercase -mt-0.5">Haute Gastronomie</span>
+</div>
+</a>
+<!-- Minimal Navigation Links -->
+<nav class="hidden md:flex items-center gap-10">
+<a class="text-xs uppercase tracking-[0.18em] text-brand-charcoal/80 hover:text-brand-ruby transition-colors duration-200" href="#menu">
+          Thực đơn
+        </a>
+<a class="text-xs uppercase tracking-[0.18em] text-brand-charcoal/80 hover:text-brand-ruby transition-colors duration-200" href="#khu-vuc">
+          Không gian
+        </a>
+<a class="text-xs uppercase tracking-[0.18em] text-brand-charcoal/80 hover:text-brand-ruby transition-colors duration-200" href="#triet-ly">
+          Triết lý ẩm thực
+        </a>
+<a class="text-xs uppercase tracking-[0.18em] text-brand-charcoal/80 hover:text-brand-ruby transition-colors duration-200" href="#lien-he">
+          Liên hệ
+        </a>
+</nav>
+<!-- Action -->
+<div class="flex items-center gap-6">
+<a class="hidden lg:flex items-center gap-2 text-xs tracking-wider text-brand-muted hover:text-brand-charcoal transition-colors" href="tel:02838228899">
+<span class="material-symbols-outlined text-base text-brand-moss">call</span>
+<span>028 3822 8899</span>
+</a>
+<a class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-brand-ruby bg-brand-ruby text-white text-xs uppercase tracking-widest hover:bg-brand-ruby-dark transition-all duration-300 hover:shadow-lg hover:shadow-brand-ruby/10" href="#booking-widget">
+<span>Đặt bàn</span>
+</a>
+</div>
+</div>
+</header>
+<main>
+<!-- ==================== 2. ARTISTIC HERO SECTION ==================== -->
+<section class="relative pt-12 pb-24 md:pt-20 md:pb-36 overflow-hidden">
+<div class="max-w-7xl mx-auto px-6 md:px-12">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+<!-- Text Content -->
+<div class="lg:col-span-6 space-y-8">
+<div class="flex items-center gap-3">
+<span class="h-px w-8 bg-brand-moss/60"></span>
+<span class="text-xs uppercase tracking-[0.25em] text-brand-moss font-medium">Michelin Selected Guide 2024</span>
+</div>
+<h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl text-brand-charcoal font-normal tracking-tight leading-[1.15]">
+              Vũ khúc ẩm thực <br/><span class="italic font-normal">Pháp &amp; Á Đông</span> đương đại
+            </h1>
+<p class="text-base sm:text-lg text-brand-muted font-light leading-relaxed max-w-xl">
+              Nơi mỹ vị Pháp cổ điển hòa quyện cùng tinh túy thảo mộc nhiệt đới bản địa. Một không gian yên bình tuyệt đối cho những tâm hồn thưởng ngoạn ẩm thực đích thực.
+            </p>
+<div class="pt-2 flex flex-wrap items-center gap-5">
+<a class="px-8 py-3.5 rounded-full bg-brand-ruby text-white text-xs uppercase tracking-[0.16em] hover:bg-brand-ruby-dark transition-all shadow-sm" href="#booking-widget">
+                Đặt bàn thưởng tiệc
+              </a>
+<a class="px-8 py-3.5 rounded-full border border-brand-charcoal/20 text-brand-charcoal text-xs uppercase tracking-[0.16em] hover:border-brand-charcoal transition-all" href="#menu">
+                Khám phá thực đơn
+              </a>
+</div>
+<div class="pt-8 border-t border-[#231A11]/10 flex items-center gap-6 text-brand-muted text-xs tracking-wider">
+<span>Bếp trưởng Laurent Vũ</span>
+<span class="w-1 h-1 rounded-full bg-brand-muted/40"></span>
+<span>Hầm rượu 500+ niên vụ</span>
+<span class="w-1 h-1 rounded-full bg-brand-muted/40"></span>
+<span class="text-brand-moss">100% Nguyên liệu hữu cơ</span>
+</div>
+</div>
+<!-- Artistic Single Visual Frame -->
+<div class="lg:col-span-6 relative">
+<div class="relative mx-auto aspect-[4/5] max-w-md lg:max-w-none rounded-2xl overflow-hidden shadow-2xl shadow-[#231A11]/5">
+<img class="w-full h-full object-cover transform duration-700 hover:scale-105" data-alt="A fine dining gourmet masterpiece featuring pan-seared duck breast with rich ruby red cherry port reduction sauce, golden edible gold leaf, micro herbs on an ivory stoneware plate. High-contrast culinary photography illuminated by warm candlelit ambiance with subtle amber reflections, representing luxury Parisian gastronomy." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhYsE_zsLcsBwmB7B7P2rEvIlwtoMugBSEBlP70MeAp6DX3R_xBF0H59jL0oEYRwYvSdx98XNuIoqlUejiy4uDYLv8KckHvcwE_LKtjn6SMs5wXuOX_FNs9JpaEWTUSEJHoEpMdwR_JWPlu-sGirGVujBZ4Frb2qFRDJbmmgrs-pxxSckpMQ-v02WZtbdNXIXRAL-UzjO5wySU0ntQl7xvQ81NxmnC2YXFsBjqf9k"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+<div class="absolute bottom-6 left-6 right-6 p-6 backdrop-blur-md bg-white/80 rounded-xl border border-white/60">
+<div class="flex justify-between items-baseline">
+<div>
+<span class="text-[10px] tracking-[0.2em] uppercase text-brand-moss font-semibold">Tuyệt tác khởi vị</span>
+<h4 class="font-serif text-lg text-brand-charcoal font-medium mt-0.5">Gan ngỗng Foie Gras Áp Chảo</h4>
+<p class="text-xs text-brand-muted mt-1 font-light">Sốt mâm xôi rừng &amp; brioche thủ công</p>
+</div>
+<span class="font-serif text-lg text-brand-ruby font-medium">690.000₫</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ==================== CAPSULE RESERVATION BAR ==================== -->
+<div class="mt-20 max-w-5xl mx-auto backdrop-blur-md bg-white/80 p-3 sm:p-4 rounded-2xl sm:rounded-full border border-brand-charcoal/10 shadow-lg shadow-[#231A11]/5" id="booking-widget">
+<form class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 items-center">
+<!-- Ngày -->
+<div class="px-5 py-2.5 rounded-full hover:bg-[#FBF7F2] transition-colors flex items-center gap-3">
+<span class="material-symbols-outlined text-brand-muted text-lg">calendar_today</span>
+<div class="flex-1">
+<label class="block text-[10px] uppercase tracking-wider text-brand-muted">Ngày dùng tiệc</label>
+<input class="w-full bg-transparent p-0 text-xs font-medium text-brand-charcoal border-none focus:ring-0 focus:outline-none" type="date" value="2024-11-20"/>
+</div>
+</div>
+<!-- Khung giờ -->
+<div class="px-5 py-2.5 rounded-full hover:bg-[#FBF7F2] transition-colors flex items-center gap-3 border-t sm:border-t-0 sm:border-l border-[#231A11]/5">
+<span class="material-symbols-outlined text-brand-muted text-lg">schedule</span>
+<div class="flex-1">
+<label class="block text-[10px] uppercase tracking-wider text-brand-muted">Khung giờ</label>
+<select class="w-full bg-transparent p-0 text-xs font-medium text-brand-charcoal border-none focus:ring-0 focus:outline-none">
+<option value="12:00">12:00 - Trưa thanh lịch</option>
+<option value="18:30">18:30 - Tiệc hoàng hôn</option>
+<option selected="" value="19:30">19:30 - Bữa tối ánh nến</option>
+<option value="20:30">20:30 - Dạ tiệc muộn</option>
+</select>
+</div>
+</div>
+<!-- Khách & Không gian -->
+<div class="px-5 py-2.5 rounded-full hover:bg-[#FBF7F2] transition-colors flex items-center gap-3 border-t lg:border-t-0 lg:border-l border-[#231A11]/5">
+<span class="material-symbols-outlined text-brand-muted text-lg">group</span>
+<div class="flex-1">
+<label class="block text-[10px] uppercase tracking-wider text-brand-muted">Số khách &amp; Khu vực</label>
+<select class="w-full bg-transparent p-0 text-xs font-medium text-brand-charcoal border-none focus:ring-0 focus:outline-none">
+<option selected="" value="2-main">2 Khách - Sảnh Hoàng Gia</option>
+<option value="4-garden">4 Khách - Vườn Thơ Mộng</option>
+<option value="6-vip">6-10 Khách - Salon Privé</option>
+</select>
+</div>
+</div>
+<!-- CTA -->
+<div class="p-1">
+<button class="w-full h-12 rounded-full bg-brand-ruby text-white text-xs uppercase tracking-widest hover:bg-brand-ruby-dark transition-all flex items-center justify-center gap-2" type="button">
+<span>Tìm bàn trống</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+</section>
+<!-- ==================== 3. ETHOS / PILLARS ==================== -->
+<section class="py-16 border-y border-[#231A11]/5 bg-white/40" id="triet-ly">
+<div class="max-w-7xl mx-auto px-6 md:px-12">
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 text-center md:text-left">
+<div class="space-y-2">
+<span class="text-xs uppercase tracking-[0.2em] text-brand-moss font-medium block">01 / Nguồn gốc</span>
+<h3 class="font-serif text-lg text-brand-charcoal font-medium">Hữu Cơ Thuần Khiết</h3>
+<p class="text-xs text-brand-muted leading-relaxed font-light">Nông sản tuyển chọn từ thung lũng Đà Lạt và nhập khẩu chính ngạch châu Âu.</p>
+</div>
+<div class="space-y-2">
+<span class="text-xs uppercase tracking-[0.2em] text-brand-moss font-medium block">02 / Đẳng cấp</span>
+<h3 class="font-serif text-lg text-brand-charcoal font-medium">Bếp Trưởng Michelin Star</h3>
+<p class="text-xs text-brand-muted leading-relaxed font-light">Hơn 18 năm dẫn dắt các nhà hàng danh giá tại kinh đô ẩm thực Paris.</p>
+</div>
+<div class="space-y-2">
+<span class="text-xs uppercase tracking-[0.2em] text-brand-moss font-medium block">03 / Thẩm vị</span>
+<h3 class="font-serif text-lg text-brand-charcoal font-medium">Hầm Vang 500+ Niên Vụ</h3>
+<p class="text-xs text-brand-muted leading-relaxed font-light">Tuyển tập Grand Cru Classé được bảo quản trong điều kiện lý tưởng chuẩn hầm Pháp.</p>
+</div>
+<div class="space-y-2">
+<span class="text-xs uppercase tracking-[0.2em] text-brand-moss font-medium block">04 / Tiêu chuẩn</span>
+<h3 class="font-serif text-lg text-brand-charcoal font-medium">Chứng Nhận Quốc Tế</h3>
+<p class="text-xs text-brand-muted leading-relaxed font-light">Đạt quy chuẩn vệ sinh HACCP và giám định an toàn thực phẩm nghiêm ngặt nhất.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- ==================== 4. CURATED MENU (MINIMAL & SPACIOUS) ==================== -->
+<section class="py-28 md:py-36" id="menu">
+<div class="max-w-7xl mx-auto px-6 md:px-12">
+<!-- Title & Subtitle -->
+<div class="max-w-2xl mx-auto text-center space-y-4 mb-20">
+<span class="text-xs uppercase tracking-[0.25em] text-brand-ruby font-medium block">Tuyệt tác tinh tuyển</span>
+<h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-brand-charcoal">
+            Dấu Ấn Ẩm Thực Mùa Này
+          </h2>
+<p class="text-sm sm:text-base text-brand-muted font-light leading-relaxed">
+            Mỗi món ăn là một khúc biến tấu tinh xảo giữa nguồn nguyên liệu trân quý và nghệ thuật chế biến chuẩn mực.
+          </p>
+</div>
+<!-- 3 Highlighted Dishes -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-14">
+<!-- Dish 1 -->
+<article class="group space-y-6">
+<div class="relative aspect-[4/3] overflow-hidden rounded-xl bg-[#231A11]/5">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Exquisite Wagyu A5 Miyazaki beef tenderloin steak sliced with deep marbling texture, served with black winter truffle shavings and glossy beef demi-glace on warm ceramic plate in a luxurious dining environment with warm amber candlelight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsYFcdmf1546aIQIPBGKdiZXTCAgiCuEunFkAbP56fPQw7yg3U-ToX5gXONN63yuoIHwLlhUDtuzz3ArMG2bBI3B-qYZvkCz_M3WNZTilu0hJHDqr_o9w3urza6uonk0ar_oy-0bzlj0eX3P8H59WKhcr2OaHnSSCFn7ImVjuH9PZVIlv-OC_pIuKAwSZAfQfOyzZhdzR7w4lusemRotxXgD1D7VYK6chS70JAvcE"/>
+<span class="absolute top-4 left-4 text-[10px] tracking-widest uppercase bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-brand-charcoal">Signature</span>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-baseline gap-4">
+<h3 class="font-serif text-xl text-brand-charcoal group-hover:text-brand-ruby transition-colors">
+                  Thăn Bò Wagyu A5 &amp; Truffle Đen
+                </h3>
+<span class="font-serif text-base text-brand-ruby font-medium whitespace-nowrap">1.850.000₫</span>
+</div>
+<p class="text-xs sm:text-sm text-brand-muted font-light leading-relaxed">
+                Bò Miyazaki áp chảo bơ thảo mộc, nấm truffles Périgord quý hiếm, khoai tây nghiền vị kem béo ngậy.
+              </p>
+</div>
+</article>
+<!-- Dish 2 -->
+<article class="group space-y-6">
+<div class="relative aspect-[4/3] overflow-hidden rounded-xl bg-[#231A11]/5">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Gourmet Brittany blue lobster tail arranged with golden saffron emulsion sauce, caviar pearls, and delicate micro-greens presented on an artisanal ivory dish with soft warm lighting in high end French dining style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDv_-ejrwv3DmSWIqi-23Eijz1qtkrHpn1NQSWQVRZIn8kg0UEM58QSncVFH95XbC8cB8KFoXWC3k4RW4dYSzDe1KuOYSGepsamel78bNw00Im2cLLek3ZCbNUgTAoim1DEifq2mm4lgYKZa1c_eLJz6viBx68drDdubMetz3joNDiau2CQQ3amDtsKUOZmZ1w3Kj9shvPUAwx7S97judITPdCcH01W4mTa-D9HqLk"/>
+<span class="absolute top-4 left-4 text-[10px] tracking-widest uppercase bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-brand-charcoal">Hải sản tươi sống</span>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-baseline gap-4">
+<h3 class="font-serif text-xl text-brand-charcoal group-hover:text-brand-ruby transition-colors">
+                  Tôm Hùm Xanh Brittany &amp; Nghệ Tây
+                </h3>
+<span class="font-serif text-base text-brand-ruby font-medium whitespace-nowrap">1.420.000₫</span>
+</div>
+<p class="text-xs sm:text-sm text-brand-muted font-light leading-relaxed">
+                Tôm hùm biển sâu chần bơ nhạt, sốt saffron Ba Tư thơm lừng cùng trứng cá tầm Oscietra thượng hạng.
+              </p>
+</div>
+</article>
+<!-- Dish 3 -->
+<article class="group space-y-6">
+<div class="relative aspect-[4/3] overflow-hidden rounded-xl bg-[#231A11]/5">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Pan-roasted wild Norwegian salmon fillet with crispy golden skin, asparagus spears, and citrus champagne veloute sauce served on handcrafted ceramic table setting with luxury wine glasses in a warm restaurant background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbyxpaH6dr7FXD3BBq5jbPFrOSmXDqAG-pvSrLTBJH-bCsoWMQgkoYa2Pg6Vm-vRiPKpyK4NsKx-9-DyzLqtNH2LNQEm6jWN5tbEGAM1fqH7XaBzRQbZV3qGFZqOrtE9EpwtnuqJPQ9DuEIaqOR5Z0ZbQ-bLqUNcG4jYN6dy5b19YurzpHGF-aw7E7qJ6dw8W16pQ7GuahPJOtkSjyjsnR4pcyscMQ4qw5R2FefJ8"/>
+<span class="absolute top-4 left-4 text-[10px] tracking-widest uppercase bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-brand-charcoal">Món chính</span>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-baseline gap-4">
+<h3 class="font-serif text-xl text-brand-charcoal group-hover:text-brand-ruby transition-colors">
+                  Cá Hồi Fjord Sốt Champagne Brut
+                </h3>
+<span class="font-serif text-base text-brand-ruby font-medium whitespace-nowrap">980.000₫</span>
+</div>
+<p class="text-xs sm:text-sm text-brand-muted font-light leading-relaxed">
+                Cá hồi Na Uy da giòn thịt mọng, sốt kem sâm panh Brut Imperial, măng tây xanh hữu cơ Đà Lạt.
+              </p>
+</div>
+</article>
+</div>
+<!-- Minimal Centered Link -->
+<div class="text-center mt-16">
+<a class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-brand-charcoal/80 hover:text-brand-ruby pb-1 border-b border-brand-charcoal/20 hover:border-brand-ruby transition-all" href="#booking-widget">
+<span>Tải về bảng thực đơn Degustation PDF</span>
+<span class="material-symbols-outlined text-sm">north_east</span>
+</a>
+</div>
+</div>
+</section>
+<!-- ==================== 5. ATMOSPHERE & DINING SPACES ==================== -->
+<section class="py-28 bg-[#F4ECE1]/60" id="khu-vuc">
+<div class="max-w-7xl mx-auto px-6 md:px-12">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+<div>
+<span class="text-xs uppercase tracking-[0.25em] text-brand-moss font-medium block">Không gian ẩm thực</span>
+<h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-brand-charcoal mt-2">
+              Chốn Riêng Tư Thanh Tịnh
+            </h2>
+</div>
+<p class="text-sm text-brand-muted max-w-md font-light leading-relaxed">
+            Thiết kế kiến trúc tôn vinh ánh sáng ấm, chất liệu gỗ mộc và sự yên tĩnh cần có của một bữa tiệc cao cấp.
+          </p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Space 1 -->
+<div class="bg-white/80 rounded-2xl overflow-hidden border border-[#231A11]/5 shadow-sm group">
+<div class="relative h-72 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Magnificent luxury restaurant grand main dining hall featuring warm crystal chandeliers, pristine white linen covered round dining tables, dark wood acoustic wall paneling, and warm candlelight reflections on polished wine glasses." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcPrvK5hNMa326PY1PNCX0eXUyBR0zuk_3M9jByaIlffqvF6SMZJG3YznprGUF4cYAYxfHs7nDglNqdQNFOy26ghlnWi7FExhLBXiYHvwlTjPTPMn-gUneieoiekwJqFGsZlO2svnUnbrTDfM-G37Kb76qoXSra7x2534zkEzVvCWLYw-sGmO_6HnQq-2-WrCkkDgUCb4jnHf-nwqEYHNtqXWgAooa64SSqHFRXTs"/>
+</div>
+<div class="p-8 space-y-3">
+<div class="flex items-center justify-between">
+<h3 class="font-serif text-xl text-brand-charcoal font-medium">Sảnh Hoàng Gia (Grand Hall)</h3>
+<span class="text-[11px] text-brand-muted tracking-wider">60 - 80 khách</span>
+</div>
+<p class="text-xs sm:text-sm text-brand-muted font-light leading-relaxed">
+                Đèn chùm pha lê Tiệp Khắc và âm hưởng thính phòng du dương cho những buổi dạ tiệc long trọng.
+              </p>
+<div class="pt-3">
+<a class="text-xs uppercase tracking-widest text-brand-ruby font-medium hover:underline" href="#booking-widget">Đặt bàn sảnh →</a>
+</div>
+</div>
+</div>
+<!-- Space 2 -->
+<div class="bg-white/80 rounded-2xl overflow-hidden border border-[#231A11]/5 shadow-sm group">
+<div class="relative h-72 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Intimate outdoor terrace courtyard garden dining setting surrounded by lush tropical greenery, climbing jasmine flowers, subtle warm amber bistro string lights and sleek dark iron bistro tables setting with wine decanters." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6gGD68cr8uDQ8MltQgRz95PR_LAz9PBKHoeamjF-nL282JwyBGQierW1mKvroE6zbx2woqBav8p8bMPfABBlVqJTxQoEodnOc3jiZb4DFk0-T0QV5Hx2QVPTQqf9E0_yyM_vBpg7V9mbr-KwIBLe40QQH1yHaz_AFaOc0nWCgnFbtW2ThOozFLfheNIBdboqDmveTLrudgy8kFB8zt9koZRKUt_PVy5zAvGIB5Fw"/>
+</div>
+<div class="p-8 space-y-3">
+<div class="flex items-center justify-between">
+<h3 class="font-serif text-xl text-brand-charcoal font-medium">Khu Vườn Thơ Mộng (Terrace)</h3>
+<span class="text-[11px] text-brand-muted tracking-wider">24 - 36 khách</span>
+</div>
+<p class="text-xs sm:text-sm text-brand-muted font-light leading-relaxed">
+                Khu vườn mở đón gió với hương hoa nhài thoang thoảng dưới ánh nến dịu êm của màn đêm Sài Gòn.
+              </p>
+<div class="pt-3">
+<a class="text-xs uppercase tracking-widest text-brand-ruby font-medium hover:underline" href="#booking-widget">Đặt bàn vườn →</a>
+</div>
+</div>
+</div>
+<!-- Space 3 -->
+<div class="bg-white/80 rounded-2xl overflow-hidden border border-[#231A11]/5 shadow-sm group">
+<div class="relative h-72 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Ultra-exclusive private dining VIP suite room with solid mahogany dining table, leather executive chairs, dedicated wine display cooler, contemporary abstract art on wall, and warm intimate lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5-LnsBlj4iutT-UjP4LvICAlZEEi0MLMKYGPADGfdyyJjPo1Hsp98yRNwJCY2KI_qvUd5qUY_DsADLG8PFHJGDiLocx-s7QR7KWkmIUu4ryUIbU3TeAwCFFY7x-Rg59Of1-tVwlsh1S3S2RCxpfj_xt1HdQyA_tvgTjv6mpVmBqrs0Q_j4kGfMxvHixeubIJ9excepyYpg4QMiGGif5Uhup2YyfLMT8CTeAj2Tj8"/>
+</div>
+<div class="p-8 space-y-3">
+<div class="flex items-center justify-between">
+<h3 class="font-serif text-xl text-brand-charcoal font-medium">Salon Privé (Phòng VIP)</h3>
+<span class="text-[11px] text-brand-muted tracking-wider">8 - 18 khách</span>
+</div>
+<p class="text-xs sm:text-sm text-brand-muted font-light leading-relaxed">
+                Riêng tư tuyệt đối với lối đi riêng, phục vụ bởi đội ngũ quản gia và Sommelier chuyên trách.
+              </p>
+<div class="pt-3">
+<a class="text-xs uppercase tracking-widest text-brand-ruby font-medium hover:underline" href="#booking-widget">Liên hệ giữ chỗ →</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ==================== 6. TESTIMONIALS (CLEAN & SUBTLE) ==================== -->
+<section class="py-24 max-w-7xl mx-auto px-6 md:px-12">
+<div class="max-w-3xl mx-auto text-center space-y-6">
+<span class="text-xs uppercase tracking-[0.25em] text-brand-gold font-medium block">Cảm nhận thực khách</span>
+<blockquote class="font-serif text-xl sm:text-2xl text-brand-charcoal leading-relaxed font-light italic">
+          "Một trải nghiệm hiếm hoi tại châu Á nơi hương vị tinh tế của ẩm thực cổ điển Pháp kết hợp hoàn mỹ đến từng giọt sốt với thảo mộc Việt Nam. Phong thái phục vụ chuẩn mực và êm đềm."
+        </blockquote>
+<div class="pt-2">
+<p class="text-xs uppercase tracking-[0.2em] text-brand-charcoal font-semibold">David Le</p>
+<p class="text-xs text-brand-muted mt-0.5">Food Critic &amp; Culinary Writer</p>
+</div>
+</div>
+</section>
+<!-- ==================== 7. ELEGANT BANQUET CTA ==================== -->
+<section class="py-24 bg-brand-charcoal text-white relative overflow-hidden">
+<div class="max-w-4xl mx-auto px-6 md:px-12 text-center space-y-8 relative z-10">
+<span class="text-xs uppercase tracking-[0.25em] text-brand-gold font-medium block">Đặt tiệc riêng &amp; Kỷ niệm</span>
+<h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-[#FBF7F2]">
+          Kiến Tạo Khoảnh Khắc Đáng Nhớ Cùng L'Épicure
+        </h2>
+<p class="text-sm sm:text-base text-[#FBF7F2]/70 font-light max-w-xl mx-auto leading-relaxed">
+          Từ dạ tiệc cầu hôn riêng tư đến các sự kiện ngoại giao cấp cao. Đội ngũ Concierge sẵn sàng thiết kế thực đơn độc bản theo ý niệm của quý khách.
+        </p>
+<div class="flex flex-wrap items-center justify-center gap-4 pt-4">
+<a class="px-8 py-3.5 rounded-full bg-brand-ruby text-white text-xs uppercase tracking-[0.16em] hover:bg-brand-ruby-dark transition-all" href="#booking-widget">
+            Đặt bàn trực tuyến
+          </a>
+<a class="px-8 py-3.5 rounded-full border border-white/20 text-[#FBF7F2] text-xs uppercase tracking-[0.16em] hover:bg-white/5 transition-all" href="tel:02838228899">
+            Hotline: 028 3822 8899
+          </a>
+</div>
+</div>
+</section>
+</main>
+<!-- ==================== 8. MINIMAL FOOTER ==================== -->
+<footer class="bg-[#18120C] text-[#FBF7F2]/70 border-t border-white/5" id="lien-he">
+<div class="max-w-7xl mx-auto px-6 md:px-12 py-20">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-12 pb-16 border-b border-white/10">
+<!-- Brand Info -->
+<div class="md:col-span-5 space-y-4">
+<div class="flex items-center gap-3">
+<span class="w-8 h-8 rounded-full border border-brand-ruby/40 text-brand-ruby flex items-center justify-center font-serif text-base">
+              É
+            </span>
+<span class="font-serif text-xl tracking-[0.1em] text-white uppercase">L'Épicure</span>
+</div>
+<p class="text-xs leading-relaxed text-[#FBF7F2]/60 max-w-sm font-light">
+            Nhà hàng ẩm thực cao cấp giao thoa giữa mỹ thuật ẩm thực Pháp cổ điển và thảo mộc Á Đông đương đại.
+          </p>
+</div>
+<!-- Links -->
+<div class="md:col-span-3 space-y-3 text-xs">
+<h4 class="text-white font-medium uppercase tracking-[0.15em] mb-4">Khám Phá</h4>
+<ul class="space-y-2.5 font-light">
+<li><a class="hover:text-white transition-colors" href="#triet-ly">Triết lý ẩm thực</a></li>
+<li><a class="hover:text-white transition-colors" href="#menu">Thực đơn Degustation</a></li>
+<li><a class="hover:text-white transition-colors" href="#khu-vuc">Hầm rượu Sommelier</a></li>
+<li><a class="hover:text-white transition-colors" href="#">Tiêu chuẩn an toàn ATTP</a></li>
+</ul>
+</div>
+<!-- Contact -->
+<div class="md:col-span-4 space-y-3 text-xs font-light">
+<h4 class="text-white font-medium uppercase tracking-[0.15em] mb-4">Địa Chỉ &amp; Liên Hệ</h4>
+<p>18 Đồng Khởi, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh</p>
+<p>Điện thoại: 028 3822 8899 • reservation@lepicure.vn</p>
+<p class="text-[#FBF7F2]/40 pt-2 text-[11px]">Giờ phục vụ: 11:30 - 14:30 | 18:00 - 23:00</p>
+</div>
+</div>
+<!-- Copyright -->
+<div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-[11px] text-[#FBF7F2]/40 gap-4">
+<p>© 2024 L'Épicure Gastronomie. Giữ toàn quyền bản quyền.</p>
+<div class="flex items-center gap-6">
+<a class="hover:text-white transition-colors" href="#">Điều khoản dịch vụ</a>
+<a class="hover:text-white transition-colors" href="#">Bảo mật thông tin</a>
+<span class="text-[#FBF7F2]/80">Tiếng Việt</span>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

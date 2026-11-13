@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>L'Épicure Gastronomie — Tài Khoản &amp; Lịch Sử Đặt Bàn</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Plus+Jakarta+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Theme Configuration -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary-fixed-dim": "#ffb4a8",
+            "secondary": "#4a6633",
+            "primary-container": "#af140b",
+            "tertiary": "#633500",
+            "inverse-primary": "#ffb4a8",
+            "surface-container-low": "#fff1e8",
+            "error": "#ba1a1a",
+            "on-tertiary": "#ffffff",
+            "on-secondary-fixed": "#0c2000",
+            "secondary-fixed-dim": "#afd192",
+            "surface-bright": "#fff8f5",
+            "on-surface-variant": "#5b403c",
+            "tertiary-container": "#844800",
+            "on-tertiary-fixed-variant": "#6c3a00",
+            "surface": "#fff8f5",
+            "outline": "#906f6a",
+            "on-secondary": "#ffffff",
+            "on-secondary-container": "#4e6b36",
+            "on-primary-container": "#ffbfb4",
+            "on-surface": "#231a11",
+            "on-primary-fixed": "#410000",
+            "background": "#fff8f5",
+            "secondary-fixed": "#cbedac",
+            "error-container": "#ffdad6",
+            "surface-dim": "#e9d7c8",
+            "outline-variant": "#e4beb8",
+            "surface-container-high": "#f8e5d6",
+            "inverse-surface": "#392e25",
+            "primary": "#870000",
+            "surface-container-lowest": "#ffffff",
+            "on-background": "#231a11",
+            "tertiary-fixed": "#ffdcc1",
+            "secondary-container": "#c8eaa9",
+            "on-secondary-fixed-variant": "#334e1d",
+            "on-error-container": "#93000a",
+            "on-tertiary-container": "#ffc18e",
+            "surface-container-highest": "#f2dfd1",
+            "on-primary-fixed-variant": "#930000",
+            "inverse-on-surface": "#ffeee1",
+            "primary-fixed": "#ffdad4",
+            "surface-tint": "#b91d12",
+            "on-error": "#ffffff",
+            "tertiary-fixed-dim": "#ffb779",
+            "surface-container": "#feeadc",
+            "surface-variant": "#f2dfd1",
+            "on-primary": "#ffffff",
+            "on-tertiary-fixed": "#2e1500"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-lg": "1.5rem",
+            "gutter-mobile": "1rem",
+            "space-sm": "0.5rem",
+            "space-xxl": "4rem",
+            "gutter": "1.5rem",
+            "space-xs": "0.25rem",
+            "margin-mobile": "1.25rem",
+            "space-md": "1rem",
+            "space-xl": "2.5rem",
+            "margin": "3rem"
+          },
+          "fontFamily": {
+            "display-lg": ["Playfair Display", "serif"],
+            "body-md": ["Plus Jakarta Sans", "sans-serif"],
+            "display-lg-mobile": ["Playfair Display", "serif"],
+            "headline-md-mobile": ["Playfair Display", "serif"],
+            "headline-sm": ["Playfair Display", "serif"],
+            "headline-lg": ["Playfair Display", "serif"],
+            "headline-md": ["Playfair Display", "serif"],
+            "body-lg": ["Plus Jakarta Sans", "sans-serif"],
+            "headline-lg-mobile": ["Playfair Display", "serif"],
+            "label-md": ["Plus Jakarta Sans", "sans-serif"],
+            "body-sm": ["Plus Jakarta Sans", "sans-serif"],
+            "label-sm": ["Plus Jakarta Sans", "sans-serif"],
+            "label-lg": ["Plus Jakarta Sans", "sans-serif"]
+          },
+          "fontSize": {
+            "display-lg": ["56px", { "lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-md": ["15px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "display-lg-mobile": ["38px", { "lineHeight": "46px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "headline-md-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "500" }],
+            "headline-sm": ["22px", { "lineHeight": "28px", "fontWeight": "500" }],
+            "headline-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "headline-md": ["32px", { "lineHeight": "40px", "fontWeight": "500" }],
+            "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+            "headline-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "body-sm": ["13px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "700" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .material-symbols-fill {
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased selection:bg-primary selection:text-white min-h-screen flex flex-col">
+<!-- ================= TOP NAVIGATION (Shared Component: TopNavBar) ================= -->
+<header class="bg-surface/95 dark:bg-inverse-surface/95 backdrop-blur-md docked full-width top-0 sticky z-50 shadow-[0_2px_8px_-2px_rgba(43,33,24,0.06)] dark:shadow-none">
+<div class="flex justify-between items-center w-full px-6 md:px-12 max-w-7xl mx-auto h-20">
+<!-- Brand Logo Anchor -->
+<a class="flex items-center gap-3 group" href="#">
+<span class="text-headline-md font-headline-md font-semibold text-primary dark:text-inverse-primary tracking-tight">L'Épicure</span>
+<span class="hidden sm:inline-block w-[1px] h-5 bg-outline-variant/60"></span>
+<span class="hidden sm:inline-block text-label-sm font-label-sm tracking-widest text-on-surface-variant uppercase">Haute Gastronomie</span>
+</a>
+<!-- Desktop Nav Links -->
+<nav class="hidden lg:flex items-center space-x-8">
+<a class="text-on-surface-variant dark:text-surface-variant transition-colors duration-200 hover:text-primary dark:hover:text-inverse-primary text-body-md font-body-md" href="#">Thực đơn</a>
+<a class="text-on-surface-variant dark:text-surface-variant transition-colors duration-200 hover:text-primary dark:hover:text-inverse-primary text-body-md font-body-md" href="#">Trải nghiệm</a>
+<a class="text-primary dark:text-inverse-primary font-semibold border-b-2 border-primary dark:border-inverse-primary pb-1 text-body-md font-body-md" href="#">Khu vực bàn</a>
+<a class="text-on-surface-variant dark:text-surface-variant transition-colors duration-200 hover:text-primary dark:hover:text-inverse-primary text-body-md font-body-md" href="#">Hầm rượu</a>
+<a class="text-on-surface-variant dark:text-surface-variant transition-colors duration-200 hover:text-primary dark:hover:text-inverse-primary text-body-md font-body-md" href="#">Liên hệ</a>
+</nav>
+<!-- Trailing Action Clusters -->
+<div class="flex items-center space-x-4 md:space-x-6">
+<!-- Icon Actions -->
+<button aria-label="Thông báo" class="text-on-surface-variant hover:text-primary transition-colors relative p-1.5 rounded-full hover:bg-surface-container" type="button">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<button aria-label="Giỏ chọn món" class="text-on-surface-variant hover:text-primary transition-colors p-1.5 rounded-full hover:bg-surface-container" type="button">
+<span class="material-symbols-outlined" data-icon="restaurant_menu">restaurant_menu</span>
+</button>
+<span class="w-[1px] h-6 bg-outline-variant/60 hidden md:block"></span>
+<!-- Secondary & Primary CTA -->
+<a class="hidden md:inline-flex items-center text-label-md font-label-md text-secondary border border-secondary/40 hover:bg-secondary/10 px-4 py-2 rounded-xl transition-colors" href="#">
+          Giỏ chọn món
+        </a>
+<a class="inline-flex items-center text-label-md font-label-md bg-primary-container text-white px-5 py-2.5 rounded-xl shadow-[0_4px_16px_rgba(175,20,11,0.2)] hover:bg-primary transition-all duration-150 active:scale-[0.99]" href="#">
+          Đặt bàn ngay
+        </a>
+<!-- User Profile Avatar -->
+<div class="relative pl-1">
+<div class="w-10 h-10 rounded-full ring-2 ring-primary/20 overflow-hidden bg-surface-container-high flex items-center justify-center cursor-pointer shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Sophisticated portrait of high-end epicurean patron Jean-Pierre Laurent seated in a dim warmly lit Michelin restaurant, wearing an impeccably tailored charcoal dinner jacket, ambient mahogany tones and glowing crystal glass in soft bokeh background with warm ivory cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAI3HNl86gOSHRgwO1tHDwT8LaKZQPfpCVYqovi5vwGWh_a5lZxpYq_dQuhuwaP93krRvNJXnnh2Zf6Wyh3YWG22o-fh4ZnA-STf6IKO-OofYIvQ6eZ0Vxdbj5xz7pxsfXEzy0pG-BXAEvjf3R3q6MYk5ZoTFRm3-ELVUaY1ou1m77RfCliw5cAkV6vaZmnreTxOPn67axgzyX-WEhtL_BI0PhraSEfAoHBytR6JiM"/>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- ================= MAIN CANVAS CONTENT ================= -->
+<main class="flex-grow max-w-7xl w-full mx-auto px-6 md:px-12 py-10 md:py-14 space-y-12">
+<!-- HERO EDITORIAL BANNER (VIP Profile Welcome) -->
+<section class="relative bg-surface-container-lowest rounded-2xl p-8 md:p-12 border border-primary/10 shadow-[0_4px_24px_-4px_rgba(43,33,24,0.06)] overflow-hidden">
+<!-- Ambient Atmospheric Glow -->
+<div class="absolute -right-20 -top-24 w-96 h-96 bg-primary-fixed-dim/20 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute right-48 -bottom-24 w-80 h-80 bg-secondary-fixed/25 rounded-full blur-2xl pointer-events-none"></div>
+<div class="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+<!-- Patron Identity & Salutation -->
+<div class="space-y-4 max-w-2xl">
+<div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FDD364]/25 border border-[#FDD364]/80 text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-tertiary-container material-symbols-fill" data-icon="stars" style="font-variation-settings: 'FILL' 1;">stars</span>
+<span class="text-label-sm font-label-sm tracking-wider uppercase text-tertiary font-bold">Thành Viên VIP Gold Club</span>
+</div>
+<h1 class="text-headline-lg font-headline-lg text-on-surface tracking-tight leading-tight">
+            Xin chào Quý khách, <span class="italic font-normal text-primary">Jean-Pierre Laurent</span>
+</h1>
+<p class="text-body-md font-body-md text-on-surface-variant max-w-xl">
+            Chào mừng ngài trở lại không gian ẩm thực riêng biệt. Tích lũy hiện tại: <strong class="text-on-surface font-semibold">350 điểm ẩm thực</strong>. Ngài luôn được áp dụng ưu đãi đặc quyền 5%, bàn ưu tiên hầm rượu &amp; sự đồng hành của Trưởng Sommelier.
+          </p>
+</div>
+<!-- Metric & VIP Privilege Badges -->
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-4 lg:gap-6 bg-surface-container-low/70 backdrop-blur-sm p-5 rounded-xl border border-outline-variant/30">
+<div class="space-y-1">
+<span class="text-label-sm font-label-sm text-on-surface-variant uppercase">Cấp Bậc Thẻ</span>
+<p class="text-headline-sm font-headline-sm text-tertiary font-semibold">Gold VIP</p>
+<span class="text-body-sm font-body-sm text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="verified">verified</span> Ưu đãi 5%
+            </span>
+</div>
+<div class="space-y-1">
+<span class="text-label-sm font-label-sm text-on-surface-variant uppercase">Điểm Ẩm Thực</span>
+<p class="text-headline-sm font-headline-sm text-primary font-semibold">350 <span class="text-body-sm font-body-sm text-on-surface-variant">pts</span></p>
+<span class="text-body-sm font-body-sm text-on-surface-variant">Hạn dùng 12/2025</span>
+</div>
+<div class="col-span-2 sm:col-span-1 space-y-1 border-t sm:border-t-0 sm:border-l border-outline-variant/40 pt-3 sm:pt-0 sm:pl-4">
+<span class="text-label-sm font-label-sm text-on-surface-variant uppercase">Bàn Tiệc Ưu Tiên</span>
+<p class="text-headline-sm font-headline-sm text-secondary font-semibold">Cấp 1</p>
+<span class="text-body-sm font-body-sm text-on-surface-variant">Tự động giữ chỗ</span>
+</div>
+</div>
+</div>
+</section>
+<!-- HORIZONTAL PILLS TAB NAVIGATION -->
+<nav aria-label="Chế độ xem tài khoản" class="flex items-center space-x-2 md:space-x-3 overflow-x-auto pb-2 border-b border-outline-variant/30">
+<!-- Active Pill -->
+<button class="px-6 py-3 rounded-full bg-primary text-white text-label-md font-label-md shadow-[0_4px_16px_rgba(175,20,11,0.25)] flex items-center gap-2 whitespace-nowrap transition-all duration-150">
+<span class="material-symbols-outlined text-[18px]" data-icon="calendar_month">calendar_month</span>
+        Lịch sử đặt bàn &amp; Gọi món
+      </button>
+<!-- Inactive Pills -->
+<button class="px-6 py-3 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-on-surface text-label-md font-label-md flex items-center gap-2 whitespace-nowrap border border-outline-variant/40 transition-colors duration-150">
+<span class="material-symbols-outlined text-[18px]" data-icon="receipt_long">receipt_long</span>
+        Hóa đơn điện tử VAT &amp; Tải PDF
+      </button>
+<button class="px-6 py-3 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-on-surface text-label-md font-label-md flex items-center gap-2 whitespace-nowrap border border-outline-variant/40 transition-colors duration-150">
+<span class="material-symbols-outlined text-[18px]" data-icon="person_edit">person_edit</span>
+        Hồ sơ khẩu vị &amp; Ghi chú dị ứng cá nhân
+      </button>
+</nav>
+<!-- MAIN TWO-COLUMN CONTENT GRID -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+<!-- ================= LEFT RAIL: BOOKING CARDS (8 Cols) ================= -->
+<section class="lg:col-span-8 space-y-6">
+<div class="flex items-center justify-between pb-2">
+<div>
+<h2 class="text-headline-sm font-headline-sm text-on-surface tracking-tight">Danh Sách Bàn Tiệc Đã Đặt</h2>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Tra cứu tiến trình thực đơn, thời gian đón tiếp và chỉ dẫn phòng tiệc.</p>
+</div>
+<span class="text-label-md font-label-md px-3 py-1 rounded-full bg-surface-container-high text-on-surface-variant">
+            3 Lượt Đặt Gần Nhất
+          </span>
+</div>
+<!-- ================= CARD 1: UPCOMING / ACTIVE (HIGHLIGHT) ================= -->
+<article class="bg-surface-container-lowest rounded-2xl p-6 md:p-8 border-2 border-primary/30 shadow-[0_8px_30px_rgba(43,33,24,0.08)] relative overflow-hidden transition-all duration-300 hover:shadow-[0_12px_36px_rgba(43,33,24,0.12)]">
+<!-- Ambient Ribbon Indicator -->
+<div class="absolute top-0 right-0">
+<span class="inline-flex items-center gap-1.5 px-4 py-1.5 bg-secondary text-white text-label-sm font-label-sm rounded-bl-xl tracking-wider uppercase font-semibold">
+<span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+              Đã xác nhận (Confirmed)
+            </span>
+</div>
+<!-- Card Header & Booking ID -->
+<div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-outline-variant/30 pb-5">
+<div>
+<span class="text-label-sm font-label-sm text-primary tracking-widest uppercase font-bold">Mã Đặt Chỗ</span>
+<h3 class="text-headline-sm font-headline-sm text-on-surface font-semibold tracking-tight">#BK-8829</h3>
+</div>
+<div class="text-left sm:text-right">
+<span class="text-label-md font-label-md text-on-surface-variant">Thời gian tiếp đón</span>
+<p class="text-body-lg font-body-lg text-primary font-bold flex items-center sm:justify-end gap-1.5">
+<span class="material-symbols-outlined text-[20px]" data-icon="schedule">schedule</span>
+                20:30 — Thứ Sáu, 25/10/2024
+              </p>
+</div>
+</div>
+<!-- Venue & Spatial Context -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 py-5 border-b border-outline-variant/30 bg-surface-container-low/40 -mx-6 md:-mx-8 px-6 md:px-8">
+<div class="flex items-start gap-3">
+<div class="p-2.5 rounded-xl bg-surface-container-lowest border border-outline-variant/40 text-primary">
+<span class="material-symbols-outlined" data-icon="meeting_room">meeting_room</span>
+</div>
+<div>
+<span class="text-label-sm font-label-sm text-on-surface-variant uppercase">Khu Vực Bàn</span>
+<p class="text-body-md font-body-md text-on-surface font-semibold">Phòng VIP Bordeaux</p>
+<span class="text-body-sm font-body-sm text-on-surface-variant">Lầu 2 — Tầm nhìn ban công</span>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="p-2.5 rounded-xl bg-surface-container-lowest border border-outline-variant/40 text-primary">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+</div>
+<div>
+<span class="text-label-sm font-label-sm text-on-surface-variant uppercase">Số Lượng Thực Khách</span>
+<p class="text-body-md font-body-md text-on-surface font-semibold">6 Quý khách</p>
+<span class="text-body-sm font-body-sm text-secondary">Bàn khánh tiết gia đình</span>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="p-2.5 rounded-xl bg-surface-container-lowest border border-outline-variant/40 text-primary">
+<span class="material-symbols-outlined" data-icon="wine_bar">wine_bar</span>
+</div>
+<div>
+<span class="text-label-sm font-label-sm text-on-surface-variant uppercase">Quản Lý Phục Vụ</span>
+<p class="text-body-md font-body-md text-on-surface font-semibold">Antoine Mercier</p>
+<span class="text-body-sm font-body-sm text-tertiary">Chuyên gia Sommelier</span>
+</div>
+</div>
+</div>
+<!-- Pre-ordered Courses & Sommelier Selections -->
+<div class="py-5 space-y-3">
+<div class="flex items-center justify-between">
+<span class="text-label-md font-label-md text-on-surface font-semibold uppercase tracking-wider flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-primary" data-icon="restaurant">restaurant</span>
+                Thực đơn &amp; Rượu vang đặt trước:
+              </span>
+<span class="text-label-sm font-label-sm text-secondary font-medium">Bếp trưởng đã ghi nhận</span>
+</div>
+<div class="space-y-2">
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-bright border border-outline-variant/30">
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<div>
+<span class="text-body-md font-body-md text-on-surface font-medium">Set Haute Cuisine 6 món — Mùa Thu Thượng Hạng</span>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Bao gồm Bò Wagyu A5 hun khói gỗ sồi &amp; Nấm Truffle đen Alba</p>
+</div>
+</div>
+<span class="text-body-md font-body-md text-on-surface font-semibold whitespace-nowrap">6 Phần</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-bright border border-outline-variant/30">
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<div>
+<span class="text-body-md font-body-md text-on-surface font-medium">Hầm rượu Grand Cru 2015 — Château Margaux Premier Grand Cru</span>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Nhiệt độ phục vụ chuẩn 17°C, ủ bình thở Decanter trước 45 phút</p>
+</div>
+</div>
+<span class="text-body-md font-body-md text-on-surface font-semibold whitespace-nowrap">2 Chai</span>
+</div>
+</div>
+<!-- Allergen Notice for this Booking -->
+<div class="p-3.5 rounded-xl bg-[#FD8F00]/10 border border-[#FD8F00]/30 flex items-start gap-3">
+<span class="material-symbols-outlined text-[20px] text-[#FD8F00]" data-icon="report">report</span>
+<div class="text-body-sm font-body-sm text-on-surface">
+<strong>Chỉ dẫn ẩm thực đã ghi chú:</strong> Chuẩn bị 2 phần không dùng Gluten, 1 phần tránh tuyệt đối tiêu sọ. Bếp trưởng điều hành đã phê duyệt quy trình chế biến tiệt trùng riêng.
+              </div>
+</div>
+</div>
+<!-- Card Actions CTA -->
+<div class="pt-5 border-t border-outline-variant/30 flex flex-wrap items-center justify-between gap-3">
+<button class="inline-flex items-center gap-2 text-label-md font-label-md text-secondary border border-secondary px-5 py-2.5 rounded-xl hover:bg-secondary/10 transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="map">map</span>
+              Xem sơ đồ bàn tiệc
+            </button>
+<div class="flex items-center gap-3">
+<button class="inline-flex items-center gap-2 text-label-md font-label-md text-on-surface border border-outline-variant/80 px-4 py-2.5 rounded-xl hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="edit_note">edit_note</span>
+                Chỉnh sửa món gọi
+              </button>
+<button class="inline-flex items-center gap-2 text-label-md font-label-md bg-primary-container text-white px-5 py-2.5 rounded-xl hover:bg-primary transition-all duration-150 shadow-[0_4px_16px_rgba(175,20,11,0.25)]">
+<span class="material-symbols-outlined text-[18px]" data-icon="support_agent">support_agent</span>
+                Liên hệ Quản lý Sommelier
+              </button>
+</div>
+</div>
+</article>
+<!-- ================= CARD 2: RECENTLY COMPLETED ================= -->
+<article class="bg-surface-container-lowest rounded-2xl p-6 md:p-8 border border-outline-variant/40 shadow-[0_2px_8px_-2px_rgba(43,33,24,0.04)] relative transition-all duration-200 hover:border-outline-variant">
+<!-- Card Header & Booking ID -->
+<div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-outline-variant/30 pb-4">
+<div class="flex items-center gap-3">
+<div>
+<span class="text-label-sm font-label-sm text-on-surface-variant tracking-widest uppercase font-semibold">Mã Đặt Chỗ</span>
+<h3 class="text-headline-sm font-headline-sm text-on-surface font-semibold tracking-tight">#BK-8821</h3>
+</div>
+<span class="inline-flex items-center gap-1 px-3 py-1 bg-surface-container-high text-on-surface text-label-sm font-label-sm rounded-full">
+<span class="material-symbols-outlined text-[16px] text-secondary" data-icon="check_circle">check_circle</span>
+                Hoàn thành &amp; Đã thanh toán
+              </span>
+</div>
+<div class="text-left sm:text-right">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Ngày dùng bữa</span>
+<p class="text-body-md font-body-md text-on-surface font-medium">15/10/2024 — 19:00</p>
+</div>
+</div>
+<!-- Venue & Spatial Context -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 py-4 border-b border-outline-variant/30 text-body-sm font-body-sm">
+<div>
+<span class="text-label-sm font-label-sm text-on-surface-variant uppercase">Khu Vực Bàn</span>
+<p class="text-on-surface font-semibold mt-0.5">Bàn T-08 Sân Vườn</p>
+<span class="text-on-surface-variant">Không gian ngoài trời có lò sưởi</span>
+</div>
+<div>
+<span class="text-label-sm font-label-sm text-on-surface-variant uppercase">Số Lượng Khách</span>
+<p class="text-on-surface font-semibold mt-0.5">4 Quý khách</p>
+<span class="text-on-surface-variant">Tiệc tối đối tác cao cấp</span>
+</div>
+<div>
+<span class="text-label-sm font-label-sm text-on-surface-variant uppercase">Tổng Chi Phí (Đã VAT)</span>
+<p class="text-body-lg font-body-lg text-primary font-bold mt-0.5">18.421.830 ₫</p>
+<span class="text-secondary text-[12px]">Đã tích +184 điểm thưởng</span>
+</div>
+</div>
+<!-- Courses summary text -->
+<div class="py-4 text-body-sm font-body-sm text-on-surface-variant flex items-center justify-between">
+<span>Dùng món: Thực đơn À la carte Hải sản Brittany, Gan ngỗng béo áp chảo &amp; 01 Chai Dom Pérignon Vintage 2013.</span>
+</div>
+<!-- Actions CTA -->
+<div class="pt-4 border-t border-outline-variant/30 flex flex-wrap items-center justify-between gap-3">
+<button class="inline-flex items-center gap-2 text-label-md font-label-md text-primary hover:text-primary-container font-semibold transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="picture_as_pdf">picture_as_pdf</span>
+              Tải hóa đơn VAT (PDF)
+            </button>
+<div class="flex items-center gap-3">
+<button class="inline-flex items-center gap-2 text-label-md font-label-md text-on-surface border border-outline-variant/80 px-4 py-2 rounded-xl hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="star">star</span>
+                Đánh giá trải nghiệm
+              </button>
+<button class="inline-flex items-center gap-2 text-label-md font-label-md text-secondary border border-secondary px-4 py-2 rounded-xl hover:bg-secondary/10 transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="refresh">refresh</span>
+                Đặt lại bàn tiệc này
+              </button>
+</div>
+</div>
+</article>
+<!-- ================= CARD 3: EARLIER HISTORY ================= -->
+<article class="bg-surface-container-lowest/70 rounded-2xl p-6 border border-outline-variant/30 opacity-90 hover:opacity-100 transition-opacity">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+<div>
+<div class="flex items-center gap-2">
+<span class="text-label-sm font-label-sm text-on-surface-variant uppercase font-semibold">Mã #BK-8750</span>
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+<span class="text-body-sm font-body-sm text-on-surface font-medium">28/09/2024 — 21:00</span>
+</div>
+<p class="text-body-md font-body-md text-on-surface mt-1">
+<strong class="font-semibold">Bàn Chef Counter (2 khách)</strong> — Omakase Pháp &amp; Rượu Ghép Món bởi Bếp Trưởng Pierre Gagnaire.
+              </p>
+</div>
+<div class="flex items-center gap-3 pt-2 sm:pt-0">
+<span class="text-body-md font-body-md text-on-surface font-semibold">12.500.000 ₫</span>
+<button class="text-label-sm font-label-sm text-secondary hover:underline flex items-center gap-1">
+                Xem lại biên lai
+                <span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</article>
+</section>
+<!-- ================= RIGHT RAIL: PERSONAL PREFERENCES & CONCIERGE (4 Cols) ================= -->
+<aside class="lg:col-span-4 space-y-6">
+<!-- WIDGET 1: HỒ SƠ KHẨU VỊ & CẢNH BÁO DỊ ỨNG -->
+<div class="bg-surface-container-lowest rounded-2xl p-6 border border-primary/15 shadow-[0_4px_20px_-4px_rgba(43,33,24,0.06)] relative overflow-hidden">
+<div class="flex items-center justify-between pb-4 border-b border-outline-variant/30">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[22px]" data-icon="health_and_safety">health_and_safety</span>
+<h3 class="text-headline-sm font-headline-sm text-on-surface text-[19px] font-semibold">Hồ Sơ Khẩu Vị &amp; Dị Ứng</h3>
+</div>
+<button class="text-label-sm font-label-sm text-primary hover:underline">Sửa hồ sơ</button>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant py-3">
+            Thông tin này được chuyển tự động đến Trưởng Bếp và Trưởng Buồng Rượu trước mỗi khung giờ tiếp đón của ngài.
+          </p>
+<div class="space-y-4 pt-1">
+<!-- Allergy Alerts -->
+<div>
+<span class="text-label-sm font-label-sm text-error uppercase font-bold tracking-wider flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="warning">warning</span>
+                Cảnh báo dị ứng nghiêm ngặt
+              </span>
+<div class="flex flex-wrap gap-2 mt-2">
+<span class="px-3 py-1 rounded-full bg-error-container text-on-error-container text-label-md font-label-md flex items-center gap-1.5 border border-error/20">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                  Không dùng Gluten
+                </span>
+<span class="px-3 py-1 rounded-full bg-error-container text-on-error-container text-label-md font-label-md flex items-center gap-1.5 border border-error/20">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                  Dị ứng tiêu sọ
+                </span>
+</div>
+</div>
+<!-- Wine & Gastronomy Preferences -->
+<div class="pt-2 border-t border-outline-variant/30">
+<span class="text-label-sm font-label-sm text-secondary uppercase font-bold tracking-wider flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="wine_bar">wine_bar</span>
+                Vang ưa chuộng (Cellar Preferences)
+              </span>
+<div class="flex flex-wrap gap-2 mt-2">
+<span class="px-3 py-1 rounded-full bg-secondary-fixed/50 text-on-secondary-fixed-variant text-label-md font-label-md border border-secondary/30">
+                  Vang đỏ Bordeaux Grand Cru
+                </span>
+<span class="px-3 py-1 rounded-full bg-secondary-fixed/50 text-on-secondary-fixed-variant text-label-md font-label-md border border-secondary/30">
+                  Burgundy Pinot Noir
+                </span>
+<span class="px-3 py-1 rounded-full bg-surface-container-high text-on-surface-variant text-label-md font-label-md">
+                  Rượu sâm panh Brut Nature
+                </span>
+</div>
+</div>
+<!-- Table Seating Preference -->
+<div class="pt-2 border-t border-outline-variant/30">
+<span class="text-label-sm font-label-sm text-on-surface-variant uppercase font-semibold">Vị trí ngồi ưu tiên</span>
+<p class="text-body-sm font-body-sm text-on-surface mt-1 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-tertiary" data-icon="chair">chair</span>
+                Phòng VIP riêng tư hoặc Bàn góc sân vườn yên tĩnh.
+              </p>
+</div>
+</div>
+</div>
+<!-- WIDGET 2: DEDICATED VIP CONCIERGE HOTLINE -->
+<div class="bg-inverse-surface text-inverse-on-surface rounded-2xl p-6 relative overflow-hidden shadow-xl">
+<!-- Ambient gold ornament -->
+<div class="absolute -right-10 -bottom-10 w-36 h-36 bg-primary/20 rounded-full blur-xl pointer-events-none"></div>
+<div class="flex items-center gap-2 text-tertiary-fixed">
+<span class="material-symbols-outlined text-[20px]" data-icon="diamond">diamond</span>
+<span class="text-label-sm font-label-sm uppercase tracking-widest font-semibold">Dịch Vụ Quản Gia Riêng</span>
+</div>
+<h3 class="text-headline-sm font-headline-sm text-white mt-2 font-medium">Concierge VIP 24/7</h3>
+<p class="text-body-sm font-body-sm text-surface-variant mt-2">
+            Đường dây phục vụ dành riêng cho Thành viên Gold Club để điều chỉnh thực đơn riêng, đặt hoa nghệ thuật hoặc chuẩn bị xe đưa đón.
+          </p>
+<div class="mt-5 p-4 rounded-xl bg-surface-container-lowest/10 backdrop-blur border border-outline-variant/20 flex items-center justify-between">
+<div>
+<span class="text-label-sm font-label-sm text-surface-variant uppercase">Đường Dây Ưu Tiên</span>
+<p class="text-headline-sm font-headline-sm text-white tracking-wider font-bold">028 3822 8899</p>
+</div>
+<a class="p-3 bg-primary text-white rounded-full hover:bg-primary-container transition-transform active:scale-95 flex items-center justify-center" href="tel:02838228899">
+<span class="material-symbols-outlined text-[20px]" data-icon="call">call</span>
+</a>
+</div>
+<div class="mt-4 flex items-center justify-between text-body-sm font-body-sm text-surface-variant">
+<span class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed"></span>
+              Trực ban: Quản lý Jean-Luc
+            </span>
+<span class="text-tertiary-fixed">Phản hồi tức thì</span>
+</div>
+</div>
+<!-- WIDGET 3: SƠ ĐỒ HẦM RƯỢU & TRẢI NGHIỆM ĐẶC QUYỀN -->
+<div class="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/40 shadow-sm space-y-4">
+<div class="relative h-36 rounded-xl overflow-hidden border border-outline-variant/30">
+<img class="w-full h-full object-cover" data-alt="Intimate underground wine cellar with stone archways, rows of vintage French Grand Cru wine bottles illuminated by amber candle sconces and soft warm atmospheric luxury lighting in high-end Michelin restaurant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYlC6QPyvRA7Dqhh4IY4Atw9E5Pf97lc0o_3oNRJM0dB5yizpKQp7nAlSd7rYgt02M5mzcvj555F8cwXSD89rff6z00Q4vbSrQFPoyHwWg9sJ5qLV4sFHaAWkYd3L7KTPKYkavJbZy29GyJ8lPJD1Xtl5CuwKBmS7sL7ZXO1KosdzT9B9g9RMiTHLWtwiUr6bexKV6FGZejVpdcrbRp60sb3pLfSChPs8CISI6ecY"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex items-end p-4">
+<span class="text-white text-body-md font-body-md font-semibold">Thử Vang Trước Giờ Tiệc Tại Hầm Đất Đá</span>
+</div>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant">
+            Với tư cách thành viên VIP, ngài có quyền thưởng thức 2 ly rượu khai vị miễn phí tại hầm đá cổ cùng Bếp trưởng trước khi dùng bữa.
+          </p>
+<button class="w-full py-2.5 rounded-xl border border-secondary text-secondary hover:bg-secondary/10 text-label-md font-label-md transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="meeting_room">meeting_room</span>
+            Yêu cầu đón tiếp tại hầm rượu
+          </button>
+</div>
+</aside>
+</div>
+</main>
+<!-- ================= FOOTER (Shared Component: Footer) ================= -->
+<footer class="bg-inverse-surface dark:bg-surface-container-lowest docked full-width bg-inverse-surface dark:bg-surface-container-lowest border-t border-outline-variant/20 mt-20">
+<div class="w-full max-w-7xl mx-auto px-6 md:px-12 py-16">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-10 pb-12 border-b border-outline-variant/15">
+<!-- Brand & Mission Column -->
+<div class="md:col-span-5 space-y-4">
+<span class="text-headline-md font-headline-md font-semibold text-inverse-on-surface dark:text-on-surface tracking-wide">
+            L'Épicure
+          </span>
+<p class="text-body-sm font-body-sm text-surface-variant dark:text-on-surface-variant max-w-md">
+            Đỉnh cao nghệ thuật ẩm thực Pháp cổ điển hòa quyện cùng phong vị nguyên bản tinh tế. Tôn vinh nông sản hữu cơ bền vững và bộ sưu tập rượu vang Grand Cru độc bản.
+          </p>
+<div class="flex items-center gap-4 text-surface-variant">
+<span class="text-label-sm font-label-sm tracking-wider uppercase">Địa chỉ: 18B Lê Thánh Tôn, Bến Nghé, Quận 1, TP. Hồ Chí Minh</span>
+</div>
+</div>
+<!-- Navigation Links Column -->
+<div class="md:col-span-4 space-y-3">
+<span class="text-label-md font-label-md text-inverse-primary dark:text-primary uppercase tracking-widest font-semibold block">
+            Thông Tin &amp; Quy Định
+          </span>
+<ul class="space-y-2.5">
+<li>
+<a class="text-body-sm font-body-sm text-surface-variant dark:text-on-surface-variant hover:text-inverse-on-surface dark:hover:text-primary transition-colors duration-150" href="#">
+                Về chúng tôi
+              </a>
+</li>
+<li>
+<a class="text-body-sm font-body-sm text-surface-variant dark:text-on-surface-variant hover:text-inverse-on-surface dark:hover:text-primary transition-colors duration-150" href="#">
+                Triết lý ẩm thực
+              </a>
+</li>
+<li>
+<a class="text-body-sm font-body-sm text-surface-variant dark:text-on-surface-variant hover:text-inverse-on-surface dark:hover:text-primary transition-colors duration-150" href="#">
+                Chứng nhận ATTP &amp; Nguồn gốc
+              </a>
+</li>
+<li>
+<a class="text-body-sm font-body-sm text-surface-variant dark:text-on-surface-variant hover:text-inverse-on-surface dark:hover:text-primary transition-colors duration-150" href="#">
+                Chính sách đặt &amp; hủy bàn
+              </a>
+</li>
+<li>
+<a class="text-body-sm font-body-sm text-surface-variant dark:text-on-surface-variant hover:text-inverse-on-surface dark:hover:text-primary transition-colors duration-150" href="#">
+                Điều khoản bảo mật
+              </a>
+</li>
+</ul>
+</div>
+<!-- Certification & Working Hours -->
+<div class="md:col-span-3 space-y-4">
+<span class="text-label-md font-label-md text-inverse-primary dark:text-primary uppercase tracking-widest font-semibold block">
+            Giờ Phục Vụ
+          </span>
+<div class="text-body-sm font-body-sm text-surface-variant dark:text-on-surface-variant space-y-1">
+<p>Bữa trưa: 11:30 — 14:30 (Thứ 3 - CN)</p>
+<p>Bữa tối: 18:00 — 23:00 (Hàng ngày)</p>
+<p class="text-tertiary-fixed dark:text-tertiary-container pt-2">Phục vụ Sommelier và hầm rượu riêng suốt thời gian mở cửa.</p>
+</div>
+</div>
+</div>
+<!-- Copyright Bottom Bar -->
+<div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+<p class="text-body-sm font-body-sm text-surface-variant dark:text-on-surface-variant">
+          © 2024 L'Épicure Gastronomie. Giữ toàn quyền bản quyền. Chứng nhận ATTP số 128/2023/BQLATTP-HCM.
+        </p>
+<div class="flex items-center space-x-6 text-label-sm font-label-sm text-surface-variant">
+<a class="hover:text-inverse-on-surface transition-colors" href="#">Bảo mật thông tin</a>
+<span>•</span>
+<a class="hover:text-inverse-on-surface transition-colors" href="#">Điều khoản ẩm thực</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

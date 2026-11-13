@@ -1,0 +1,406 @@
+// ============================================================
+// ERD - Website Am thuc & Nha hang - Dat ban truc tuyen
+// Dinh dang DBML cho dbdiagram.io
+// Mo https://dbdiagram.io -> New Diagram -> dan noi dung file nay
+// Sau do Export -> MySQL / PostgreSQL de sinh ma SQL tao bang.
+// ============================================================
+
+Project restaurant_booking {
+  database_type: "MySQL"
+  Note: "ERD day du theo AGENTS.md"
+}
+
+// =========================
+// NHOM NGUOI DUNG
+// =========================
+
+Enum role_name {
+  admin
+  staff
+  kitchen
+  customer
+}
+
+Table roles {
+  id bigint [pk, increment]
+  name role_name [not null, unique]
+  description varchar(255)
+  created_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  Note: "Nhom quyen nguoi dung"
+}
+
+Table users {
+  id bigint [pk, increment]
+  role_id bigint [not null, ref: > roles.id]
+  name varchar(150) [not null]
+  email varchar(150) [not null, unique]
+  password varchar(255) [not null]
+  phone varchar(20)
+  avatar varchar(255)
+  status varchar(20) [not null, default: "active", note: "active | inactive"]
+  created_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  Indexes {
+    (role_id)
+    (email) [unique]
+    (status)
+  }
+}
+
+// =========================
+// NHOM THUC DON
+// =========================
+
+Table categories {
+  id bigint [pk, increment]
+  name varchar(150) [not null]
+  slug varchar(150) [not null, unique]
+  description text
+  image varchar(255)
+  sort_order int [not null, default: 0]
+  is_visible boolean [not null, default: true]
+  created_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  Indexes {
+    (slug) [unique]
+    (sort_order)
+    (is_visible)
+  }
+}
+
+Table dishes {
+  id bigint [pk, increment]
+  category_id bigint [not null, ref: > categories.id]
+  name varchar(200) [not null]
+  slug varchar(200) [not null, unique]
+  description text
+  image varchar(255)
+  price decimal(12,2) [not null]
+  preparation_time int [note: "phut"]
+  is_available boolean [not null, default: true, note: "con mon / het mon"]
+  is_visible boolean [not null, default: true]
+  created_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  Indexes {
+    (category_id)
+    (slug) [unique]
+    (is_available)
+    (is_visible)
+    (price)
+  }
+}
+// =========================
+// NHOM KHU VUC & BAN
+// =========================
+
+Table dining_areas {
+  id bigint [pk, increment]
+  name varchar(150) [not null]
+  description text
+  sort_order int [not null, default: 0]
+  created_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  Indexes {
+    (sort_order)
+  }
+}
+
+Enum table_status {
+  empty
+  reserved
+  in_use
+  serving
+  awaiting_payment
+  cleaning
+  locked
+}
+
+Table restaurant_tables {
+  id bigint [pk, increment]
+  area_id bigint [not null, ref: > dining_areas.id]
+  code varchar(20) [not null, unique, note: "ma ban"]
+  name varchar(100) [not null]
+  capacity int [not null]
+  status table_status [not null, default: "empty"]
+  position_x int [note: "vi tri tren so do"]
+  position_y int
+  created_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  Indexes {
+    (area_id)
+    (code) [unique]
+    (status)
+    (capacity)
+  }
+}
+
+// =========================
+// NHOM DAT BAN
+// =========================
+
+Enum booking_status {
+  pending
+  confirmed
+  seated
+  completed
+  cancelled
+  no_show
+}
+
+Table bookings {
+  id bigint [pk, increment]
+  user_id bigint [ref: > users.id, note: "khach hang (nullable neu khach vang lai)"]
+  customer_name varchar(150) [not null]
+  customer_phone varchar(20) [not null]
+  customer_email varchar(150)
+  booking_date date [not null]
+  booking_time time [not null]
+  number_of_guests int [not null]
+  area_id bigint [ref: > dining_areas.id]
+  table_id bigint [ref: > restaurant_tables.id]
+  notes text [note: "ghi chu chung"]
+  status booking_status [not null, default: "pending"]
+  created_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  Indexes {
+    (user_id)
+    (table_id)
+    (area_id)
+    (booking_date)
+    (booking_time)
+    (status)
+    (customer_phone)
+  }
+}
+
+Table booking_details {
+  id bigint [pk, increment]
+  booking_id bigint [not null, ref: > bookings.id]
+  dish_id bigint [not null, ref: > dishes.id]
+  quantity int [not null]
+  unit_price decimal(12,2) [not null, note: "snapshot gia tai thoi diem dat"]
+  note text [note: "ghi chu rieng cho mon"]
+  created_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  Indexes {
+    (booking_id)
+    (dish_id)
+  }
+}
+
+Table booking_status_histories {
+  id bigint [pk, increment]
+  booking_id bigint [not null, ref: > bookings.id]
+  old_status booking_status
+  new_status booking_status [not null]
+  changed_by bigint [ref: > users.id]
+  note text
+  created_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  Indexes {
+    (booking_id)
+    (changed_by)
+    (created_at)
+  }
+}
+
+// =========================
+// NHOM GOI MON
+// =========================
+
+Enum order_status {
+  pending
+  confirmed
+  preparing
+  ready
+  served
+  completed
+  cancelled
+}
+
+Enum order_item_status {
+  pending
+  confirmed
+  preparing
+  ready
+  served
+  cancelled
+}
+
+Enum payment_status {
+  unpaid
+  paid
+  refunded
+}
+
+Table orders {
+  id bigint [pk, increment]
+  booking_id bigint [ref: > bookings.id]
+  table_id bigint [not null, ref: > restaurant_tables.id]
+  created_by bigint [ref: > users.id, note: "nhan vien tao don"]
+  customer_name varchar(150)
+  status order_status [not null, default: "pending"]
+  payment_status payment_status [not null, default: "unpaid"]
+  total_amount decimal(12,2) [not null, default: 0]
+  discount decimal(12,2) [not null, default: 0]
+  service_charge decimal(12,2) [not null, default: 0]
+  tax decimal(12,2) [not null, default: 0]
+  grand_total decimal(12,2) [not null, default: 0]
+  notes text
+  created_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  Indexes {
+    (booking_id)
+    (table_id)
+    (created_by)
+    (status)
+    (payment_status)
+    (created_at)
+  }
+}
+
+Table order_items {
+  id bigint [pk, increment]
+  order_id bigint [not null, ref: > orders.id]
+  dish_id bigint [not null, ref: > dishes.id]
+  dish_name varchar(200) [not null, note: "snapshot ten mon"]
+  quantity int [not null]
+  unit_price decimal(12,2) [not null, note: "snapshot gia"]
+  subtotal decimal(12,2) [not null]
+  note text [note: "ghi chu rieng cho mon"]
+  status order_item_status [not null, default: "pending"]
+  created_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  Indexes {
+    (order_id)
+    (dish_id)
+    (status)
+  }
+}
+
+Table order_status_histories {
+  id bigint [pk, increment]
+  order_id bigint [not null, ref: > orders.id]
+  old_status order_status
+  new_status order_status [not null]
+  changed_by bigint [ref: > users.id]
+  note text
+  created_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  Indexes {
+    (order_id)
+    (changed_by)
+    (created_at)
+  }
+}
+
+// =========================
+// NHOM NHA BEP
+// =========================
+
+Table kitchen_tickets {
+  id bigint [pk, increment]
+  order_id bigint [not null, ref: > orders.id]
+  ticket_number varchar(30) [not null, unique]
+  status varchar(20) [not null, default: "pending", note: "pending | received | in_progress | done"]
+  created_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  Indexes {
+    (order_id)
+    (ticket_number) [unique]
+    (status)
+  }
+}
+
+Table kitchen_ticket_items {
+  id bigint [pk, increment]
+  ticket_id bigint [not null, ref: > kitchen_tickets.id]
+  order_item_id bigint [not null, ref: > order_items.id]
+  status order_item_status [not null, default: "pending"]
+  started_at datetime
+  completed_at datetime
+  created_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  Indexes {
+    (ticket_id)
+    (order_item_id)
+    (status)
+  }
+}
+
+// =========================
+// NHOM THANH TOAN
+// =========================
+
+Enum invoice_status {
+  draft
+  issued
+  paid
+  cancelled
+}
+
+Enum payment_method {
+  cash
+  card
+  transfer
+  ewallet
+}
+
+Table invoices {
+  id bigint [pk, increment]
+  order_id bigint [not null, unique, ref: > orders.id]
+  invoice_number varchar(30) [not null, unique]
+  customer_name varchar(150)
+  issued_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  subtotal decimal(12,2) [not null, default: 0]
+  discount decimal(12,2) [not null, default: 0]
+  service_charge decimal(12,2) [not null, default: 0]
+  tax decimal(12,2) [not null, default: 0]
+  total decimal(12,2) [not null, default: 0]
+  payment_method payment_method
+  status invoice_status [not null, default: "draft"]
+  pdf_path varchar(255)
+  created_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  Indexes {
+    (order_id) [unique]
+    (invoice_number) [unique]
+    (status)
+    (issued_at)
+  }
+}
+
+Table payments {
+  id bigint [pk, increment]
+  invoice_id bigint [not null, ref: > invoices.id]
+  amount decimal(12,2) [not null]
+  method payment_method [not null]
+  paid_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  received_by bigint [ref: > users.id]
+  created_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  Indexes {
+    (invoice_id)
+    (received_by)
+    (paid_at)
+  }
+}
+
+// =========================
+// NHOM THONG BAO
+// =========================
+
+Table notifications {
+  id bigint [pk, increment]
+  user_id bigint [ref: > users.id, note: "nguoi nhan (null = broadcast)"]
+  type varchar(50) [not null, note: "booking_new, order_new, dish_ready, ..."]
+  title varchar(200) [not null]
+  message text [not null]
+  data json [note: "payload chi tiet"]
+  is_read boolean [not null, default: false]
+  created_at datetime [not null, default: `CURRENT_TIMESTAMP`]
+  Indexes {
+    (user_id)
+    (type)
+    (is_read)
+    (created_at)
+  }
+}
+

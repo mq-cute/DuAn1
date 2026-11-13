@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-surface" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>L'Épicure Gastronomie — Cổng Xác Thực &amp; Quản Trị Đa Vai Trò</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Plus+Jakarta+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Script -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config Verbatim -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary-fixed-dim": "#ffb4a8",
+            "secondary": "#4a6633",
+            "primary-container": "#af140b",
+            "tertiary": "#633500",
+            "inverse-primary": "#ffb4a8",
+            "surface-container-low": "#fff1e8",
+            "error": "#ba1a1a",
+            "on-tertiary": "#ffffff",
+            "on-secondary-fixed": "#0c2000",
+            "secondary-fixed-dim": "#afd192",
+            "surface-bright": "#fff8f5",
+            "on-surface-variant": "#5b403c",
+            "tertiary-container": "#844800",
+            "on-tertiary-fixed-variant": "#6c3a00",
+            "surface": "#fff8f5",
+            "outline": "#906f6a",
+            "on-secondary": "#ffffff",
+            "on-secondary-container": "#4e6b36",
+            "on-primary-container": "#ffbfb4",
+            "on-surface": "#231a11",
+            "on-primary-fixed": "#410000",
+            "background": "#fff8f5",
+            "secondary-fixed": "#cbedac",
+            "error-container": "#ffdad6",
+            "surface-dim": "#e9d7c8",
+            "outline-variant": "#e4beb8",
+            "surface-container-high": "#f8e5d6",
+            "inverse-surface": "#392e25",
+            "primary": "#870000",
+            "surface-container-lowest": "#ffffff",
+            "on-background": "#231a11",
+            "tertiary-fixed": "#ffdcc1",
+            "secondary-container": "#c8eaa9",
+            "on-secondary-fixed-variant": "#334e1d",
+            "on-error-container": "#93000a",
+            "on-tertiary-container": "#ffc18e",
+            "surface-container-highest": "#f2dfd1",
+            "on-primary-fixed-variant": "#930000",
+            "inverse-on-surface": "#ffeee1",
+            "primary-fixed": "#ffdad4",
+            "surface-tint": "#b91d12",
+            "on-error": "#ffffff",
+            "tertiary-fixed-dim": "#ffb779",
+            "surface-container": "#feeadc",
+            "surface-variant": "#f2dfd1",
+            "on-primary": "#ffffff",
+            "on-tertiary-fixed": "#2e1500"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-lg": "1.5rem",
+            "gutter-mobile": "1rem",
+            "space-sm": "0.5rem",
+            "space-xxl": "4rem",
+            "gutter": "1.5rem",
+            "space-xs": "0.25rem",
+            "margin-mobile": "1.25rem",
+            "space-md": "1rem",
+            "space-xl": "2.5rem",
+            "margin": "3rem"
+          },
+          "fontFamily": {
+            "display-lg": ["Playfair Display"],
+            "body-md": ["Plus Jakarta Sans"],
+            "display-lg-mobile": ["Playfair Display"],
+            "headline-md-mobile": ["Playfair Display"],
+            "headline-sm": ["Playfair Display"],
+            "headline-lg": ["Playfair Display"],
+            "headline-md": ["Playfair Display"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Playfair Display"],
+            "label-md": ["Plus Jakarta Sans"],
+            "body-sm": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "display-lg": ["56px", { "lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-md": ["15px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "display-lg-mobile": ["38px", { "lineHeight": "46px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "headline-md-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "500" }],
+            "headline-sm": ["22px", { "lineHeight": "28px", "fontWeight": "500" }],
+            "headline-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "headline-md": ["32px", { "lineHeight": "40px", "fontWeight": "500" }],
+            "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+            "headline-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "body-sm": ["13px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "700" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+    .material-symbols-filled {
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+    .editorial-quote::before {
+      content: "“";
+      font-family: "Playfair Display", serif;
+      position: absolute;
+      left: -28px;
+      top: -24px;
+      font-size: 72px;
+      opacity: 0.25;
+      color: #ffdcc1;
+    }
+  </style>
+</head>
+<body class="h-full bg-surface text-on-surface font-body-md text-body-md antialiased selection:bg-primary-fixed selection:text-primary">
+<!-- Split Screen Shell: Note transactional auth suppressing standard BottomNavBar/TopNavBar per semantic shell mandate -->
+<div class="min-h-full flex flex-col lg:flex-row bg-surface">
+<!-- LEFT PANE: Visual Brand Experience (48% on large screens) -->
+<div class="relative w-full lg:w-[48%] min-h-[460px] lg:min-h-screen flex flex-col justify-between p-8 sm:p-12 lg:p-16 overflow-hidden bg-inverse-surface text-inverse-on-surface">
+<!-- Luxury Imagery Background with warm amber-espresso gradient overlay -->
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105" data-alt="An atmospheric, opulent wine cellar vault in a Michelin-starred Parisian restaurant, lined with vintage Grand Cru oak barrels and backlit warm golden alcoves of dusty premier cru bottles. Candlelight glows warmly on polished stone archways and an aged mahogany tasting counter with crystal Riedel goblets, radiating quiet luxury, deep burgundy shades, warm linen amber, and intimate sensory depth." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDYjMZxW6eD2ZKIdWVVQuFLlc6TvRpMD8kZdXX2jK08FUYNCUZPbPClrufmjc7R6S6Q3VYR8PDhRolsc2Tck3oZwhouXeHrZRlpBsQT5pydQpa89PnLjfNAIrLbLVsJdWRcY-RdVX146tGRM5UeT_12R96aI5_wnbs3Yn20vZigHegQOsMkfELk0XNaofGofMFOFHrO4vZYPRWQNp4V9ebXPRl-008hKHjtuAIOwvc')">
+</div>
+<!-- Ambient Lighting Tone Overlay -->
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface via-inverse-surface/75 to-inverse-surface/40 mix-blend-multiply"></div>
+<div class="absolute inset-0 bg-gradient-to-r from-inverse-surface/80 via-transparent to-inverse-surface/40"></div>
+<!-- Left Rail Header: Brand Emblem & Back to Website Navigation -->
+<div class="relative z-10 flex items-center justify-between">
+<a class="inline-flex items-center gap-3 group text-inverse-on-surface focus:outline-none" href="#">
+<span class="w-10 h-10 rounded-full border border-tertiary-fixed/30 bg-surface/10 backdrop-blur-md flex items-center justify-center text-tertiary-fixed shadow-[0_2px_8px_-2px_rgba(43,33,24,0.06)] group-hover:border-tertiary-fixed transition-colors duration-200">
+<span class="material-symbols-outlined text-[20px]" data-icon="restaurant_menu">restaurant_menu</span>
+</span>
+<span class="font-headline-md text-headline-sm tracking-tight text-inverse-on-surface font-semibold">L'Épicure</span>
+</a>
+<!-- Michelin Guide 2024 Distinction Badge -->
+<div class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-container-lowest/10 backdrop-blur-md border border-outline-variant/30 text-surface-bright shadow-sm">
+<span class="material-symbols-outlined text-primary-container material-symbols-filled text-[18px]" data-icon="hotel_class">hotel_class</span>
+<span class="font-label-sm text-label-sm tracking-widest uppercase text-tertiary-fixed">Michelin Guide 2024</span>
+</div>
+</div>
+<!-- Center Narrative: Editorial Quote & Philosophy -->
+<div class="relative z-10 my-auto py-12 max-w-lg">
+<div class="inline-flex items-center gap-2 mb-4 px-3 py-1 rounded-full bg-primary-container/20 border border-primary-container/40 text-primary-fixed text-label-sm uppercase tracking-wider font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-fixed animate-pulse"></span>
+          Haute Gastronomie Française
+        </div>
+<div class="relative">
+<blockquote class="editorial-quote font-display-lg text-headline-lg lg:text-display-lg italic font-normal text-surface-bright leading-tight mb-6">
+            L'art de vivre et la haute gastronomie.
+          </blockquote>
+</div>
+<p class="font-body-md text-body-md text-inverse-on-surface/85 leading-relaxed font-light mb-8">
+          Nơi hội ngộ của những trải nghiệm ẩm thực tinh hoa, nguồn nguyên liệu canh tác hữu cơ chuẩn terroir và hầm rượu Grand Cru tuyển chọn bởi các chuyên gia Sommelier hàng đầu thế giới.
+        </p>
+<!-- Signature Details Bento Grid Module -->
+<div class="grid grid-cols-2 gap-4 pt-6 border-t border-inverse-on-surface/15">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-tertiary-fixed text-[22px] mt-0.5" data-icon="wine_bar">wine_bar</span>
+<div>
+<p class="font-headline-sm text-headline-sm text-surface-bright">1,800+</p>
+<p class="font-body-sm text-body-sm text-inverse-on-surface/70">Nhãn rượu Grand Cru lưu trữ</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary-fixed text-[22px] mt-0.5" data-icon="workspace_premium">workspace_premium</span>
+<div>
+<p class="font-headline-sm text-headline-sm text-surface-bright">3 Sao Vàng</p>
+<p class="font-body-sm text-body-sm text-inverse-on-surface/70">Chuẩn mực dịch vụ ẩm thực VIP</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Left Rail Footer: Security & Compliance Accreditation -->
+<div class="relative z-10 pt-8 border-t border-inverse-on-surface/10 flex flex-wrap items-center justify-between gap-4 text-inverse-on-surface/60 font-label-md text-label-md">
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary-fixed text-[18px]" data-icon="verified_user">verified_user</span>
+<span>Mục 2.3 &amp; 14 AGENTS.md</span>
+</div>
+<span class="w-1 h-1 rounded-full bg-inverse-on-surface/40"></span>
+<span>PCI-DSS Tier 4</span>
+<span class="w-1 h-1 rounded-full bg-inverse-on-surface/40"></span>
+<span>TLS 1.3 / E2EE</span>
+</div>
+<span class="text-tertiary-fixed font-serif italic text-body-sm">Sélection d'Exception</span>
+</div>
+</div>
+<!-- RIGHT PANE: Authentication & Role Selection Portal (52% on large screens) -->
+<div class="w-full lg:w-[52%] flex flex-col justify-between p-6 sm:p-12 lg:p-20 bg-surface overflow-y-auto">
+<!-- Top Utility Bar: Language switcher and help desk -->
+<div class="flex items-center justify-between mb-8 pb-4 border-b border-outline-variant/30">
+<a class="inline-flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors text-label-md font-label-md group" href="#">
+<span class="material-symbols-outlined text-[18px] group-hover:-translate-x-1 transition-transform" data-icon="arrow_back">arrow_back</span>
+<span>Về trang chủ nhà hàng</span>
+</a>
+<div class="flex items-center gap-4 text-label-md font-label-md text-on-surface-variant">
+<button class="flex items-center gap-1.5 hover:text-primary transition-colors" title="Chuyển đổi ngôn ngữ" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="language">language</span>
+<span>VIE (VN)</span>
+</button>
+<span class="text-outline-variant">|</span>
+<a class="flex items-center gap-1 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[16px]" data-icon="support_agent">support_agent</span>
+<span>Hỗ trợ VIP 24/7</span>
+</a>
+</div>
+</div>
+<!-- Main Form Wrapper -->
+<div class="max-w-md w-full mx-auto my-auto py-4">
+<!-- Header Branding & Titles -->
+<div class="text-center sm:text-left mb-8">
+<div class="inline-flex items-center gap-2 mb-3 px-3 py-1 rounded-full bg-surface-container-high border border-outline-variant/40 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="lock">lock</span>
+<span class="font-label-sm text-label-sm tracking-wide uppercase font-semibold">Cổng Xác Thực An Toàn Đa Tầng</span>
+</div>
+<h1 class="font-headline-md text-headline-md font-semibold text-on-surface tracking-tight mb-2">
+            Chào Mừng Đến Với L'Épicure
+          </h1>
+<p class="font-body-md text-body-md text-on-surface-variant">
+            Đăng nhập để quản lý bàn tiệc ẩm thực hoặc truy cập cổng vận hành nội bộ theo chuẩn phân quyền.
+          </p>
+</div>
+<!-- Role Selector (Segmented Pills Control) -->
+<div class="mb-8">
+<label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold mb-2.5">
+            Chọn Phân Quyền Truy Cập (Role-based Portal)
+          </label>
+<div class="grid grid-cols-3 p-1.5 bg-surface-container-high/80 rounded-xl border border-outline-variant/40 gap-1.5" role="tablist">
+<!-- Tab 1: Khách hàng (Default active) -->
+<button aria-selected="true" class="role-pill flex flex-col sm:flex-row items-center justify-center gap-1.5 py-2.5 px-2 rounded-lg text-center transition-all duration-200 bg-surface-container-lowest text-primary shadow-[0_2px_8px_-2px_rgba(43,33,24,0.08)] border border-primary/20 font-semibold text-label-md" id="role-guest" onclick="selectRole('guest')" role="tab" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="face">face</span>
+<span class="truncate">Khách Hàng</span>
+</button>
+<!-- Tab 2: Bếp & Phục vụ -->
+<button aria-selected="false" class="role-pill flex flex-col sm:flex-row items-center justify-center gap-1.5 py-2.5 px-2 rounded-lg text-center transition-all duration-200 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest/50 text-label-md font-medium" id="role-staff" onclick="selectRole('staff')" role="tab" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="skillet">skillet</span>
+<span class="truncate">Bếp &amp; Phục Vụ</span>
+</button>
+<!-- Tab 3: Ban Quản Trị -->
+<button aria-selected="false" class="role-pill flex flex-col sm:flex-row items-center justify-center gap-1.5 py-2.5 px-2 rounded-lg text-center transition-all duration-200 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest/50 text-label-md font-medium" id="role-admin" onclick="selectRole('admin')" role="tab" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="shield_person">shield_person</span>
+<span class="truncate">Quản Trị Viên</span>
+</button>
+</div>
+<!-- Dynamic Role Guidance Indicator -->
+<div class="mt-2.5 px-3 py-2 rounded-lg bg-surface-container-low text-on-surface-variant font-body-sm text-body-sm flex items-center gap-2 border border-outline-variant/30" id="role-description">
+<span class="material-symbols-outlined text-[16px] text-secondary" data-icon="info">info</span>
+<span id="role-desc-text">Cổng VIP: Xem lịch sử đặt bàn, menu cá nhân hóa và điểm thưởng hội viên.</span>
+</div>
+</div>
+<!-- Authentication Form with CSRF Protection -->
+<form action="#" class="space-y-5" method="POST" onsubmit="event.preventDefault(); showLoginNotification();">
+<!-- Hidden CSRF Token for Section 14 AGENTS.md Security -->
+<input name="csrf_token" type="hidden" value="c8f2a170e94bb503923cdeea128b9c4501a34bcf9d"/>
+<!-- Identifier / Email Input -->
+<div>
+<label class="block font-label-md text-label-md font-medium text-on-surface mb-2" for="identity-input">
+<span id="label-identity">Email ẩm thực hoặc Thẻ VIP</span> <span class="text-error">*</span>
+</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]" data-icon="mail">mail</span>
+</div>
+<input class="w-full h-[52px] pl-11 pr-4 bg-surface-container-lowest border border-outline-variant rounded-xl font-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary-container focus:ring-4 focus:ring-primary-container/10 transition-all outline-none" id="identity-input" placeholder="quykhach@lepicure.com" required="" type="text"/>
+</div>
+</div>
+<!-- Password Input with Toggle Visibility -->
+<div>
+<div class="flex items-center justify-between mb-2">
+<label class="block font-label-md text-label-md font-medium text-on-surface" for="password-input">
+                Mật khẩu xác thực <span class="text-error">*</span>
+</label>
+<a class="font-label-md text-label-md text-primary hover:text-primary-container font-semibold transition-colors" href="#">
+                Quên mật khẩu ẩm thực?
+              </a>
+</div>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]" data-icon="key">key</span>
+</div>
+<input class="w-full h-[52px] pl-11 pr-11 bg-surface-container-lowest border border-outline-variant rounded-xl font-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary-container focus:ring-4 focus:ring-primary-container/10 transition-all outline-none" id="password-input" placeholder="••••••••••••" required="" type="password"/>
+<button class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-on-surface-variant hover:text-primary focus:outline-none transition-colors" id="toggle-password-btn" onclick="togglePasswordVisibility()" title="Ẩn/Hiện mật khẩu" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="visibility" id="password-toggle-icon">visibility</span>
+</button>
+</div>
+</div>
+<!-- Session Controls: Remember Device checkbox -->
+<div class="flex items-center justify-between pt-1">
+<label class="flex items-center gap-2.5 cursor-pointer select-none">
+<input checked="" class="w-5 h-5 rounded-md border-outline-variant text-secondary focus:ring-secondary/20 focus:ring-offset-0 transition-colors" name="remember_session" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface-variant">
+                Ghi nhớ đăng nhập an toàn (30 ngày)
+              </span>
+</label>
+<div class="flex items-center gap-1 text-label-sm font-label-sm text-secondary">
+<span class="material-symbols-outlined text-[16px]" data-icon="enhanced_encryption">enhanced_encryption</span>
+<span>Encrypted</span>
+</div>
+</div>
+<!-- Primary CTA Button (Ruby Red #AF140B) -->
+<button class="w-full h-[52px] bg-primary-container hover:bg-primary text-on-primary font-semibold font-label-lg text-label-lg rounded-xl shadow-[0_4px_16px_-4px_rgba(175,20,11,0.35)] hover:shadow-[0_6px_24px_-4px_rgba(175,20,11,0.45)] active:scale-[0.99] transition-all duration-200 flex items-center justify-center gap-2" type="submit">
+<span class="material-symbols-outlined text-[20px]" data-icon="login">login</span>
+<span id="submit-button-text">Đăng Nhập Vào Hệ Thống</span>
+</button>
+</form>
+<!-- Divider with tactile typography -->
+<div class="relative my-7">
+<div class="absolute inset-0 flex items-center">
+<div class="w-full border-t border-outline-variant/40"></div>
+</div>
+<div class="relative flex justify-center text-label-sm uppercase tracking-wider font-semibold">
+<span class="bg-surface px-4 text-on-surface-variant/70">Hoặc tiếp tục với</span>
+</div>
+</div>
+<!-- Secondary Quick Authentication Actions -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+<!-- One-touch Google OAuth VIP -->
+<button class="w-full h-12 px-4 rounded-xl border border-outline-variant/70 bg-surface-container-lowest hover:bg-surface-container-low text-on-surface font-label-md text-label-md font-medium flex items-center justify-center gap-2.5 transition-all shadow-[0_2px_6px_rgba(43,33,24,0.04)]" type="button">
+<svg class="w-4 h-4" viewbox="0 0 24 24">
+<path d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.9C6.2 7.1 8.8 5 12 5z" fill="#EA4335"></path>
+<path d="M23.5 12.3c0-.8-.1-1.7-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z" fill="#4285F4"></path>
+<path d="M5.3 14.7c-.2-.7-.4-1.5-.4-2.7s.2-2 .4-2.7L1.6 6.4C.6 8.4 0 10.6 0 13s.6 4.6 1.6 6.6l3.7-2.9z" fill="#FBBC05"></path>
+<path d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.2 0-5.8-2.1-6.7-5.3L1.6 15.9C3.5 19.8 7.4 23 12 23z" fill="#34A853"></path>
+</svg>
+<span>Tài Khoản Google VIP</span>
+</button>
+<!-- Guest Checkout Reservation -->
+<button class="w-full h-12 px-4 rounded-xl border border-secondary/40 text-secondary hover:bg-secondary/5 font-label-md text-label-md font-medium flex items-center justify-center gap-2 transition-all" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="book_online">book_online</span>
+<span>Đặt Bàn Vãng Lai</span>
+</button>
+</div>
+<!-- Registration Link & VIP Onboarding Invitation -->
+<p class="text-center font-body-sm text-body-sm text-on-surface-variant mt-7">
+          Chưa có thẻ thành viên L'Épicure Privilege Club?
+          <a class="text-primary hover:text-primary-container font-semibold underline underline-offset-4 ml-1" href="#">
+            Đăng ký thẻ VIP
+          </a>
+</p>
+</div>
+<!-- Right Rail Footer: Compliance, Encryption, and Legal Seals -->
+<div class="mt-8 pt-6 border-t border-outline-variant/30 flex flex-col sm:flex-row items-center justify-between gap-3 text-on-surface-variant/70 font-label-sm text-label-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-secondary" data-icon="lock_clock">lock_clock</span>
+<span>Bảo vệ phiên đăng nhập AGENTS Mục 2.3 &amp; CSRF Token v4.1</span>
+</div>
+<div class="flex items-center gap-4">
+<a class="hover:text-primary transition-colors" href="#">Điều khoản bảo mật</a>
+<span>•</span>
+<a class="hover:text-primary transition-colors" href="#">Chính sách dữ liệu GDPR</a>
+</div>
+</div>
+</div>
+</div>
+<!-- Notification Toast for Interactive Feedback -->
+<div class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none" id="login-toast">
+<div class="bg-inverse-surface text-inverse-on-surface px-5 py-4 rounded-xl shadow-[0_20px_48px_-10px_rgba(43,33,24,0.3)] flex items-center gap-3 border border-tertiary-fixed/30">
+<span class="material-symbols-outlined text-secondary-fixed text-[24px]" data-icon="task_alt">task_alt</span>
+<div>
+<p class="font-label-lg text-label-lg font-semibold text-surface-bright">Đang khởi tạo phiên làm việc...</p>
+<p class="font-body-sm text-body-sm text-inverse-on-surface/80">Xác thực chứng thư bảo mật vai trò thành công.</p>
+</div>
+</div>
+</div>
+<!-- Role Selection and Interactive Logic -->
+<script>
+    const roleConfig = {
+      guest: {
+        title: "Khách Hàng",
+        labelIdentity: "Email ẩm thực hoặc Thẻ VIP",
+        placeholderIdentity: "quykhach@lepicure.com",
+        descText: "Cổng VIP: Xem lịch sử đặt bàn, menu cá nhân hóa và điểm thưởng hội viên.",
+        icon: "face",
+        buttonText: "Đăng Nhập Khách Hàng VIP"
+      },
+      staff: {
+        title: "Bếp & Phục Vụ",
+        labelIdentity: "Mã định danh nhân viên (Staff ID)",
+        placeholderIdentity: "CHE-8402 (hoặc SOM-1092)",
+        descText: "Hệ thống KDS điều phối đơn món, kiểm tra hầm rượu và tình trạng bàn thời gian thực.",
+        icon: "skillet",
+        buttonText: "Truy Cập Cổng Vận Hành KDS"
+      },
+      admin: {
+        title: "Ban Quản Trị",
+        labelIdentity: "Tài khoản Điều Hành Cấp Cao",
+        placeholderIdentity: "director@lepicure.com",
+        descText: "Cổng bảo mật Tier 4: Phân tích doanh số, giám sát an toàn thực phẩm và quản lý ca trực.",
+        icon: "shield_person",
+        buttonText: "Xác Thực Quyền Quản Trị"
+      }
+    };
+
+    function selectRole(roleKey) {
+      // Clear active styles on all pills
+      const pills = document.querySelectorAll('.role-pill');
+      pills.forEach(p => {
+        p.classList.remove('bg-surface-container-lowest', 'text-primary', 'shadow-[0_2px_8px_-2px_rgba(43,33,24,0.08)]', 'border', 'border-primary/20', 'font-semibold');
+        p.classList.add('text-on-surface-variant', 'font-medium');
+        p.setAttribute('aria-selected', 'false');
+      });
+
+      // Activate clicked pill
+      const activePill = document.getElementById(`role-${roleKey}`);
+      if (activePill) {
+        activePill.classList.remove('text-on-surface-variant', 'font-medium');
+        activePill.classList.add('bg-surface-container-lowest', 'text-primary', 'shadow-[0_2px_8px_-2px_rgba(43,33,24,0.08)]', 'border', 'border-primary/20', 'font-semibold');
+        activePill.setAttribute('aria-selected', 'true');
+      }
+
+      // Update Form Content
+      const data = roleConfig[roleKey];
+      if (data) {
+        document.getElementById('label-identity').innerText = data.labelIdentity;
+        document.getElementById('identity-input').setAttribute('placeholder', data.placeholderIdentity);
+        document.getElementById('role-desc-text').innerText = data.descText;
+        document.getElementById('submit-button-text').innerText = data.buttonText;
+      }
+    }
+
+    function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('password-input');
+      const toggleIcon = document.getElementById('password-toggle-icon');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.innerText = 'visibility_off';
+      } else {
+        passwordInput.type = 'password';
+        toggleIcon.innerText = 'visibility';
+      }
+    }
+
+    function showLoginNotification() {
+      const toast = document.getElementById('login-toast');
+      toast.classList.remove('translate-y-24', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.add('translate-y-24', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 3500);
+    }
+  </script>
+</body></html>

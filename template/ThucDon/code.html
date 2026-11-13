@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bò Wagyu A5 Miyazaki Áp Chảo | L'Épicure Gastronomie</title>
+<!-- Google Fonts & Material Symbols -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@100..900&family=Plus+Jakarta+Sans:wght@100..900&display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS CDN with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Custom Config -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary-fixed-dim": "#ffb4a8",
+            "secondary": "#4a6633",
+            "primary-container": "#af140b",
+            "tertiary": "#633500",
+            "inverse-primary": "#ffb4a8",
+            "surface-container-low": "#fff1e8",
+            "error": "#ba1a1a",
+            "on-tertiary": "#ffffff",
+            "on-secondary-fixed": "#0c2000",
+            "secondary-fixed-dim": "#afd192",
+            "surface-bright": "#fff8f5",
+            "on-surface-variant": "#5b403c",
+            "tertiary-container": "#844800",
+            "on-tertiary-fixed-variant": "#6c3a00",
+            "surface": "#fff8f5",
+            "outline": "#906f6a",
+            "on-secondary": "#ffffff",
+            "on-secondary-container": "#4e6b36",
+            "on-primary-container": "#ffbfb4",
+            "on-surface": "#231a11",
+            "on-primary-fixed": "#410000",
+            "background": "#fff8f5",
+            "secondary-fixed": "#cbedac",
+            "error-container": "#ffdad6",
+            "surface-dim": "#e9d7c8",
+            "outline-variant": "#e4beb8",
+            "surface-container-high": "#f8e5d6",
+            "inverse-surface": "#392e25",
+            "primary": "#870000",
+            "surface-container-lowest": "#ffffff",
+            "on-background": "#231a11",
+            "tertiary-fixed": "#ffdcc1",
+            "secondary-container": "#c8eaa9",
+            "on-secondary-fixed-variant": "#334e1d",
+            "on-error-container": "#93000a",
+            "on-tertiary-container": "#ffc18e",
+            "surface-container-highest": "#f2dfd1",
+            "on-primary-fixed-variant": "#930000",
+            "inverse-on-surface": "#ffeee1",
+            "primary-fixed": "#ffdad4",
+            "surface-tint": "#b91d12",
+            "on-error": "#ffffff",
+            "tertiary-fixed-dim": "#ffb779",
+            "surface-container": "#feeadc",
+            "surface-variant": "#f2dfd1",
+            "on-primary": "#ffffff",
+            "on-tertiary-fixed": "#2e1500"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-lg": "1.5rem",
+            "gutter-mobile": "1rem",
+            "space-sm": "0.5rem",
+            "space-xxl": "4rem",
+            "gutter": "1.5rem",
+            "space-xs": "0.25rem",
+            "margin-mobile": "1.25rem",
+            "space-md": "1rem",
+            "space-xl": "2.5rem",
+            "margin": "3rem"
+          },
+          "fontFamily": {
+            "display-lg": ["Playfair Display"],
+            "body-md": ["Plus Jakarta Sans"],
+            "display-lg-mobile": ["Playfair Display"],
+            "headline-md-mobile": ["Playfair Display"],
+            "headline-sm": ["Playfair Display"],
+            "headline-lg": ["Playfair Display"],
+            "headline-md": ["Playfair Display"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Playfair Display"],
+            "label-md": ["Plus Jakarta Sans"],
+            "body-sm": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "display-lg": ["56px", { "lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-md": ["15px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "display-lg-mobile": ["38px", { "lineHeight": "46px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "headline-md-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "500" }],
+            "headline-sm": ["22px", { "lineHeight": "28px", "fontWeight": "500" }],
+            "headline-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "headline-md": ["32px", { "lineHeight": "40px", "fontWeight": "500" }],
+            "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+            "headline-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "body-sm": ["13px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "700" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      height: 4px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #e4beb8;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col font-body-md selection:bg-primary-fixed selection:text-primary">
+<!-- TopNavBar (Shared Component Anchor) -->
+<header class="docked full-width top-0 sticky z-50 bg-surface/95 dark:bg-inverse-surface/95 backdrop-blur-md shadow-[0_2px_8px_-2px_rgba(43,33,24,0.06)] dark:shadow-none">
+<div class="flex justify-between items-center w-full px-6 md:px-12 max-w-7xl mx-auto h-20">
+<!-- Brand Logo -->
+<a class="text-headline-md font-headline-md font-semibold text-primary dark:text-inverse-primary tracking-tight" href="#">
+        L'Épicure
+      </a>
+<!-- Desktop Navigation Links (Intent matching: Thực đơn is Active) -->
+<nav class="hidden md:flex items-center space-x-8">
+<a class="text-primary dark:text-inverse-primary font-semibold border-b-2 border-primary dark:border-inverse-primary pb-1 font-label-lg text-label-lg" href="#">
+          Thực đơn
+        </a>
+<a class="text-on-surface-variant dark:text-surface-variant transition-colors duration-200 hover:text-primary dark:hover:text-inverse-primary font-label-lg text-label-lg" href="#">
+          Trải nghiệm
+        </a>
+<a class="text-on-surface-variant dark:text-surface-variant transition-colors duration-200 hover:text-primary dark:hover:text-inverse-primary font-label-lg text-label-lg" href="#">
+          Khu vực bàn
+        </a>
+<a class="text-on-surface-variant dark:text-surface-variant transition-colors duration-200 hover:text-primary dark:hover:text-inverse-primary font-label-lg text-label-lg" href="#">
+          Hầm rượu
+        </a>
+<a class="text-on-surface-variant dark:text-surface-variant transition-colors duration-200 hover:text-primary dark:hover:text-inverse-primary font-label-lg text-label-lg" href="#">
+          Liên hệ
+        </a>
+</nav>
+<!-- Trailing Action Cluster -->
+<div class="flex items-center space-x-3 sm:space-x-5">
+<button aria-label="Thông báo" class="relative p-2 text-on-surface-variant hover:text-primary transition-colors duration-150 rounded-full">
+<span class="material-symbols-outlined text-[22px]">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary-container"></span>
+</button>
+<button class="hidden lg:flex items-center space-x-2 text-secondary font-label-md text-label-md px-3.5 py-2 rounded-xl border border-secondary/30 hover:bg-secondary/5 transition-colors duration-150">
+<span class="material-symbols-outlined text-[18px]">restaurant_menu</span>
+<span>Giỏ chọn món</span>
+</button>
+<a class="bg-primary-container text-on-primary font-label-md text-label-md px-5 py-2.5 rounded-xl hover:bg-primary transition-all duration-200 shadow-[0_4px_16px_rgba(175,20,11,0.25)] active:scale-[0.99]" href="#dat-ban">
+          Đặt bàn ngay
+        </a>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-12 py-8">
+<!-- Editorial Breadcrumb -->
+<nav class="flex items-center space-x-2 text-body-sm font-body-sm text-on-surface-variant/80 mb-8 overflow-x-auto whitespace-nowrap pb-1">
+<a class="hover:text-primary transition-colors duration-150" href="#">Trang chủ</a>
+<span class="text-outline-variant select-none">/</span>
+<a class="hover:text-primary transition-colors duration-150" href="#">Thực đơn</a>
+<span class="text-outline-variant select-none">/</span>
+<a class="hover:text-primary transition-colors duration-150" href="#">Bò Wagyu & Thịt cao cấp</a>
+<span class="text-outline-variant select-none">/</span>
+<span class="text-primary font-medium">Bò Wagyu A5 Miyazaki Áp Chảo</span>
+</nav>
+<!-- Two-Tier Luxury Editorial Presentation Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start">
+<!-- LEFT RAIL: Visual Storytelling & Culinary Craft (5 Columns) -->
+<section class="lg:col-span-6 xl:col-span-6 flex flex-col space-y-6">
+<!-- Primary Masterpiece Visual Card -->
+<div class="relative bg-surface-container-lowest rounded-2xl overflow-hidden p-2 shadow-[0_4px_24px_-6px_rgba(43,33,24,0.07)] border border-outline-variant/30 group">
+<div class="relative aspect-[4/3] rounded-xl overflow-hidden bg-surface-container">
+<img alt="Bò Wagyu A5 Miyazaki Áp Chảo" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" data-alt="A gourmet close-up photograph of seared A5 Miyazaki Wagyu beef steak resting on an artisan stoneware plate, garnished with fine shaved Périgord black truffles and glossy dark veal demi-glace jus, illuminated by soft warm candlelight in a Michelin-starred Parisian restaurant atmosphere with amber accents and refined ivory linen." id="main-dish-image" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDl9s-Mz-aTKlhKOjPjYkwx5Rf1fi8qc29mZWyfJMJY0eXr0Uw7WnCeZWab05e47Y_ZX-GSH9EKqF3DVA9o_WqFE8rVS1Rx2ss5nh-tbNjbKHi-3aN2YJUYhN9TlMzFSsCBmWlGVZgBOk_EkU9egNba4YNqScWetsSXHLWmabK-dPMeH51cgSLoGam1u0Y4UhCAxe4SOvqKG4mEscEnFbaI5tB6eUtbHVcFJMwDySQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/40 via-transparent to-transparent opacity-60 pointer-events-none"></div>
+<!-- Atmospheric Badge Overlay -->
+<div class="absolute bottom-4 left-4 flex items-center space-x-2 bg-surface-container-lowest/90 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-outline-variant/40 shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">award_star</span>
+<span class="font-label-sm text-label-sm tracking-wide text-on-surface">Món Ăn Biểu Tượng 2024</span>
+</div>
+</div>
+</div>
+<!-- Gallery Thumbnails (Macro Details & Chef Mastery) -->
+<div class="grid grid-cols-4 gap-3">
+<button class="relative rounded-xl overflow-hidden border-2 border-primary aspect-square shadow-sm focus:outline-none" onclick="updateMainImage(this)">
+<img alt="Vân mỡ A5 Miyazaki" class="w-full h-full object-cover" data-alt="A detailed macro shot showing the exquisite snowflake marbling pattern of raw A5 Miyazaki Wagyu beef tenderloin on a dark cedar cutting board, photographed under warm soft kitchen studio lights with deep red and gold tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbYpNqZSpVDikWTzCdeeI1AE8W63hHB8ieQwRz0ySMSch1XUI9C_Y1LV_FXXEzJ-7ryS-IDeLp_7T4wpkBV53kH3g9CG4ZOc0RoaWHe6YCADhiZlp2qSiWAHt3P76RYA8aYx6fFJgOqhX545t00d1GPTfdP9i55CFkLhxvkB6uGahXe4NfEkZrLi6AV5-uGD0BV79DdT1nYms_AvRoNY9uZCIURfzni3briNqRy-U"/>
+</button>
+<button class="relative rounded-xl overflow-hidden border border-outline-variant/50 aspect-square hover:border-primary/60 transition-colors duration-150 focus:outline-none" onclick="updateMainImage(this)">
+<img alt="Nấm Truffle đen Périgord" class="w-full h-full object-cover" data-alt="A luxury culinary photo of freshly harvested French Périgord black truffles with a silver truffle shaver slicing delicate aromatic flakes onto a golden butter pan in a warm low-key gourmet kitchen." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZC18Frg53CfTo3hh1i0zCTwsZpxRzBADVnJj_Za4NBwom0Vdhtg0aKafN6QvZAUqrl_zBpjaQpLmzU4kzZBcGt6Zz4vrIzMinYYzF3Yh7aPcC8BabQbgwvF88SbWdAvnKNns9dVkKUD2DVCBM9r6r6Y8IfVsq61jM9ZMBFxibRwco2_CRyjcKZYV0W7s0ZrYzKvrZ3AzO0p_EtysbtlSAYzFQWVbtK3hhcnaTHGA"/>
+</button>
+<button class="relative rounded-xl overflow-hidden border border-outline-variant/50 aspect-square hover:border-primary/60 transition-colors duration-150 focus:outline-none" onclick="updateMainImage(this)">
+<img alt="Nghệ thuật trình bày đĩa" class="w-full h-full object-cover" data-alt="An executive chef with clean white chef sleeves delicately garnishing a sizzling Wagyu steak with micro-herbs using precision culinary tweezers in a soft ambient fine dining restaurant kitchen." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBR0F17ja-W1fUvWIi27xkYHPNNAYGFlTwUupoM2vWDdlmrAkyCyckK4olZNR_2u5nMfYq1LS-VrUj3izqV7pU89Y3hwW_4Jr2XsG2xmgvxRUnb4agZXYS_EkJ1jEupWZEquaY_9EUg6Ona6uOmMEJHLCQjbabdhskr1DIr2Emx5pGOQTgHmH83pUTjWbULTc2DPU2UIsM763ySiSu7btTxWeO21HgW0bM4ug5oBk"/>
+</button>
+<button class="relative rounded-xl overflow-hidden border border-outline-variant/50 aspect-square hover:border-primary/60 transition-colors duration-150 focus:outline-none" onclick="updateMainImage(this)">
+<img alt="Thưởng thức cùng vang Bordeaux" class="w-full h-full object-cover" data-alt="A crystal wine glass filled with vintage Bordeaux red wine beside a finished seared Wagyu course on an elegant white linen dining table set with silverware and glowing amber candles." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcPoCTU8n4s3kVcxpKTw7wHrI-J1QEn86tk6SVoANhcgMXYGiWwlEak85HyLitJ24mQ38c10rxzw3m2ROPnWiQO0uy53JAiO1XlLbBBA8lwYsn9Z6CSBOeO1RyCX9irDizPvkUl7sC_RKaQqzNfMyn6HRlIGcRFyiAYQYXZVhA4Z8m0lcMjlMuPazchdBYU4mmUKYjWA7lya-u_F2M_Jl3qDp02tMW6Rbu-PHNgdA"/>
+</button>
+</div>
+<!-- Sommelier & Cellar Recommendation Card -->
+<div class="bg-surface-container-low/70 border border-outline-variant/40 rounded-2xl p-6 mt-4 relative overflow-hidden">
+<div class="flex items-start space-x-4">
+<div class="p-3 bg-secondary/10 rounded-xl text-secondary shrink-0">
+<span class="material-symbols-outlined text-[28px]">wine_bar</span>
+</div>
+<div>
+<div class="flex items-center space-x-2">
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-secondary font-bold">Gợi Ý Từ Chuyên Gia Rượu Vang (Sommelier)</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface mt-1">Château Margaux Premier Grand Cru 2015</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-2 leading-relaxed">
+                Tannin mượt như lụa cùng hương quả mọng chín sẫm và gỗ sồi Pháp cổ điển hòa quyện tuyệt đỉnh, tôn vinh vị béo ngậy tan chảy của thớ thịt bò Miyazaki A5 và nốt hương nấm Truffle quý phái.
+              </p>
+<div class="mt-3 flex items-center space-x-4">
+<span class="font-label-md text-label-md font-semibold text-primary">Giá đề xuất: 4.600.000 ₫ / chai</span>
+<span class="text-outline-variant">|</span>
+<span class="font-label-md text-label-md text-secondary">Phục vụ đúng nhiệt độ 16°C - 18°C</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- RIGHT RAIL: Editorial Nomenclature, Provenance, & Gastronomy Action (6 Columns) -->
+<section class="lg:col-span-6 xl:col-span-6 flex flex-col space-y-6">
+<!-- Header & Badges -->
+<div>
+<div class="flex flex-wrap items-center gap-2 mb-3">
+<span class="inline-flex items-center space-x-1.5 bg-[#FDD364]/40 border border-[#FDD364] text-tertiary px-3 py-1 rounded-full font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[15px] text-tertiary" style="font-variation-settings: 'FILL' 1;">stars</span>
+<span>Michelin Signature</span>
+</span>
+<span class="inline-flex items-center space-x-1 bg-secondary/15 text-secondary px-3 py-1 rounded-full font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[15px]">verified</span>
+<span>Bếp Trưởng Khuyên Dùng</span>
+</span>
+<span class="text-on-surface-variant/70 font-label-sm text-label-sm">Mã món: #WQ-502</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg font-bold text-on-surface tracking-tight leading-tight">
+            Bò Wagyu A5 Miyazaki Áp Chảo
+          </h1>
+<p class="font-headline-sm text-headline-sm italic text-on-surface-variant/80 font-normal mt-1">
+            Bœuf Wagyu A5 Saisi, Truffe Noire & Jus Corsé
+          </p>
+<div class="mt-4 flex items-baseline space-x-3 pb-6 border-b border-outline-variant/30">
+<span class="font-headline-md text-headline-md font-semibold text-primary-container">
+              2.850.000 ₫
+            </span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">
+              (Đã bao gồm 10% VAT & 5% phí phục vụ cao cấp)
+            </span>
+</div>
+</div>
+<!-- Culinary Story & Provenance -->
+<div class="space-y-3">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Câu Chuyện & Nguồn Gốc Nguyên Liệu</h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+            Được mệnh danh là báu vật của nền ẩm thực xử sở Phù Tang, bò Wagyu A5 đến từ vùng Miyazaki từng liên tiếp đạt huy chương Prime Gold danh giá nhất Nhật Bản. Mỗi phần thịt đạt tỷ lệ vân mỡ cẩm thạch BMS 10-12 hoàn hảo, được các nghệ nhân ẩm thực tại L'Épicure khéo léo áp chảo cùng bơ thủ công Normandy, phủ nấm Truffle đen Périgord nhập khẩu chính ngạch từ Pháp và rưới xốt Jus hầm cô đặc trong suốt 48 giờ.
+          </p>
+</div>
+<!-- Ingredients & Allergy Transparency (Commitment to Safety) -->
+<div class="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-5 shadow-[0_2px_8px_-2px_rgba(43,33,24,0.04)]">
+<div class="flex items-center space-x-2 text-primary mb-3">
+<span class="material-symbols-outlined text-[20px]">restaurant</span>
+<h4 class="font-label-lg text-label-lg uppercase tracking-wider font-bold">Thành Phần & Cảnh Báo Dị Ứng</h4>
+</div>
+<div class="flex flex-wrap gap-2 mb-3">
+<span class="px-3 py-1 bg-surface-container text-on-surface rounded-lg font-label-md text-label-md">Thịt bò Miyazaki A5 (200g)</span>
+<span class="px-3 py-1 bg-surface-container text-on-surface rounded-lg font-label-md text-label-md">Nấm Truffle đen Périgord</span>
+<span class="px-3 py-1 bg-surface-container text-on-surface rounded-lg font-label-md text-label-md">Bơ lạt Normandy AOP</span>
+<span class="px-3 py-1 bg-surface-container text-on-surface rounded-lg font-label-md text-label-md">Vang đỏ Bordeaux thượng hạng</span>
+<span class="px-3 py-1 bg-surface-container text-on-surface rounded-lg font-label-md text-label-md">Muối khoáng Guérande</span>
+</div>
+<div class="flex items-start space-x-2 text-on-surface-variant font-body-sm text-body-sm pt-2 border-t border-outline-variant/20">
+<span class="material-symbols-outlined text-secondary text-[18px] shrink-0 mt-0.5">verified_user</span>
+<span>
+<strong>Cam kết an toàn dị ứng:</strong> Chứa sản phẩm từ bơ sữa (Lactose) và chiết xuất vang nho. Quý khách có yêu cầu kiêng cữ vui lòng điền ghi chú chuyên biệt phía dưới.
+            </span>
+</div>
+</div>
+<!-- Customization Flow: Doneness & Kitchen Notes -->
+<form class="space-y-5" onsubmit="event.preventDefault();">
+<!-- Seating / Cooking Preference -->
+<div>
+<div class="flex justify-between items-center mb-2.5">
+<label class="font-label-lg text-label-lg text-on-surface font-semibold">
+                Độ Chín Thưởng Thức Khuyên Dùng
+              </label>
+<span class="font-body-sm text-body-sm text-secondary italic">Đầu bếp khuyên chọn Medium Rare</span>
+</div>
+<div class="grid grid-cols-3 gap-3">
+<label class="relative flex flex-col items-center justify-center p-3 rounded-xl border border-outline-variant/50 bg-surface-container-lowest cursor-pointer hover:border-primary-container transition-all">
+<input class="sr-only peer" name="doneness" type="radio" value="rare"/>
+<span class="font-label-md text-label-md font-semibold text-on-surface peer-checked:text-primary">Rare</span>
+<span class="text-[11px] text-on-surface-variant text-center mt-0.5">Ấm lòng đào, mềm ngậy</span>
+<div class="absolute inset-0 rounded-xl border-2 border-primary pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+</label>
+<label class="relative flex flex-col items-center justify-center p-3 rounded-xl border border-outline-variant/50 bg-surface-container-lowest cursor-pointer hover:border-primary-container transition-all">
+<input checked="" class="sr-only peer" name="doneness" type="radio" value="medium-rare"/>
+<span class="font-label-md text-label-md font-semibold text-on-surface peer-checked:text-primary">Medium Rare</span>
+<span class="text-[11px] text-on-surface-variant text-center mt-0.5">Vân mỡ tan chảy tối ưu</span>
+<div class="absolute inset-0 rounded-xl border-2 border-primary pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+</label>
+<label class="relative flex flex-col items-center justify-center p-3 rounded-xl border border-outline-variant/50 bg-surface-container-lowest cursor-pointer hover:border-primary-container transition-all">
+<input class="sr-only peer" name="doneness" type="radio" value="medium"/>
+<span class="font-label-md text-label-md font-semibold text-on-surface peer-checked:text-primary">Medium</span>
+<span class="text-[11px] text-on-surface-variant text-center mt-0.5">Chín hồng vừa vặn</span>
+<div class="absolute inset-0 rounded-xl border-2 border-primary pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+</label>
+</div>
+</div>
+<!-- Allergy & Special Dietary Notes for Executive Chef -->
+<div>
+<label class="block font-label-lg text-label-lg text-on-surface font-semibold mb-2" for="chef-notes">
+              Ghi Chú Riêng Cho Bếp Trưởng (Dị ứng, khẩu vị, gia vị riêng)
+            </label>
+<div class="relative">
+<textarea class="w-full bg-surface-container-lowest border-1.5 border-outline/30 focus:border-primary focus:ring-0 rounded-xl px-4 py-3 text-body-sm font-body-sm text-on-surface placeholder:text-on-surface-variant/50 transition-colors" id="chef-notes" placeholder="Ví dụ: Giảm nồng độ bơ, dị ứng nhẹ với tiêu đen hoặc chuẩn bị món nhân kỷ niệm đặc biệt..." rows="2"></textarea>
+</div>
+</div>
+<!-- Action CTA Buttons (Ruby Palette #AF140B) -->
+<div class="flex flex-col sm:flex-row items-center gap-3 pt-2">
+<button class="w-full sm:w-1/2 flex items-center justify-center space-x-2 py-3.5 px-6 rounded-xl border-1.5 border-secondary text-secondary hover:bg-secondary/10 font-label-lg text-label-lg font-semibold transition-all duration-150 active:scale-[0.99]" type="button">
+<span class="material-symbols-outlined text-[20px]">dinner_dining</span>
+<span>Thêm vào bàn tiệc</span>
+</button>
+<button class="w-full sm:w-1/2 flex items-center justify-center space-x-2 py-3.5 px-6 rounded-xl bg-primary-container text-on-primary font-label-lg text-label-lg font-semibold shadow-[0_6px_20px_rgba(175,20,11,0.28)] hover:brightness-95 transition-all duration-200 active:scale-[0.99]" type="submit">
+<span class="material-symbols-outlined text-[20px]">calendar_today</span>
+<span>Đặt bàn thưởng thức ngay</span>
+</button>
+</div>
+<!-- Reassurance Policy Tagline -->
+<div class="flex items-center justify-center space-x-6 text-[12px] text-on-surface-variant/80 pt-2">
+<span class="flex items-center space-x-1">
+<span class="material-symbols-outlined text-[16px] text-secondary">check_circle</span>
+<span>Bảo lưu bàn trong 15 phút</span>
+</span>
+<span class="flex items-center space-x-1">
+<span class="material-symbols-outlined text-[16px] text-secondary">check_circle</span>
+<span>Hỗ trợ hủy bàn linh hoạt 24h</span>
+</span>
+</div>
+</form>
+</section>
+</div>
+<!-- RECOMMENDED COURSES / PAIRING HARMONY SECTION (Bento Gallery) -->
+<section class="mt-20 pt-12 border-t border-outline-variant/30">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8">
+<div>
+<span class="font-label-md text-label-md text-primary uppercase tracking-widest font-bold">Thực Đơn Tinh Hoa</span>
+<h2 class="font-headline-md text-headline-md text-on-surface font-semibold mt-1">
+            Món Ăn Cùng Phong Vị Gợi Ý
+          </h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+            Các món khai vị và tráng miệng được thiết kế riêng nhằm tạo nên một hải trình mỹ vị trọn vẹn.
+          </p>
+</div>
+<a class="mt-4 sm:mt-0 font-label-md text-label-md font-semibold text-secondary flex items-center space-x-1 hover:underline" href="#">
+<span>Xem trọn bộ thực đơn mùa thu</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+<!-- 3 Elegant Harmonized Course Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Card 1: Foie Gras Poêlé -->
+<article class="bg-surface-container-lowest rounded-2xl overflow-hidden border border-outline-variant/30 shadow-[0_2px_8px_-2px_rgba(43,33,24,0.04)] hover:shadow-[0_8px_24px_-6px_rgba(43,33,24,0.08)] transition-all duration-300 group flex flex-col">
+<div class="relative aspect-[16/10] overflow-hidden bg-surface-container">
+<img alt="Gan Ngỗng Pháp Áp Chảo" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Pan-seared French duck foie gras served with caramelized figs, port wine reduction, and toasted brioche on warm porcelain dinnerware, high-key warm ambient luxury lighting in an upscale dining setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiciaBcWwaq0c1jjF6qwlFZsGCO_rLnADJXhwtrWQW3CZdD8HryBVPjyp8PNeUQOrRfR99WrBK-_6sN5lfMhZ6hIgidFSFyGdaHs70ZHfo0F4X_jeXZMrYEpAvZQaXkLzMecDVAPvIZp6bKjOnrRK72HqAekgDqMSmTnGbwbTc6aQ30aDZTbiosoAjJGkQfcbO22CBKlxDX7A3rAVNDCEiZ_0n1a2Pwo1au6pQnqE"/>
+<div class="absolute top-3 right-3 bg-[#FD8F00] text-surface-container-lowest font-label-sm text-label-sm px-2.5 py-1 rounded-full shadow-sm font-semibold">
+              Khai Vị Hoàn Hảo
+            </div>
+<div class="absolute bottom-3 left-3 bg-secondary text-on-secondary font-label-sm text-label-sm px-2 py-0.5 rounded-md">
+              Normandy Terroir
+            </div>
+</div>
+<div class="p-5 flex flex-col flex-grow justify-between">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-medium group-hover:text-primary transition-colors">
+                Gan Ngỗng Pháp Áp Chảo Sốt Quả Vả
+              </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mt-2 leading-relaxed">
+                Foie gras tươi nhập từ vùng Landes, áp chảo lửa lớn kết hợp mứt quả vả ngâm rượu vang Port ngọt dịu thanh tao.
+              </p>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant/20 flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm font-semibold text-primary">890.000 ₫</span>
+<button class="text-secondary hover:text-primary transition-colors p-1" title="Chi tiết món">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Card 2: Súp Tôm Hùm Bretagne -->
+<article class="bg-surface-container-lowest rounded-2xl overflow-hidden border border-outline-variant/30 shadow-[0_2px_8px_-2px_rgba(43,33,24,0.04)] hover:shadow-[0_8px_24px_-6px_rgba(43,33,24,0.08)] transition-all duration-300 group flex flex-col">
+<div class="relative aspect-[16/10] overflow-hidden bg-surface-container">
+<img alt="Bisque Tôm Hùm Xanh Bretagne" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Rich classic French lobster bisque soup in a wide-rim ivory porcelain bowl with saffron foam and tender lobster medallion chunks, fine dining table setting with soft gold reflections and warm ambient lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuACdNUWP87Os0fhJf3U92b-aMlvzdG4iy2Y70uQgZ2WR0YrW5nZUVmU1u0M566-l_-P_JL1DvTH768KXWLuD_obyEfVb-xapjK453cDyCKJSUgYOSKEk04MuWNyNd6RWOmySTGbdGZPSx8VHBqHgOkdaXdgyyz0hI-iHB_UjHUseedKmjL2G52D8CoQzfvjpDucWIJYmGTQhJ_JnS5hH9WSJkiClCjejB-H1wd91jA"/>
+<div class="absolute top-3 right-3 bg-[#FD8F00] text-surface-container-lowest font-label-sm text-label-sm px-2.5 py-1 rounded-full shadow-sm font-semibold">
+              Signature
+            </div>
+<div class="absolute bottom-3 left-3 bg-secondary text-on-secondary font-label-sm text-label-sm px-2 py-0.5 rounded-md">
+              Hải Sản Tươi Sống
+            </div>
+</div>
+<div class="p-5 flex flex-col flex-grow justify-between">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-medium group-hover:text-primary transition-colors">
+                Bisque Tôm Hùm Xanh Bretagne
+              </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mt-2 leading-relaxed">
+                Súp kem nhung sánh mịn từ tôm hùm xanh đánh bắt tự nhiên, hòa quyện rượu Cognac cổ điển và nghệ tây Saffron.
+              </p>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant/20 flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm font-semibold text-primary">750.000 ₫</span>
+<button class="text-secondary hover:text-primary transition-colors p-1" title="Chi tiết món">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Card 3: Mille-Feuille Vani Bourbon -->
+<article class="bg-surface-container-lowest rounded-2xl overflow-hidden border border-outline-variant/30 shadow-[0_2px_8px_-2px_rgba(43,33,24,0.04)] hover:shadow-[0_8px_24px_-6px_rgba(43,33,24,0.08)] transition-all duration-300 group flex flex-col">
+<div class="relative aspect-[16/10] overflow-hidden bg-surface-container">
+<img alt="Mille-Feuille Vani Bourbon" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Artisanal French Mille-Feuille pastry with crisp golden puff pastry layers, Madagascar Bourbon vanilla cream, and dusted sugar powder on a minimalist marble slab in an intimate high-end restaurant." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvjkAXLeRKOuwY81fKJbB1l8DanvjP-MKaEh2rXm42DkDZnjJaZApYrbXOfb2k2LCfkS8qfWZC7P4I0A407zfaWqcp-C7ytxYoEbnSeX7QhRMK5RreacpO7Cd3eLciFNEU0DvrHDdaCdrhQuEJS7IAyB7zHGa0N_XP2YEXau_3qCKyJFAFKHh1Yu_2Ccb1a3sm_wKzKxLFgd9di_jf9O1bDVr-H99noxkHFJO9IwI"/>
+<div class="absolute top-3 right-3 bg-secondary/90 text-on-secondary font-label-sm text-label-sm px-2.5 py-1 rounded-full shadow-sm font-semibold">
+              Tráng Miệng Tinh Tế
+            </div>
+<div class="absolute bottom-3 left-3 bg-secondary text-on-secondary font-label-sm text-label-sm px-2 py-0.5 rounded-md">
+              Hương Vani Madagascar
+            </div>
+</div>
+<div class="p-5 flex flex-col flex-grow justify-between">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-medium group-hover:text-primary transition-colors">
+                Mille-Feuille Vani Bourbon & Caramel Muối
+              </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mt-2 leading-relaxed">
+                Ngàn lớp bánh ngàn lớp giòn rụm kết hợp kem béo ngậy nấu từ hạt vani Bourbon Madagascar thượng phẩm.
+              </p>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant/20 flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm font-semibold text-primary">480.000 ₫</span>
+<button class="text-secondary hover:text-primary transition-colors p-1" title="Chi tiết món">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+</button>
+</div>
+</div>
+</article>
+</div>
+</section>
+<!-- PRIVATE CHEF'S TABLE RESERVATION BANNER -->
+<section class="mt-16 bg-surface-container rounded-3xl p-8 md:p-12 border border-outline-variant/40 relative overflow-hidden">
+<div class="max-w-2xl relative z-10">
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-primary font-bold">Đặc Quyền Bàn Bếp Trưởng (Chef's Counter)</span>
+<h3 class="font-headline-lg text-headline-lg font-bold text-on-surface mt-2">
+          Chiêm ngưỡng khoảnh khắc chế tác Wagyu trực tiếp
+        </h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-3 leading-relaxed">
+          Chỉ 8 chỗ ngồi mỗi tối quanh quầy đá cẩm thạch mở, nơi bạn có thể trò chuyện cùng bếp trưởng điều hành và quan sát kỹ thuật áp chảo trên lửa hồng chuẩn phong cách ẩm thực Haute Cuisine Pháp.
+        </p>
+<div class="mt-6 flex flex-wrap items-center gap-4">
+<a class="bg-primary-container text-on-primary font-label-md text-label-md px-6 py-3 rounded-xl hover:bg-primary transition-colors shadow-md" href="#dat-ban">
+            Yêu cầu bàn Chef's Table
+          </a>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Phục vụ tối đa 8 thực khách/buổi</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer (Shared Component Anchor) -->
+<footer class="docked full-width bg-inverse-surface dark:bg-surface-container-lowest border-t border-outline-variant/20 mt-20">
+<div class="w-full max-w-7xl mx-auto px-6 md:px-12 py-16">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-10">
+<!-- Brand & Philosophy Column -->
+<div class="md:col-span-5 space-y-4">
+<span class="text-headline-md font-headline-md font-semibold text-inverse-on-surface dark:text-on-surface tracking-wide block">
+            L'Épicure Gastronomie
+          </span>
+<p class="text-surface-variant dark:text-on-surface-variant text-body-sm font-body-sm max-w-md leading-relaxed">
+            Nơi hội tụ tinh hoa nghệ thuật ẩm thực Pháp cổ điển và nguyên liệu tuyển chọn đắt giá nhất hành tinh. Chúng tôi trân trọng từng khoảnh khắc tao nhã bên bàn tiệc của quý khách.
+          </p>
+<div class="pt-2 text-surface-variant/80 text-body-sm font-body-sm">
+<p>Địa chỉ: 18B Lê Thánh Tôn, Bến Nghé, Quận 1, TP. Hồ Chí Minh</p>
+<p class="mt-1">Hotline đặt bàn riêng: +84 (0) 28 3822 9988</p>
+</div>
+</div>
+<!-- Navigation Links Column -->
+<div class="md:col-span-4 space-y-3">
+<h4 class="font-label-lg text-label-lg font-semibold text-inverse-primary dark:text-primary uppercase tracking-wider">
+            Liên Kết Danh Mục
+          </h4>
+<ul class="space-y-2.5">
+<li>
+<a class="text-surface-variant dark:text-on-surface-variant hover:text-inverse-on-surface dark:hover:text-primary transition-colors duration-150 text-body-sm font-body-sm block" href="#">
+                Về chúng tôi
+              </a>
+</li>
+<li>
+<a class="text-surface-variant dark:text-on-surface-variant hover:text-inverse-on-surface dark:hover:text-primary transition-colors duration-150 text-body-sm font-body-sm block" href="#">
+                Triết lý ẩm thực
+              </a>
+</li>
+<li>
+<a class="text-surface-variant dark:text-on-surface-variant hover:text-inverse-on-surface dark:hover:text-primary transition-colors duration-150 text-body-sm font-body-sm block" href="#">
+                Chứng nhận ATTP & Nguồn gốc
+              </a>
+</li>
+<li>
+<a class="text-surface-variant dark:text-on-surface-variant hover:text-inverse-on-surface dark:hover:text-primary transition-colors duration-150 text-body-sm font-body-sm block" href="#">
+                Chính sách đặt & hủy bàn
+              </a>
+</li>
+<li>
+<a class="text-surface-variant dark:text-on-surface-variant hover:text-inverse-on-surface dark:hover:text-primary transition-colors duration-150 text-body-sm font-body-sm block" href="#">
+                Điều khoản bảo mật
+              </a>
+</li>
+</ul>
+</div>
+<!-- Hours & Sommelier Service -->
+<div class="md:col-span-3 space-y-3">
+<h4 class="font-label-lg text-label-lg font-semibold text-inverse-primary dark:text-primary uppercase tracking-wider">
+            Giờ Phục Vụ Bữa Ăn
+          </h4>
+<div class="text-surface-variant dark:text-on-surface-variant text-body-sm font-body-sm space-y-2">
+<div>
+<p class="font-semibold text-inverse-on-surface dark:text-on-surface">Bữa Trưa (Lunch Degustation):</p>
+<p>11:30 – 14:30 (Thứ 3 – Chủ Nhật)</p>
+</div>
+<div>
+<p class="font-semibold text-inverse-on-surface dark:text-on-surface">Bữa Tối (Grand Dinner):</p>
+<p>18:00 – 22:30 (Hằng ngày)</p>
+</div>
+<p class="text-xs text-outline-variant pt-1">*Dress code: Elegant Smart Casual</p>
+</div>
+</div>
+</div>
+<!-- Legal & Copyright Bar -->
+<div class="mt-12 pt-8 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center text-body-sm font-body-sm text-surface-variant/70">
+<p>© 2024 L'Épicure Gastronomie. Giữ toàn quyền bản quyền. Chứng nhận ATTP số 128/2023/BQLATTP-HCM.</p>
+<div class="mt-4 md:mt-0 flex space-x-6 text-label-sm font-label-sm">
+<span class="hover:text-inverse-on-surface transition-colors cursor-pointer">Bảo mật thông tin</span>
+<span class="hover:text-inverse-on-surface transition-colors cursor-pointer">Quy chế hoạt động</span>
+<span class="hover:text-inverse-on-surface transition-colors cursor-pointer">VIP Concierge</span>
+</div>
+</div>
+</div>
+</footer>
+<!-- Inline Lightweight Micro-Interactions -->
+<script>
+    function updateMainImage(buttonElement) {
+      // Find all thumbnail buttons and reset border state
+      const allButtons = buttonElement.parentElement.querySelectorAll('button');
+      allButtons.forEach(btn => {
+        btn.classList.remove('border-2', 'border-primary');
+        btn.classList.add('border', 'border-outline-variant/50');
+      });
+
+      // Highlight selected thumbnail
+      buttonElement.classList.remove('border', 'border-outline-variant/50');
+      buttonElement.classList.add('border-2', 'border-primary');
+
+      // Soft transition for the main image
+      const thumbnailImg = buttonElement.querySelector('img');
+      const mainDishImg = document.getElementById('main-dish-image');
+      
+      if (thumbnailImg && mainDishImg) {
+        mainDishImg.style.opacity = '0.5';
+        setTimeout(() => {
+          mainDishImg.src = thumbnailImg.src;
+          mainDishImg.setAttribute('data-alt', thumbnailImg.getAttribute('data-alt'));
+          mainDishImg.style.opacity = '1';
+        }, 120);
+      }
+    }
+  </script>
+</body></html>

@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>L'Épicure Gastronomie — Quản Lý Thực Đơn &amp; Danh Mục</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Plus+Jakarta+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-container-highest": "#f2dfd1",
+            "on-surface": "#231a11",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#ffbfb4",
+            "surface-bright": "#fff8f5",
+            "primary": "#870000",
+            "secondary-fixed": "#cbedac",
+            "surface": "#fff8f5",
+            "surface-dim": "#e9d7c8",
+            "inverse-on-surface": "#ffeee1",
+            "tertiary-fixed-dim": "#ffb779",
+            "on-tertiary-container": "#ffc18e",
+            "secondary": "#4a6633",
+            "primary-container": "#af140b",
+            "outline-variant": "#e4beb8",
+            "primary-fixed-dim": "#ffb4a8",
+            "on-secondary": "#ffffff",
+            "on-error": "#ffffff",
+            "inverse-primary": "#ffb4a8",
+            "tertiary-fixed": "#ffdcc1",
+            "surface-variant": "#f2dfd1",
+            "tertiary-container": "#844800",
+            "surface-container-low": "#fff1e8",
+            "on-tertiary": "#ffffff",
+            "on-primary-fixed-variant": "#930000",
+            "surface-container-lowest": "#ffffff",
+            "on-tertiary-fixed-variant": "#6c3a00",
+            "error": "#ba1a1a",
+            "on-background": "#231a11",
+            "surface-tint": "#b91d12",
+            "surface-container": "#feeadc",
+            "error-container": "#ffdad6",
+            "background": "#fff8f5",
+            "tertiary": "#633500",
+            "secondary-container": "#c8eaa9",
+            "on-primary-fixed": "#410000",
+            "secondary-fixed-dim": "#afd192",
+            "primary-fixed": "#ffdad4",
+            "on-secondary-fixed-variant": "#334e1d",
+            "surface-container-high": "#f8e5d6",
+            "on-secondary-fixed": "#0c2000",
+            "on-surface-variant": "#5b403c",
+            "on-secondary-container": "#4e6b36",
+            "on-error-container": "#93000a",
+            "on-tertiary-fixed": "#2e1500",
+            "inverse-surface": "#392e25",
+            "outline": "#906f6a"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-md": "1rem",
+            "gutter-mobile": "1rem",
+            "space-xl": "2.5rem",
+            "gutter": "1.5rem",
+            "space-sm": "0.5rem",
+            "space-lg": "1.5rem",
+            "space-xs": "0.25rem",
+            "margin-mobile": "1.25rem",
+            "margin": "3rem",
+            "space-xxl": "4rem"
+          },
+          "fontFamily": {
+            "display-lg-mobile": ["Playfair Display"],
+            "headline-sm": ["Playfair Display"],
+            "body-sm": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Playfair Display"],
+            "label-md": ["Plus Jakarta Sans"],
+            "display-lg": ["Playfair Display"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "headline-lg": ["Playfair Display"],
+            "headline-md-mobile": ["Playfair Display"],
+            "headline-md": ["Playfair Display"],
+            "body-md": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "display-lg-mobile": ["38px", { "lineHeight": "46px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "headline-sm": ["22px", { "lineHeight": "28px", "fontWeight": "500" }],
+            "body-sm": ["13px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "headline-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "display-lg": ["56px", { "lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+            "headline-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "headline-md-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "500" }],
+            "headline-md": ["32px", { "lineHeight": "40px", "fontWeight": "500" }],
+            "body-md": ["15px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "700" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+      font-size: 19px;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .material-symbols-outlined.fill-icon {
+      font-variation-settings: 'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased min-h-screen selection:bg-primary-fixed selection:text-on-primary-fixed flex flex-col justify-between">
+<!-- TOP APP BAR / BRAND HEADER -->
+<header class="bg-surface/95 backdrop-blur-md sticky top-0 z-50 shadow-[0_2px_8px_-2px_rgba(43,33,24,0.06)]">
+<div class="w-full max-w-7xl mx-auto px-6 md:px-12 h-20 flex justify-between items-center">
+<!-- Left: Logo & Contextual Breadcrumb -->
+<div class="flex items-center gap-6">
+<a class="font-headline-md text-headline-md font-semibold text-primary tracking-tight" href="#">
+          L'Épicure
+        </a>
+<span class="hidden md:inline-block w-px h-5 bg-outline-variant/40"></span>
+<nav class="hidden md:flex items-center gap-2 text-on-surface-variant font-label-md text-label-md">
+<span class="hover:text-primary transition-colors cursor-pointer">Bảng điều khiển</span>
+<span class="material-symbols-outlined text-[15px] text-outline">chevron_right</span>
+<span class="text-primary font-semibold">Thực đơn &amp; Danh mục</span>
+</nav>
+</div>
+<!-- Right: Search quick link, Notifications & Executive Profile -->
+<div class="flex items-center gap-6">
+<div class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-low text-on-surface-variant text-label-sm font-label-sm">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span>Dịch vụ Bữa Tối Đang Hoạt Động</span>
+</div>
+<button aria-label="Thông báo" class="text-on-surface-variant hover:text-primary transition-colors relative p-1.5">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+</button>
+<div class="flex items-center gap-3 pl-2">
+<img class="w-9 h-9 rounded-full object-cover ring-1 ring-outline-variant/60 shadow-sm" data-alt="Close-up portrait of an executive head chef dressed in a crisp, bespoke white culinary uniform with subtle gold trim. The lighting is warm, soft, and cinematic, reflecting an opulent Michelin-starred kitchen atmosphere with polished copper and soft marble tones in the muted background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwtjgaK7FxK50ZqtVGZT2SFRoru0Dg8TyzeDxpHVTP_JKR7iBQX0LduBYfGjDWVdjIohYJ-dIFFlkMVWRa5IRmfb94wHnj5YnALHqVp0hXlLyj_5D1rDOE2jdp0lk7fOl2JTZDrYiX8zmR3FvCXIJrvEraQ4Ec36rD0MBCelvCIRuuDbly5EWHO4dC7zog5HsGmEXIJf3o-I7BRpeckpX8fNStsLmB7yqs9-2h6rk"/>
+<div class="hidden sm:flex flex-col text-left">
+<span class="font-label-md text-label-md font-semibold text-on-surface leading-tight">Chef Jean-Luc N.</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Executive Chef</span>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- MAIN CANVAS -->
+<main class="w-full max-w-7xl mx-auto px-6 md:px-12 py-10 md:py-14 flex-grow">
+<!-- HEADER TITLE & ACTIONS -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-10">
+<div>
+<p class="font-label-md text-label-md uppercase tracking-[0.2em] text-secondary font-semibold mb-2">Ẩm Thực Thượng Hạng</p>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">
+          Quản Lý Thực Đơn
+        </h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2 max-w-xl">
+          Danh mục ẩm thực đương đại, hầm rượu Grand Cru và kiểm soát trạng thái phục vụ bàn tiệc theo thời gian thực.
+        </p>
+</div>
+<!-- Action Buttons -->
+<div class="flex items-center gap-3.5 self-start md:self-auto">
+<button class="px-5 py-3 rounded-xl border border-secondary text-secondary hover:bg-secondary/5 font-label-lg text-label-lg transition-all duration-150 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>+ Danh mục</span>
+</button>
+<button class="px-6 py-3 rounded-xl bg-primary-container text-on-primary hover:opacity-95 shadow-[0_4px_16px_rgba(175,20,11,0.22)] font-label-lg text-label-lg transition-all duration-150 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>+ Thêm Món Ăn Mới</span>
+</button>
+</div>
+</div>
+<!-- 3 KEY KPI STAT PILLS (Minimalist, quiet luxury, borderless feel) -->
+<section class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-12">
+<!-- KPI 1 -->
+<div class="bg-surface-container-lowest/80 rounded-2xl p-6 shadow-[0_2px_8px_-2px_rgba(43,33,24,0.03)] border border-outline-variant/30 flex items-center justify-between">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider block mb-1">Món Đang Quản Lý</span>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-md text-headline-md font-semibold text-on-surface">48</span>
+<span class="font-body-sm text-body-sm text-secondary font-medium">Hoạt động</span>
+</div>
+</div>
+<div class="w-11 h-11 rounded-full bg-surface-container-low flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">restaurant_menu</span>
+</div>
+</div>
+<!-- KPI 2 -->
+<div class="bg-surface-container-lowest/80 rounded-2xl p-6 shadow-[0_2px_8px_-2px_rgba(43,33,24,0.03)] border border-outline-variant/30 flex items-center justify-between">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider block mb-1">Danh Mục Hoạt Động</span>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-md text-headline-md font-semibold text-on-surface">6</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Phân khu món</span>
+</div>
+</div>
+<div class="w-11 h-11 rounded-full bg-surface-container-low flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined">category</span>
+</div>
+</div>
+<!-- KPI 3 -->
+<div class="bg-surface-container-lowest/80 rounded-2xl p-6 shadow-[0_2px_8px_-2px_rgba(43,33,24,0.03)] border border-outline-variant/30 flex items-center justify-between">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider block mb-1">Tạm Hết / Cần Bổ Sung</span>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-md text-headline-md font-semibold text-primary">6</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Cần nhập kho</span>
+</div>
+</div>
+<div class="w-11 h-11 rounded-full bg-surface-container-low flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined">inventory_2</span>
+</div>
+</div>
+</section>
+<!-- CATEGORIES TABS & FILTER TOOLBAR -->
+<div class="space-y-6 mb-8">
+<!-- Horizontal Minimalist Category Pills -->
+<div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-outline-variant/25">
+<button class="px-5 py-2.5 rounded-full bg-primary text-on-primary font-label-md text-label-md whitespace-nowrap shadow-sm transition-all">
+          Tất cả (48)
+        </button>
+<button class="px-5 py-2.5 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low font-label-md text-label-md whitespace-nowrap transition-all">
+          Khai vị (8)
+        </button>
+<button class="px-5 py-2.5 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low font-label-md text-label-md whitespace-nowrap transition-all">
+          Món chính &amp; Hải sản (16)
+        </button>
+<button class="px-5 py-2.5 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low font-label-md text-label-md whitespace-nowrap transition-all">
+          Thịt thượng hạng &amp; Wagyu (10)
+        </button>
+<button class="px-5 py-2.5 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low font-label-md text-label-md whitespace-nowrap transition-all">
+          Hầm rượu Grand Cru (9)
+        </button>
+<button class="px-5 py-2.5 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low font-label-md text-label-md whitespace-nowrap transition-all">
+          Tráng miệng (5)
+        </button>
+</div>
+<!-- Search & Status Selectors -->
+<div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+<!-- Search Input -->
+<div class="relative flex-grow max-w-md">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full h-11 pl-11 pr-4 bg-surface-container-lowest border border-outline-variant/40 rounded-xl font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all" placeholder="Tìm theo tên món, mã SKU hoặc tên tiếng Pháp..." type="text"/>
+</div>
+<!-- Filter Pills & Sorting -->
+<div class="flex items-center gap-3">
+<div class="inline-flex p-1 rounded-xl bg-surface-container-low border border-outline-variant/30">
+<button class="px-3.5 py-1.5 rounded-lg bg-surface-container-lowest text-on-surface font-label-sm text-label-sm shadow-xs font-semibold">Tất cả</button>
+<button class="px-3.5 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm">Còn món</button>
+<button class="px-3.5 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm">Tạm hết</button>
+</div>
+<button aria-label="Bộ lọc sắp xếp" class="h-11 px-3.5 rounded-xl border border-outline-variant/40 bg-surface-container-lowest text-on-surface-variant hover:text-on-surface flex items-center gap-1.5 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[17px]">tune</span>
+<span class="hidden md:inline">Thứ tự</span>
+</button>
+</div>
+</div>
+</div>
+<!-- DISH TABLE (Clean, breathable, quiet luxury editorial) -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-[0_2px_12px_-4px_rgba(43,33,24,0.04)] border border-outline-variant/30 overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse min-w-[860px]">
+<thead>
+<tr class="border-b border-outline-variant/30 text-on-surface-variant font-label-sm text-label-sm tracking-wider uppercase bg-surface-container-low/40">
+<th class="py-4 px-6 font-semibold" scope="col">Món Ăn</th>
+<th class="py-4 px-5 font-semibold" scope="col">Danh Mục</th>
+<th class="py-4 px-5 font-semibold" scope="col">Giá Niêm Yết</th>
+<th class="py-4 px-5 font-semibold" scope="col">Tình Trạng Kho</th>
+<th class="py-4 px-5 font-semibold text-center" scope="col">Menu Khách</th>
+<th class="py-4 px-6 font-semibold text-right" scope="col">Thao Tác</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/20 font-body-md text-body-md">
+<!-- Item 1: Wagyu A5 -->
+<tr class="hover:bg-surface-container-low/25 transition-colors group">
+<td class="py-5 px-6">
+<div class="flex items-center gap-4">
+<img class="w-14 h-14 rounded-full object-cover ring-1 ring-outline-variant/40 shadow-sm flex-shrink-0" data-alt="Exquisite close up of seared A5 Miyazaki Wagyu beef tenderloin with glistening charred crust and rose-pink interior, garnished with delicate micro-greens and shavings of fresh black winter truffle on a warm beige artisanal ceramic dish. Atmospheric golden candlelight dining ambience." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeRyD8P0g1cOXK_2oCbTPuvND4s5j5kPAuJvsPinsfaLDOfyjMRHTilm71rC89__-maiyxax6pt6VCvyeBCX5GHSCBtkNlLh6Ca5CD2ljdckP6kKsXccKLkkdHCDZ-Asr1AAPXUK5HYQvxCuODxbO9vASxr0XmxoJviK4Ddjf2t-QpD7Jkqr5ekCBIhMjgzhRDMB4smb85GTyB4ecmX9gZyQQlcWcflVW6saWEbeU"/>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-[17px] leading-tight font-semibold text-on-surface group-hover:text-primary transition-colors">
+                        Bò Wagyu A5 Miyazaki Áp Chảo
+                      </span>
+<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-tertiary-fixed text-tertiary uppercase tracking-wider">Signature</span>
+</div>
+<div class="text-on-surface-variant font-body-sm text-[13px] italic mt-0.5">Bœuf Wagyu A5 Saisi, Truffe Noire</div>
+<span class="text-outline font-label-sm text-[11px] font-mono">SKU: WGY-A5-09</span>
+</div>
+</div>
+</td>
+<td class="py-5 px-5">
+<span class="px-3 py-1 rounded-lg bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm">
+                  Thịt thượng hạng &amp; Wagyu
+                </span>
+</td>
+<td class="py-5 px-5 font-body-md font-semibold text-on-surface">
+                2.850.000 đ
+              </td>
+<td class="py-5 px-5">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-label-sm font-label-sm bg-secondary/10 text-secondary font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                  Còn 12 phần
+                </span>
+</td>
+<td class="py-5 px-5 text-center">
+<!-- Toggle switch: Checked -->
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-10 h-5 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</td>
+<td class="py-5 px-6 text-right">
+<div class="flex items-center justify-end gap-2 text-outline">
+<button aria-label="Chỉnh sửa" class="p-2 hover:text-primary hover:bg-surface-container-low rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[19px]">edit</span>
+</button>
+<button aria-label="Tùy chọn khác" class="p-2 hover:text-on-surface hover:bg-surface-container-low rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[19px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Item 2: Foie Gras -->
+<tr class="hover:bg-surface-container-low/25 transition-colors group">
+<td class="py-5 px-6">
+<div class="flex items-center gap-4">
+<img class="w-14 h-14 rounded-full object-cover ring-1 ring-outline-variant/40 shadow-sm flex-shrink-0" data-alt="Gourmet pan-seared duck foie gras placed gracefully over caramelized mission figs and a rich port wine reduction sauce, set on an ivory dining plate under soft warm restaurant spotlights with elegant gold accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUBt_9etpcs5IZ9SRXlgB9cQ8vjxWW7xiOoFimu3GRuIS5zSWRqT0ciAoVRKJ5jx-SPDs-kdKYWnHUZbTnW6pV-IoQUVI0zGDOTIs8GxkEBjcCkuTUfynTN2TYF-XSOTnE1HIZT9KwGUBXYLwftrITd_hL-wOX5KIjZtR7_9FqaK3EHt_EvteG4tPFAlwJ2GHGKJxeyDsqxZ4sDc6RRiHinhFv6_0hsNFsGf8Gsto"/>
+<div>
+<div class="font-headline-sm text-[17px] leading-tight font-semibold text-on-surface group-hover:text-primary transition-colors">
+                      Gan Ngỗng Foie Gras Áp Chảo
+                    </div>
+<div class="text-on-surface-variant font-body-sm text-[13px] italic mt-0.5">Foie Gras Poêlé aux Figues</div>
+<span class="text-outline font-label-sm text-[11px] font-mono">SKU: APP-FG-02</span>
+</div>
+</div>
+</td>
+<td class="py-5 px-5">
+<span class="px-3 py-1 rounded-lg bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm">
+                  Khai vị
+                </span>
+</td>
+<td class="py-5 px-5 font-body-md font-semibold text-on-surface">
+                920.000 đ
+              </td>
+<td class="py-5 px-5">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-label-sm font-label-sm bg-secondary/10 text-secondary font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                  Sẵn sàng
+                </span>
+</td>
+<td class="py-5 px-5 text-center">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-10 h-5 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</td>
+<td class="py-5 px-6 text-right">
+<div class="flex items-center justify-end gap-2 text-outline">
+<button aria-label="Chỉnh sửa" class="p-2 hover:text-primary hover:bg-surface-container-low rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[19px]">edit</span>
+</button>
+<button aria-label="Tùy chọn khác" class="p-2 hover:text-on-surface hover:bg-surface-container-low rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[19px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Item 3: Brittany Lobster (Sold Out / Disabled) -->
+<tr class="hover:bg-surface-container-low/25 transition-colors group opacity-85">
+<td class="py-5 px-6">
+<div class="flex items-center gap-4">
+<img class="w-14 h-14 rounded-full object-cover ring-1 ring-outline-variant/40 shadow-sm flex-shrink-0 grayscale-[30%]" data-alt="Succulent roasted Brittany blue lobster tail bathed in a silky golden saffron emulsion sauce, plated with sea herbs and roasted baby vegetables on fine porcelain tableware with warm low-key luxury atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNzSx6WiSB3DTGTOTU4rrSH4czCoH-MKb49DgzLDBRtjlg_r8AJFRcFqFmlBC7IUAxDhK04wQLZPV3OtDp4l7PO9_kYe-fTN1BKDY6BtictWS2fqtQuyYD2e7dsmPqhWU9hpLb7Bpkw3XKeq6Jj_yCx0l97wvrbEgX-8aD66V6ZqGoc7ADj-8KJBHCfemrJGvKZHel9ypCm6v7Dk6sWRo5-3j7yf8jMSduHu8Ffzc"/>
+<div>
+<div class="font-headline-sm text-[17px] leading-tight font-semibold text-on-surface group-hover:text-primary transition-colors">
+                      Tôm Hùm Brittany Sốt Nghệ Tây
+                    </div>
+<div class="text-on-surface-variant font-body-sm text-[13px] italic mt-0.5">Homard Bleu de Bretagne</div>
+<span class="text-outline font-label-sm text-[11px] font-mono">SKU: SEA-HMD-05</span>
+</div>
+</div>
+</td>
+<td class="py-5 px-5">
+<span class="px-3 py-1 rounded-lg bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm">
+                  Món chính &amp; Hải sản
+                </span>
+</td>
+<td class="py-5 px-5 font-body-md font-semibold text-on-surface">
+                3.450.000 đ
+              </td>
+<td class="py-5 px-5">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-label-sm font-label-sm bg-primary-container/10 text-primary-container font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+                  Tạm hết món
+                </span>
+</td>
+<td class="py-5 px-5 text-center">
+<!-- Toggle switch: Unchecked -->
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-10 h-5 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</td>
+<td class="py-5 px-6 text-right">
+<div class="flex items-center justify-end gap-2 text-outline">
+<button aria-label="Chỉnh sửa" class="p-2 hover:text-primary hover:bg-surface-container-low rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[19px]">edit</span>
+</button>
+<button aria-label="Tùy chọn khác" class="p-2 hover:text-on-surface hover:bg-surface-container-low rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[19px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Item 4: Soupe VGE -->
+<tr class="hover:bg-surface-container-low/25 transition-colors group">
+<td class="py-5 px-6">
+<div class="flex items-center gap-4">
+<img class="w-14 h-14 rounded-full object-cover ring-1 ring-outline-variant/40 shadow-sm flex-shrink-0" data-alt="Classic French gourmet truffle soup crowned with a puffed golden pastry dome in a traditional Lion head white tureen, warm steam subtly rising, photographed on an elegant linen tablecloth in a Michelin-starred dining salon." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0AlG5Gj1sNVvxSszfiHUJsBj-ui6hjRg_hf2LOkEijPXsafTKU6MOfWWhYqLXbqvhEx9Cd1TRjo4ItK3tZ0uLyB6l4hNZVsdHmttPCVkNNc6paHgKKnYdDcK0IV-ZMDx1vjie1dgNV5Ozxd-Ng1NCR9EM3ZXkWAVrkQJIKm7KusPe0kxKyP-xbB6-GNHpud-WVak3k2gNvSY57skBuIPvPKnW8oSSoJCGAPh_1e0"/>
+<div>
+<div class="font-headline-sm text-[17px] leading-tight font-semibold text-on-surface group-hover:text-primary transition-colors">
+                      Súp Nấm Rừng Truffle Đen VGE
+                    </div>
+<div class="text-on-surface-variant font-body-sm text-[13px] italic mt-0.5">Soupe aux Truffes Noires VGE</div>
+<span class="text-outline font-label-sm text-[11px] font-mono">SKU: SUP-VGE-01</span>
+</div>
+</div>
+</td>
+<td class="py-5 px-5">
+<span class="px-3 py-1 rounded-lg bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm">
+                  Khai vị
+                </span>
+</td>
+<td class="py-5 px-5 font-body-md font-semibold text-on-surface">
+                1.150.000 đ
+              </td>
+<td class="py-5 px-5">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-label-sm font-label-sm bg-secondary/10 text-secondary font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                  Còn 18 thố
+                </span>
+</td>
+<td class="py-5 px-5 text-center">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-10 h-5 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</td>
+<td class="py-5 px-6 text-right">
+<div class="flex items-center justify-end gap-2 text-outline">
+<button aria-label="Chỉnh sửa" class="p-2 hover:text-primary hover:bg-surface-container-low rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[19px]">edit</span>
+</button>
+<button aria-label="Tùy chọn khác" class="p-2 hover:text-on-surface hover:bg-surface-container-low rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[19px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Item 5: Château Margaux -->
+<tr class="hover:bg-surface-container-low/25 transition-colors group">
+<td class="py-5 px-6">
+<div class="flex items-center gap-4">
+<img class="w-14 h-14 rounded-full object-cover ring-1 ring-outline-variant/40 shadow-sm flex-shrink-0" data-alt="An opulent vintage bottle of Premier Grand Cru Classé Bordeaux wine resting on a dark polished oak wine cradle with a crystal Riedel decanter in soft ambient cellar lighting. Deep burgundy tones and golden highlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHZeioHlSz3Mfr7IC_gOWGL7c_5SPQ7Xud71xiCJlDhJXHSTLTTPuYwrmPrGD50rJ-l6NMOjWewf4e9jfDWSlz2FQFTQ_tUBipbyeKVxmI8m-VzSd9dghZ-yV45jpVrfdxWsQn5OtmHWMBq5lrNGG-EbUhoMnr4ifrWSG1-2vn9h16L4s3vaFTlMoAvKxjZQVem01SxfWmdFGIEgNTPrfqvdaYRUcJYMIRngcUXF0"/>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-[17px] leading-tight font-semibold text-on-surface group-hover:text-primary transition-colors">
+                        Château Margaux Premier Grand Cru 2015
+                      </span>
+<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary-fixed text-primary uppercase tracking-wider">Grand Cru</span>
+</div>
+<div class="text-on-surface-variant font-body-sm text-[13px] italic mt-0.5">Bordeaux Rouge, Appellation Margaux Contrôlée</div>
+<span class="text-outline font-label-sm text-[11px] font-mono">SKU: WIN-MGX-15</span>
+</div>
+</div>
+</td>
+<td class="py-5 px-5">
+<span class="px-3 py-1 rounded-lg bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm">
+                  Hầm rượu Grand Cru
+                </span>
+</td>
+<td class="py-5 px-5 font-body-md font-semibold text-on-surface">
+                38.500.000 đ
+              </td>
+<td class="py-5 px-5">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-label-sm font-label-sm bg-secondary/10 text-secondary font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                  Còn 4 chai
+                </span>
+</td>
+<td class="py-5 px-5 text-center">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-10 h-5 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</td>
+<td class="py-5 px-6 text-right">
+<div class="flex items-center justify-end gap-2 text-outline">
+<button aria-label="Chỉnh sửa" class="p-2 hover:text-primary hover:bg-surface-container-low rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[19px]">edit</span>
+</button>
+<button aria-label="Tùy chọn khác" class="p-2 hover:text-on-surface hover:bg-surface-container-low rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[19px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Item 6: Soufflé -->
+<tr class="hover:bg-surface-container-low/25 transition-colors group">
+<td class="py-5 px-6">
+<div class="flex items-center gap-4">
+<img class="w-14 h-14 rounded-full object-cover ring-1 ring-outline-variant/40 shadow-sm flex-shrink-0" data-alt="Decadent high-rising French Valrhona dark chocolate soufflé dusted with fine confectioners sugar, served with a delicate pitcher of hot crème anglaise on a polished bronze tray against warm ivory ambience." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMwg1qJGhMXpsfdS_aJjyJCmcilyLpNdqCoo5fNW2R7YBSIzRu5qMVLjk5Qao_hMjJoy2KLuj-ZPkXYXHCj37cLhnO9OrMRfxOPQsrcNCWNgEtApdWBTMIG5XtCclHVv6vIBRrIEAq07AjEbGlQnwORzgKEd7Ytht6h6VUNIIGCzD2uVi6ZTgyDsVzirtA8mUy4mHZrdQZeLJHmXKq7YKPmnNtxDE1-eTF8sVdjzs"/>
+<div>
+<div class="font-headline-sm text-[17px] leading-tight font-semibold text-on-surface group-hover:text-primary transition-colors">
+                      Bánh Soufflé Chocolate Valrhona 72%
+                    </div>
+<div class="text-on-surface-variant font-body-sm text-[13px] italic mt-0.5">Soufflé Chaud au Chocolat Noir Guanaja</div>
+<span class="text-outline font-label-sm text-[11px] font-mono">SKU: DES-SOU-04</span>
+</div>
+</div>
+</td>
+<td class="py-5 px-5">
+<span class="px-3 py-1 rounded-lg bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm">
+                  Tráng miệng
+                </span>
+</td>
+<td class="py-5 px-5 font-body-md font-semibold text-on-surface">
+                420.000 đ
+              </td>
+<td class="py-5 px-5">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-label-sm font-label-sm bg-secondary/10 text-secondary font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                  Sẵn sàng
+                </span>
+</td>
+<td class="py-5 px-5 text-center">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-10 h-5 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</td>
+<td class="py-5 px-6 text-right">
+<div class="flex items-center justify-end gap-2 text-outline">
+<button aria-label="Chỉnh sửa" class="p-2 hover:text-primary hover:bg-surface-container-low rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[19px]">edit</span>
+</button>
+<button aria-label="Tùy chọn khác" class="p-2 hover:text-on-surface hover:bg-surface-container-low rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[19px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- MINIMALIST PAGINATION FOOTER -->
+<div class="px-6 py-5 border-t border-outline-variant/20 flex flex-col sm:flex-row items-center justify-between gap-4 font-label-md text-label-md text-on-surface-variant">
+<div>
+          Hiển thị <span class="font-semibold text-on-surface">6</span> trên <span class="font-semibold text-on-surface">48</span> món ăn
+        </div>
+<nav class="flex items-center gap-1.5">
+<button aria-label="Trang trước" class="w-9 h-9 rounded-lg flex items-center justify-center hover:bg-surface-container-low text-outline disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="w-9 h-9 rounded-lg flex items-center justify-center bg-primary text-on-primary font-semibold">
+            1
+          </button>
+<button class="w-9 h-9 rounded-lg flex items-center justify-center hover:bg-surface-container-low text-on-surface-variant transition-colors">
+            2
+          </button>
+<button class="w-9 h-9 rounded-lg flex items-center justify-center hover:bg-surface-container-low text-on-surface-variant transition-colors">
+            3
+          </button>
+<span class="px-2 text-outline">...</span>
+<button class="w-9 h-9 rounded-lg flex items-center justify-center hover:bg-surface-container-low text-on-surface-variant transition-colors">
+            6
+          </button>
+<button aria-label="Trang kế tiếp" class="w-9 h-9 rounded-lg flex items-center justify-center hover:bg-surface-container-low text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</nav>
+</div>
+</div>
+</main>
+<!-- FOOTER (Shared Anchor Component) -->
+<footer class="bg-inverse-surface border-t border-outline-variant/20 mt-16">
+<div class="w-full max-w-7xl mx-auto px-6 md:px-12 py-16">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 pb-10 border-b border-outline-variant/15">
+<div>
+<span class="font-headline-md text-headline-md font-semibold text-inverse-on-surface tracking-wide">
+            L'Épicure
+          </span>
+<p class="text-surface-variant font-body-sm text-body-sm mt-1 max-w-sm">
+            Nghệ thuật ẩm thực Pháp tinh tế &amp; Hầm rượu di sản tại trung tâm Sài Gòn.
+          </p>
+</div>
+<div class="flex flex-wrap gap-6 md:gap-8 font-label-sm text-label-sm">
+<a class="text-surface-variant hover:text-inverse-on-surface transition-colors duration-150" href="#">Về chúng tôi</a>
+<a class="text-surface-variant hover:text-inverse-on-surface transition-colors duration-150" href="#">Triết lý ẩm thực</a>
+<a class="text-surface-variant hover:text-inverse-on-surface transition-colors duration-150" href="#">Chứng nhận ATTP &amp; Nguồn gốc</a>
+<a class="text-surface-variant hover:text-inverse-on-surface transition-colors duration-150" href="#">Chính sách đặt &amp; hủy bàn</a>
+<a class="text-surface-variant hover:text-inverse-on-surface transition-colors duration-150" href="#">Điều khoản bảo mật</a>
+</div>
+</div>
+<div class="pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-surface-variant font-body-sm text-body-sm">
+<p>© 2024 L'Épicure Gastronomie. Giữ toàn quyền bản quyền. Chứng nhận ATTP số 128/2023/BQLATTP-HCM.</p>
+<div class="flex items-center gap-4 text-xs tracking-wider uppercase text-outline-variant/80">
+<span>Haute Cuisine</span>
+<span>•</span>
+<span>Grand Cru Cellar</span>
+<span>•</span>
+<span>Sommelier Selection</span>
+</div>
+</div>
+</div>
+</footer>
+</body></html>
