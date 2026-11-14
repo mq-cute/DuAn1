@@ -6,10 +6,14 @@ namespace App\Core;
 
 abstract class Controller
 {
-    protected function render(string $template, array $data = [], int $status = 200): void
-    {
+    protected function render(
+        string $template,
+        array $data = [],
+        int $status = 200,
+        string $layout = 'layouts/guest'
+    ): void {
         http_response_code($status);
-        View::render($template, $data);
+        View::render($template, $data, $layout);
     }
 
     protected function redirect(string $path): never

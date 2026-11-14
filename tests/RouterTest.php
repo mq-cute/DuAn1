@@ -47,6 +47,20 @@ foreach ([
     'POST /account/bookings/{id}/cancel',
     'GET /admin/bookings',
     'POST /admin/bookings/{id}/status',
+    'GET /tables',
+    'POST /tables/{id}/status',
+    'GET /staff/pos',
+    'POST /staff/orders',
+    'POST /staff/orders/{id}/items',
+    'POST /staff/order-items/{id}/status',
+    'POST /staff/orders/{id}/status',
+    'POST /staff/bookings/{id}/checkin',
+    'GET /staff/orders',
+    'GET /staff/orders/{id}',
+    'GET /staff/orders/{id}/prebill',
+    'POST /staff/orders/{id}/pay',
+    'GET /staff/orders/{id}/invoice',
+    'GET /invoices/{id}',
 ] as $expectedRoute) {
     if (!in_array($expectedRoute, $routes, true)) {
         throw new RuntimeException('The booking route was not registered: ' . $expectedRoute);

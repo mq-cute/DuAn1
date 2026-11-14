@@ -166,17 +166,123 @@ $pages = [
             'id' => 1, 'name' => 'Guest', 'email' => 'guest@example.com', 'role' => 'customer',
         ],
     ]],
+    ['table/index', [
+        'pageTitle' => 'Sơ đồ bàn', 'currentUser' => ['id' => 1, 'name' => 'Staff', 'role' => 'staff'],
+        'areas' => [['id' => 1, 'name' => 'Phòng VIP', 'description' => 'VIP', 'sort_order' => 1]],
+        'tablesByArea' => [1 => [
+            'area' => ['id' => 1, 'name' => 'Phòng VIP', 'description' => 'VIP', 'sort_order' => 1],
+            'tables' => [[
+                'id' => 1, 'code' => 'VIP-01', 'name' => 'Bàn 1', 'capacity' => 4,
+                'status' => 'empty', 'active_order' => null,
+            ]],
+        ]],
+        'totalTables' => 1, 'counts' => ['empty' => 1], 'selectedAreaId' => null,
+        'csrfToken' => $token, 'message' => '',
+    ], 'layouts/staff'],
+    ['order/pos', [
+        'pageTitle' => 'POS', 'currentUser' => ['id' => 1, 'name' => 'Staff', 'role' => 'staff'],
+        'areas' => [['id' => 1, 'name' => 'Phòng VIP']],
+        'tables' => [[
+            'id' => 1, 'code' => 'VIP-01', 'name' => 'Bàn 1', 'capacity' => 4,
+            'status' => 'serving', 'area_name' => 'Phòng VIP',
+            'active_order_id' => 1, 'customer_name' => 'Khách VIP',
+            'items' => [['id' => 1, 'dish_name' => 'Bò Wagyu', 'status' => 'served']],
+            'progress_served' => 1, 'progress_total' => 1, 'minutes_seated' => 15,
+        ]],
+        'selectedTable' => [
+            'id' => 1, 'code' => 'VIP-01', 'name' => 'Bàn 1', 'capacity' => 4,
+            'status' => 'serving', 'area_name' => 'Phòng VIP',
+        ],
+        'selectedTableId' => 1,
+        'activeOrder' => [
+            'id' => 1, 'customer_name' => 'Khách VIP', 'table_id' => 1,
+            'total_amount' => 1000000, 'service_charge' => 50000, 'tax' => 80000,
+            'grand_total' => 1130000, 'notes' => 'Ghi chú bàn',
+            'items' => [[
+                'id' => 1, 'dish_name' => 'Bò Wagyu', 'quantity' => 1,
+                'unit_price' => 1000000, 'subtotal' => 1000000,
+                'status' => 'served', 'note' => '',
+            ]],
+        ],
+        'allDishes' => [['id' => 1, 'name' => 'Bò Wagyu', 'price' => 1000000]],
+        'emptyTables' => [], 'selectedAreaId' => null, 'statusFilter' => null,
+        'csrfToken' => $token, 'message' => '', 'error' => '',
+    ], 'layouts/staff'],
+    ['order/index', [
+        'pageTitle' => 'Orders', 'currentUser' => ['id' => 1, 'name' => 'Staff', 'role' => 'staff'],
+        'orders' => [[
+            'id' => 1, 'table_id' => 1, 'table_code' => 'VIP-01', 'area_name' => 'Phòng VIP',
+            'customer_name' => 'Khách', 'staff_name' => 'Staff',
+            'served_count' => 1, 'item_count' => 1,
+            'grand_total' => 1130000, 'payment_status' => 'paid', 'status' => 'completed',
+            'created_at' => date('Y-m-d H:i:s'),
+        ]],
+        'selectedStatus' => null, 'selectedDate' => date('Y-m-d'),
+        'orderStatuses' => \App\Models\Order::ORDER_STATUSES,
+        'csrfToken' => $token, 'message' => '',
+    ], 'layouts/staff'],
+    ['order/show', [
+        'pageTitle' => 'Order Details', 'currentUser' => ['id' => 1, 'name' => 'Staff', 'role' => 'staff'],
+        'order' => [
+            'id' => 1, 'table_id' => 1, 'table_code' => 'VIP-01', 'area_name' => 'Phòng VIP',
+            'customer_name' => 'Khách', 'total_amount' => 1000000, 'service_charge' => 50000,
+            'tax' => 80000, 'grand_total' => 1130000, 'status' => 'completed',
+            'payment_status' => 'paid', 'notes' => '', 'created_at' => date('Y-m-d H:i:s'),
+            'items' => [[
+                'id' => 1, 'dish_name' => 'Bò Wagyu', 'quantity' => 1,
+                'unit_price' => 1000000, 'subtotal' => 1000000, 'status' => 'served', 'note' => '',
+            ]],
+            'histories' => [],
+        ],
+        'csrfToken' => $token, 'message' => '',
+    ], 'layouts/staff'],
+    ['invoice/show', [
+        'pageTitle' => 'Invoice', 'currentUser' => ['id' => 1, 'name' => 'Staff', 'role' => 'staff'],
+        'invoice' => [
+            'id' => 1, 'invoice_number' => 'INV-20261114-0001', 'customer_name' => 'Khách',
+            'table_code' => 'VIP-01', 'area_name' => 'Phòng VIP', 'cashier_name' => 'Staff',
+            'payment_method' => 'card', 'subtotal' => 1000000, 'service_charge' => 50000,
+            'tax' => 80000, 'discount' => 0, 'total' => 1130000, 'issued_at' => date('Y-m-d H:i:s'),
+            'items' => [[
+                'dish_name' => 'Bò Wagyu', 'quantity' => 1, 'unit_price' => 1000000,
+                'subtotal' => 1000000, 'note' => '',
+            ]],
+        ],
+        'paymentMethods' => \App\Models\Invoice::PAYMENT_METHODS,
+        'csrfToken' => $token, 'message' => '',
+    ], 'layouts/staff'],
+    ['invoice/prebill', [
+        'pageTitle' => 'Prebill', 'currentUser' => ['id' => 1, 'name' => 'Staff', 'role' => 'staff'],
+        'prebill' => [
+            'order' => [
+                'table_id' => 1, 'table_code' => 'VIP-01', 'area_name' => 'Phòng VIP',
+                'customer_name' => 'Khách', 'created_at' => date('Y-m-d H:i:s'),
+            ],
+            'items' => [[
+                'dish_name' => 'Bò Wagyu', 'quantity' => 1, 'unit_price' => 1000000,
+                'subtotal' => 1000000, 'note' => '',
+            ]],
+            'subtotal' => 1000000, 'serviceCharge' => 50000, 'tax' => 80000,
+            'grandTotal' => 1130000, 'prebillNumber' => 'PRE-001',
+            'generatedAt' => date('Y-m-d H:i:s'),
+        ],
+        'csrfToken' => $token,
+    ], 'layouts/staff'],
 ];
 
 set_error_handler(static function (int $severity, string $message, string $file, int $line): never {
     throw new ErrorException($message, 0, $severity, $file, $line);
 });
 
-foreach ($pages as [$template, $data]) {
+foreach ($pages as $page) {
+    $template = $page[0];
+    $data = $page[1];
+    $layout = $page[2] ?? 'layouts/guest';
+
     ob_start();
-    App\Core\View::render($template, $data);
+    App\Core\View::render($template, $data, $layout);
     $html = (string) ob_get_clean();
-    if ($html === '' || !str_contains($html, '<!doctype html>')) {
+    if ($html === '' || (!str_contains($html, '<!doctype html>') && !str_contains($html, '<!DOCTYPE html>'))) {
         throw new RuntimeException('View failed to render a complete page: ' . $template);
     }
     if (str_contains($html, '<script>alert(1)</script>') || str_contains($html, '<script>đặc biệt</script>')) {

@@ -24,6 +24,9 @@
                 <a href="/account/bookings">Lịch sử đặt bàn</a>
                 <a class="button button-small" href="/bookings/new">Đặt bàn</a>
             <?php elseif (in_array(($currentUser['role'] ?? ''), ['admin', 'staff'], true)): ?>
+                <a href="/tables">Sơ đồ bàn</a>
+                <a href="/staff/pos">Phục vụ tại bàn</a>
+                <a href="/staff/orders">Quản lý gọi món</a>
                 <a href="/admin/bookings">Quản lý đặt bàn</a>
             <?php endif; ?>
             <?php if (($currentUser['role'] ?? '') === 'admin'): ?>
