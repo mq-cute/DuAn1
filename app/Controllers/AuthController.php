@@ -37,8 +37,8 @@ final class AuthController extends Controller
             return;
         }
 
-        $email = strtolower(trim((string) ($_POST['email'] ?? '')));
-        $password = (string) ($_POST['password'] ?? '');
+        $email = strtolower(trim($this->postString('email')));
+        $password = $this->postString('password');
         $errors = [];
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 150) {
@@ -89,10 +89,10 @@ final class AuthController extends Controller
             return;
         }
 
-        $name = trim((string) ($_POST['name'] ?? ''));
-        $email = strtolower(trim((string) ($_POST['email'] ?? '')));
-        $password = (string) ($_POST['password'] ?? '');
-        $passwordConfirmation = (string) ($_POST['password_confirmation'] ?? '');
+        $name = trim($this->postString('name'));
+        $email = strtolower(trim($this->postString('email')));
+        $password = $this->postString('password');
+        $passwordConfirmation = $this->postString('password_confirmation');
         $errors = [];
 
         $nameLength = preg_match_all('/./us', $name, $characters);
@@ -172,5 +172,12 @@ final class AuthController extends Controller
             'errors' => $errors,
             'old' => $old,
         ], 422);
+    }
+
+    private function postString(string $key): string
+    {
+        $value = $_POST[$key] ?? '';
+
+        return is_string($value) ? $value : '';
     }
 }

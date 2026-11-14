@@ -14,6 +14,7 @@ final class HomeController extends Controller
         $this->render('home/index', [
             'pageTitle' => "L'Épicure — Nhà hàng & đặt bàn",
             'currentUser' => Auth::user(),
+            'csrfToken' => \App\Core\Csrf::token(),
         ]);
     }
 

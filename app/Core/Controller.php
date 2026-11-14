@@ -28,8 +28,25 @@ abstract class Controller
         return $user;
     }
 
+    protected function requireRole(string ...$roles): array
+    {
+        $user = $this->requireAuthenticated();
+        if (!in_array($user['role'] ?? '', $roles, true)) {
+            http_response_code(403);
+            $this->render('errors/403', [
+                'pageTitle' => 'Không có quyền truy cập',
+                'currentUser' => $user,
+            ], 403);
+            exit;
+        }
+
+        return $user;
+    }
+
     protected function verifyCsrf(): bool
     {
-        return Csrf::isValid($_POST['_csrf_token'] ?? null);
+        $token = $_POST['_csrf_token'] ?? null;
+
+        return is_string($token) && Csrf::isValid($token);
     }
 }

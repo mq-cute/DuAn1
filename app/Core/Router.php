@@ -25,7 +25,8 @@ final class Router
         $allowedMethods = [];
 
         foreach ($this->routes as $route) {
-            if ($route['path'] !== $path) {
+            $parameters = $this->match($route['path'], $path);
+            if ($parameters === null) {
                 continue;
             }
 
@@ -36,7 +37,7 @@ final class Router
 
             [$controllerClass, $controllerMethod] = $route['action'];
             $controller = new $controllerClass();
-            $controller->{$controllerMethod}();
+            $controller->{$controllerMethod}(...array_values($parameters));
             return;
         }
 
@@ -58,5 +59,36 @@ final class Router
             'path' => $path,
             'action' => $action,
         ];
+    }
+
+    private function match(string $routePath, string $requestPath): ?array
+    {
+        $pattern = '';
+        $parameters = [];
+        $parts = preg_split('/(\{[a-zA-Z][a-zA-Z0-9_]*\})/', $routePath, -1, PREG_SPLIT_DELIM_CAPTURE);
+        if ($parts === false) {
+            return null;
+        }
+
+        foreach ($parts as $part) {
+            if (preg_match('/\A\{([a-zA-Z][a-zA-Z0-9_]*)\}\z/', $part, $match) === 1) {
+                $parameters[] = $match[1];
+                $pattern .= '([^/]+)';
+                continue;
+            }
+
+            $pattern .= preg_quote($part, '~');
+        }
+
+        if (preg_match('~\A' . $pattern . '\z~u', $requestPath, $matches) !== 1) {
+            return null;
+        }
+
+        $values = array_slice($matches, 1);
+        foreach ($values as $index => $value) {
+            $values[$index] = rawurldecode($value);
+        }
+
+        return array_combine($parameters, $values) ?: [];
     }
 }

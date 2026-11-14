@@ -1,0 +1,56 @@
+<?php
+
+declare(strict_types=1);
+
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'Core'
+    . DIRECTORY_SEPARATOR . 'Router.php';
+
+final class RouteProbe
+{
+    public function show(string $slug): void
+    {
+        echo $slug;
+    }
+}
+
+$router = new App\Core\Router();
+$router->get('/menu/{slug}', [RouteProbe::class, 'show']);
+
+ob_start();
+$router->dispatch('GET', '/menu/bo-wagyu-a5');
+$result = (string) ob_get_clean();
+if ($result !== 'bo-wagyu-a5') {
+    throw new RuntimeException('The router did not pass a dynamic route parameter.');
+}
+
+http_response_code(200);
+ob_start();
+$router->dispatch('POST', '/menu/bo-wagyu-a5');
+$result = (string) ob_get_clean();
+if (http_response_code() !== 405 || $result !== 'Method Not Allowed') {
+    throw new RuntimeException('The router did not reject an unsupported method.');
+}
+
+$routesFactory = require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'routes' . DIRECTORY_SEPARATOR . 'web.php';
+$bookingRouter = $routesFactory();
+$routesProperty = new ReflectionProperty(App\Core\Router::class, 'routes');
+$routesProperty->setAccessible(true);
+$routes = array_map(
+    static fn (array $route): string => $route['method'] . ' ' . $route['path'],
+    $routesProperty->getValue($bookingRouter)
+);
+foreach ([
+    'GET /bookings/new',
+    'POST /bookings',
+    'GET /account/bookings',
+    'GET /account/bookings/{id}',
+    'POST /account/bookings/{id}/cancel',
+    'GET /admin/bookings',
+    'POST /admin/bookings/{id}/status',
+] as $expectedRoute) {
+    if (!in_array($expectedRoute, $routes, true)) {
+        throw new RuntimeException('The booking route was not registered: ' . $expectedRoute);
+    }
+}
+
+echo "Router tests passed.\n";

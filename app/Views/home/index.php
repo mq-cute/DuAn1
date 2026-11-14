@@ -7,8 +7,12 @@ use App\Core\View;
         <h1>Vũ khúc ẩm thực<br><em>đương đại</em></h1>
         <p class="lead">Một trải nghiệm ẩm thực tinh tế, được chăm chút từ nguyên liệu đến khoảnh khắc bạn ngồi vào bàn.</p>
         <div class="hero-actions">
+            <a class="button" href="/menu">Khám phá thực đơn</a>
+            <a class="button button-outline" href="/bookings/new">Đặt bàn</a>
+            <?php if (empty($currentUser)): ?>
             <a class="button" href="/register">Tạo tài khoản khách hàng</a>
             <a class="button button-outline" href="/login">Đăng nhập</a>
+            <?php endif; ?>
         </div>
         <?php if (!empty($currentUser)): ?>
             <p class="welcome-note">Xin chào, <?= View::escape($currentUser['name']) ?>.</p>
@@ -21,5 +25,5 @@ use App\Core\View;
 <section class="intro">
     <p class="eyebrow">L'EXPÉRIENCE</p>
     <h2>Một buổi tối đáng nhớ<br> bắt đầu từ đây</h2>
-    <p>Website đang được xây dựng theo từng nghiệp vụ. Đăng ký tài khoản và đăng nhập đã sẵn sàng; các chức năng thực đơn, đặt bàn và vận hành sẽ được triển khai tiếp theo.</p>
+    <p>Khám phá thực đơn được cập nhật trực tiếp từ nhà hàng. Những món bạn chọn sẽ được giữ trong giỏ phiên này để chuẩn bị cho luồng đặt bàn.</p>
 </section>
