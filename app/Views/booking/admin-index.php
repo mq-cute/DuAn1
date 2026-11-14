@@ -71,6 +71,12 @@ $nextStates = [
                             </td>
                             <td>
                                 <span class="status-pill status-<?= View::escape($booking['status']) ?>"><?= View::escape($statusLabels[$booking['status']] ?? $booking['status']) ?></span>
+                                <?php if (in_array($booking['status'], ['pending', 'confirmed'], true) && !empty($booking['table_id'])): ?>
+                                    <form action="/staff/bookings/<?= (int) $booking['id'] ?>/checkin" method="post" class="status-action-form" style="margin-top: 6px;">
+                                        <input type="hidden" name="_csrf_token" value="<?= View::escape($csrfToken) ?>">
+                                        <button class="button button-small" style="padding: 4px 10px; font-size: 11px; min-height: 28px;" type="submit">Nhận bàn & Mở POS</button>
+                                    </form>
+                                <?php endif; ?>
                                 <?php foreach ($nextStates[$booking['status']] ?? [] as $nextStatus => $label): ?>
                                     <form action="/admin/bookings/<?= (int) $booking['id'] ?>/status" method="post" class="status-action-form">
                                         <input type="hidden" name="_csrf_token" value="<?= View::escape($csrfToken) ?>">

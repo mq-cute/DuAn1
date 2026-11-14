@@ -8,7 +8,10 @@ use App\Controllers\BookingController;
 use App\Controllers\CategoryAdminController;
 use App\Controllers\DishAdminController;
 use App\Controllers\HomeController;
+use App\Controllers\InvoiceController;
 use App\Controllers\MenuController;
+use App\Controllers\OrderController;
+use App\Controllers\TableController;
 
 return static function (): \App\Core\Router {
     $router = new \App\Core\Router();
@@ -47,6 +50,28 @@ return static function (): \App\Core\Router {
     $router->post('/admin/menu/categories/{id}', [CategoryAdminController::class, 'update']);
     $router->post('/admin/menu/categories/{id}/visibility', [CategoryAdminController::class, 'toggle']);
     $router->post('/admin/menu/categories/{id}/delete', [CategoryAdminController::class, 'delete']);
+
+    // Staff Table Management (Quản lý bàn)
+    $router->get('/tables', [TableController::class, 'index']);
+    $router->post('/tables/{id}/status', [TableController::class, 'updateStatus']);
+
+    // Staff POS & Serving Operations (Tạo đơn gọi món, Cập nhật trạng thái phục vụ, Tiếp nhận đặt bàn)
+    $router->get('/staff/pos', [OrderController::class, 'pos']);
+    $router->post('/staff/orders', [OrderController::class, 'createAtTable']);
+    $router->post('/staff/orders/{id}/items', [OrderController::class, 'addItems']);
+    $router->post('/staff/order-items/{id}/status', [OrderController::class, 'updateItemStatus']);
+    $router->post('/staff/orders/{id}/status', [OrderController::class, 'updateStatus']);
+    $router->post('/staff/bookings/{id}/checkin', [OrderController::class, 'checkinBooking']);
+
+    // Staff Orders Management (Quản lý gọi món)
+    $router->get('/staff/orders', [OrderController::class, 'index']);
+    $router->get('/staff/orders/{id}', [OrderController::class, 'show']);
+
+    // Staff Billing & Invoices (Xác nhận thanh toán, In/Xuất hóa đơn, In tạm tính)
+    $router->get('/staff/orders/{id}/prebill', [InvoiceController::class, 'prebill']);
+    $router->post('/staff/orders/{id}/pay', [InvoiceController::class, 'confirmPayment']);
+    $router->get('/staff/orders/{id}/invoice', [InvoiceController::class, 'showByOrder']);
+    $router->get('/invoices/{id}', [InvoiceController::class, 'show']);
 
     return $router;
 };
