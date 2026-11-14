@@ -68,3 +68,4 @@ php tests/ViewsSmokeTest.php
 ```
 
 Các luồng đọc/ghi danh mục và món ăn cần MySQL đã cấu hình trong `.env` và schema/roles đã được import.
+test
