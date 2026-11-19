@@ -481,6 +481,139 @@ foreach ($dishes as $d) {
     }
 }
 
+// 7. Seed Sample Bookings & Orders for Customer Testing
+$custUser = $db->query("SELECT id, name, email, phone FROM users WHERE email = 'customer@lepicure.com' LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+$adminUser = $db->query("SELECT id, name, email, phone FROM users WHERE id = 1 LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+$staffUser = $db->query("SELECT id FROM users WHERE email = 'staff@lepicure.com' LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+$t4 = $db->query("SELECT id FROM restaurant_tables WHERE code = 'T-04' LIMIT 1")->fetchColumn();
+$v1 = $db->query("SELECT id FROM restaurant_tables WHERE code = 'VIP-01' LIMIT 1")->fetchColumn();
+
+if ($custUser && $t4 && $v1) {
+    // 7.1 Booking 1: Seated at T-04
+    $bkCheck = $db->prepare("SELECT id FROM bookings WHERE customer_email = :email AND table_id = :table_id");
+    $bkCheck->execute(['email' => $custUser['email'], 'table_id' => $t4]);
+    $bookingId = $bkCheck->fetchColumn();
+
+    if (!$bookingId) {
+        $bInsert = $db->prepare(
+            "INSERT INTO bookings (user_id, customer_name, customer_phone, customer_email, booking_date, booking_time, number_of_guests, area_id, table_id, notes, status, created_at)
+             VALUES (:user_id, :name, :phone, :email, :bdate, '19:00:00', 4, 1, :table_id, 'Bàn tiệc gia đình, kỷ niệm ngày cưới', 'seated', NOW())"
+        );
+        $bInsert->execute([
+            'user_id' => $custUser['id'],
+            'name' => $custUser['name'],
+            'phone' => $custUser['phone'] ?? '0901000004',
+            'email' => $custUser['email'],
+            'bdate' => date('Y-m-d'),
+            'table_id' => $t4,
+        ]);
+        $bookingId = (int) $db->lastInsertId();
+    }
+
+    // 7.2 Order 1 (Live Active Order: 'preparing' at T-04)
+    $ordCheck = $db->prepare("SELECT id FROM orders WHERE table_id = :table_id AND status NOT IN ('completed', 'cancelled')");
+    $ordCheck->execute(['table_id' => $t4]);
+    $order1Id = $ordCheck->fetchColumn();
+
+    if (!$order1Id) {
+        $ordStmt = $db->prepare(
+            "INSERT INTO orders (booking_id, table_id, created_by, customer_name, status, payment_status, total_amount, discount, service_charge, tax, grand_total, notes, created_at)
+             VALUES (:booking_id, :table_id, :created_by, :customer_name, 'preparing', 'unpaid', 6550000.00, 0, 327500.00, 524000.00, 7401500.00, 'Bò nướng chín vừa, vang phục vụ trước', NOW() - INTERVAL 25 MINUTE)"
+        );
+        $ordStmt->execute([
+            'booking_id' => $bookingId,
+            'table_id' => $t4,
+            'created_by' => $staffUser['id'] ?? 1,
+            'customer_name' => $custUser['name'],
+        ]);
+        $order1Id = (int) $db->lastInsertId();
+
+        // Items for Order 1
+        $dSup = $db->query("SELECT id, name, price FROM dishes WHERE slug = 'sup-nam-truffle-den-alba'")->fetch(PDO::FETCH_ASSOC);
+        $dGan = $db->query("SELECT id, name, price FROM dishes WHERE slug = 'gan-ngong-ap-chao-rougie'")->fetch(PDO::FETCH_ASSOC);
+        $dBowagyu = $db->query("SELECT id, name, price FROM dishes WHERE slug = 'bo-wagyu-kagoshima-a5-ap-chao'")->fetch(PDO::FETCH_ASSOC);
+        $dCuu = $db->query("SELECT id, name, price FROM dishes WHERE slug = 'than-cuu-non-nuong-thao-moc-provence'")->fetch(PDO::FETCH_ASSOC);
+
+        $itemStmt = $db->prepare("INSERT INTO order_items (order_id, dish_id, dish_name, quantity, unit_price, subtotal, note, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW() - INTERVAL 25 MINUTE)");
+        if ($dSup) $itemStmt->execute([$order1Id, $dSup['id'], $dSup['name'], 2, $dSup['price'], $dSup['price'] * 2, 'Không tiêu đen', 'ready']);
+        if ($dGan) $itemStmt->execute([$order1Id, $dGan['id'], $dGan['name'], 1, $dGan['price'], $dGan['price'], 'Sốt thêm quả mọng', 'ready']);
+        if ($dBowagyu) $itemStmt->execute([$order1Id, $dBowagyu['id'], $dBowagyu['name'], 1, $dBowagyu['price'], $dBowagyu['price'], 'Chín vừa medium rare', 'preparing']);
+        if ($dCuu) $itemStmt->execute([$order1Id, $dCuu['id'], $dCuu['name'], 1, $dCuu['price'], $dCuu['price'], 'Thảo mộc nướng kỹ', 'preparing']);
+
+        // Histories for Order 1
+        $hStmt = $db->prepare("INSERT INTO order_status_histories (order_id, old_status, new_status, changed_by, note, created_at) VALUES (?, ?, ?, ?, ?, ?)");
+        $hStmt->execute([$order1Id, 'pending', 'confirmed', $staffUser['id'] ?? 1, 'Nhân viên phục vụ đã tiếp nhận đơn gọi món tại bàn', date('Y-m-d H:i:s', strtotime('-25 minutes'))]);
+        $hStmt->execute([$order1Id, 'confirmed', 'preparing', 4, 'Bếp trưởng bắt đầu chế biến món khai vị và món chính', date('Y-m-d H:i:s', strtotime('-15 minutes'))]);
+
+        // Notifications for Order 1
+        $nStmt = $db->prepare("INSERT INTO notifications (user_id, type, title, message, data, is_read, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $nStmt->execute([
+            $custUser['id'],
+            'order_created',
+            'Đơn gọi món mới đã được tạo #' . $order1Id,
+            'Quý khách đã được xếp bàn tại T-04 (Sảnh Vòm Grand Hall). Đơn gọi món đã được gửi tới nhà bếp.',
+            json_encode(['order_id' => $order1Id, 'table' => 'T-04'], JSON_UNESCAPED_UNICODE),
+            1,
+            date('Y-m-d H:i:s', strtotime('-25 minutes')),
+        ]);
+        $nStmt->execute([
+            $custUser['id'],
+            'order_preparing',
+            'Bếp đang chế biến món ăn — Đơn #' . $order1Id,
+            'Bếp trưởng đang thực hiện chế biến món Súp nấm Truffle đen và Bò Wagyu A5 cho bàn của bạn.',
+            json_encode(['order_id' => $order1Id, 'status' => 'preparing'], JSON_UNESCAPED_UNICODE),
+            0,
+            date('Y-m-d H:i:s', strtotime('-15 minutes')),
+        ]);
+    }
+
+    // 7.3 Order 2 (Completed Past Order: 'completed' at VIP-01)
+    $ord2Check = $db->prepare("SELECT id FROM orders WHERE customer_name = :name AND status = 'completed'");
+    $ord2Check->execute(['name' => $custUser['name']]);
+    $order2Id = $ord2Check->fetchColumn();
+
+    if (!$order2Id) {
+        $ord2Stmt = $db->prepare(
+            "INSERT INTO orders (booking_id, table_id, created_by, customer_name, status, payment_status, total_amount, discount, service_charge, tax, grand_total, notes, created_at)
+             VALUES (NULL, :table_id, :created_by, :customer_name, 'completed', 'paid', 4860000.00, 0, 243000.00, 388800.00, 5491800.00, 'Tiệc chiêu đãi đối tác VIP', NOW() - INTERVAL 2 DAY)"
+        );
+        $ord2Stmt->execute([
+            'table_id' => $v1,
+            'created_by' => $staffUser['id'] ?? 1,
+            'customer_name' => $custUser['name'],
+        ]);
+        $order2Id = (int) $db->lastInsertId();
+
+        $dHau = $db->query("SELECT id, name, price FROM dishes WHERE slug = 'hau-tuoi-gillardeau-no2'")->fetch(PDO::FETCH_ASSOC);
+        $dCatuyet = $db->query("SELECT id, name, price FROM dishes WHERE slug = 'ca-tuyet-nam-cuc-ap-chao-sot-bo-chanh'")->fetch(PDO::FETCH_ASSOC);
+        $dSouffle = $db->query("SELECT id, name, price FROM dishes WHERE slug = 'banh-souffle-cam-grand-marnier'")->fetch(PDO::FETCH_ASSOC);
+
+        $itemStmt = $db->prepare("INSERT INTO order_items (order_id, dish_id, dish_name, quantity, unit_price, subtotal, note, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW() - INTERVAL 2 DAY)");
+        if ($dHau) $itemStmt->execute([$order2Id, $dHau['id'], $dHau['name'], 2, $dHau['price'], $dHau['price'] * 2, 'Chanh vàng thêm', 'served']);
+        if ($dCatuyet) $itemStmt->execute([$order2Id, $dCatuyet['id'], $dCatuyet['name'], 2, $dCatuyet['price'], $dCatuyet['price'] * 2, '', 'served']);
+        if ($dSouffle) $itemStmt->execute([$order2Id, $dSouffle['id'], $dSouffle['name'], 2, $dSouffle['price'], $dSouffle['price'] * 2, '', 'served']);
+
+        // Invoice for Order 2
+        $invStmt = $db->prepare(
+            "INSERT INTO invoices (order_id, invoice_number, customer_name, issued_at, subtotal, discount, service_charge, tax, total, payment_method, status, created_at)
+             VALUES (?, ?, ?, NOW() - INTERVAL 2 DAY, 4860000.00, 0, 243000.00, 388800.00, 5491800.00, 'card', 'paid', NOW() - INTERVAL 2 DAY)"
+        );
+        $invStmt->execute([$order2Id, 'INV-' . date('Ymd') . '-VIP01', $custUser['name']]);
+
+        // Notifications for Order 2
+        $nStmt = $db->prepare("INSERT INTO notifications (user_id, type, title, message, data, is_read, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $nStmt->execute([
+            $custUser['id'],
+            'order_completed',
+            'Hóa đơn thanh toán hoàn tất — Đơn #' . $order2Id,
+            'Cảm ơn quý khách đã dùng bữa tại L\'Épicure. Hóa đơn #INV-' . date('Ymd') . '-VIP01 đã được thanh toán thành công qua thẻ tín dụng.',
+            json_encode(['order_id' => $order2Id, 'invoice' => 'INV-' . date('Ymd') . '-VIP01'], JSON_UNESCAPED_UNICODE),
+            1,
+            date('Y-m-d H:i:s', strtotime('-2 days')),
+        ]);
+    }
+}
+
 // Thống kê kết quả
 $totalCategories = $db->query('SELECT COUNT(*) FROM categories')->fetchColumn();
 $totalDishes = $db->query('SELECT COUNT(*) FROM dishes')->fetchColumn();

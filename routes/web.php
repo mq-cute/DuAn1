@@ -11,6 +11,7 @@ use App\Controllers\DishAdminController;
 use App\Controllers\HomeController;
 use App\Controllers\InvoiceController;
 use App\Controllers\MenuController;
+use App\Controllers\NotificationController;
 use App\Controllers\OrderController;
 use App\Controllers\RestaurantAdminController;
 use App\Controllers\TableController;
@@ -45,6 +46,17 @@ return static function (): \App\Core\Router {
     $router->get('/account/bookings', [BookingController::class, 'history']);
     $router->get('/account/bookings/{id}', [BookingController::class, 'show']);
     $router->post('/account/bookings/{id}/cancel', [BookingController::class, 'cancel']);
+
+    // CHỨC NĂNG 2: Lịch sử đơn hàng & Theo dõi đơn cho khách
+    $router->get('/account/orders', [OrderController::class, 'customerOrders']);
+    $router->get('/account/orders/{id}', [OrderController::class, 'customerOrderDetail']);
+    $router->get('/account/orders/{id}/status', [OrderController::class, 'customerOrderStatus']);
+
+    // Thông báo cho khách hàng
+    $router->get('/account/notifications', [NotificationController::class, 'index']);
+    $router->post('/account/notifications/{id}/read', [NotificationController::class, 'markRead']);
+    $router->post('/account/notifications/read-all', [NotificationController::class, 'markAllRead']);
+    $router->get('/account/notifications/unread-count', [NotificationController::class, 'unreadCountJson']);
 
     // Quản lý đặt bàn
     $router->get('/admin/bookings', [BookingAdminController::class, 'index']);

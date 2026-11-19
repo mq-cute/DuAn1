@@ -121,3 +121,37 @@ ON DUPLICATE KEY UPDATE
     `preparation_time` = VALUES(`preparation_time`),
     `is_available` = VALUES(`is_available`),
     `is_visible` = VALUES(`is_visible`);
+
+-- 6. TÀI KHOẢN KHÁCH HÀNG & NHÂN VIÊN MẪU
+INSERT INTO `users` (`id`, `role_id`, `name`, `email`, `password`, `phone`, `status`) VALUES
+(2, 1, 'Quản trị viên Hệ thống', 'admin@lepicure.com', '$2y$10$wT0lqfAovZJmPcrz3U8MGOo6eA9xT9H9L2Yf3w1g4q9x7Y9H9L2Yf', '0901000001', 'active'),
+(3, 2, 'Nguyễn Hoàng Nam', 'staff@lepicure.com', '$2y$10$wT0lqfAovZJmPcrz3U8MGOo6eA9xT9H9L2Yf3w1g4q9x7Y9H9L2Yf', '0901000002', 'active'),
+(4, 3, 'Trần Bếp Trưởng', 'kitchen@lepicure.com', '$2y$10$wT0lqfAovZJmPcrz3U8MGOo6eA9xT9H9L2Yf3w1g4q9x7Y9H9L2Yf', '0901000003', 'active'),
+(5, 4, 'Jean-Pierre Laurent', 'customer@lepicure.com', '$2y$10$wT0lqfAovZJmPcrz3U8MGOo6eA9xT9H9L2Yf3w1g4q9x7Y9H9L2Yf', '0901000004', 'active')
+ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
+
+-- 7. ĐẶT BÀN & ĐƠN GỌI MÓN MẪU ĐỂ TEST "ĐƠN CỦA TÔI" & "THÔNG BÁO"
+INSERT INTO `bookings` (`id`, `user_id`, `customer_name`, `customer_phone`, `customer_email`, `booking_date`, `booking_time`, `number_of_guests`, `area_id`, `table_id`, `notes`, `status`) VALUES
+(1, 5, 'Jean-Pierre Laurent', '0901000004', 'customer@lepicure.com', CURRENT_DATE, '19:00:00', 4, 1, 4, 'Bàn tiệc gia đình, kỷ niệm ngày cưới', 'seated')
+ON DUPLICATE KEY UPDATE `status` = VALUES(`status`);
+
+INSERT INTO `orders` (`id`, `booking_id`, `table_id`, `created_by`, `customer_name`, `status`, `payment_status`, `total_amount`, `discount`, `service_charge`, `tax`, `grand_total`, `notes`) VALUES
+(1, 1, 4, 3, 'Jean-Pierre Laurent', 'preparing', 'unpaid', 6550000.00, 0, 327500.00, 524000.00, 7401500.00, 'Bò nướng chín vừa, vang phục vụ trước'),
+(2, NULL, 9, 3, 'Jean-Pierre Laurent', 'completed', 'paid', 4860000.00, 0, 243000.00, 388800.00, 5491800.00, 'Tiệc chiêu đãi đối tác VIP')
+ON DUPLICATE KEY UPDATE `status` = VALUES(`status`);
+
+INSERT INTO `order_items` (`order_id`, `dish_id`, `dish_name`, `quantity`, `unit_price`, `subtotal`, `note`, `status`) VALUES
+(1, 1, 'Súp nấm Truffle đen Alba', 2, 450000.00, 900000.00, 'Không tiêu đen', 'ready'),
+(1, 4, 'Gan ngỗng áp chảo Rougié', 1, 650000.00, 650000.00, 'Sốt thêm quả mọng', 'ready'),
+(1, 6, 'Bò Wagyu Kagoshima A5 Áp Chảo', 1, 2850000.00, 2850000.00, 'Chín vừa medium rare', 'preparing'),
+(1, 7, 'Thăn cừu non nướng thảo mộc Provence', 1, 1250000.00, 1250000.00, 'Thảo mộc nướng kỹ', 'preparing'),
+(2, 2, 'Hàu tươi Gillardeau N°2', 2, 680000.00, 1360000.00, 'Chanh vàng thêm', 'served'),
+(2, 12, 'Cá tuyết Nam Cực áp chảo sốt bơ chanh', 2, 980000.00, 1960000.00, '', 'served'),
+(2, 15, 'Bánh Soufflé Cam Grand Marnier', 2, 320000.00, 640000.00, '', 'served')
+ON DUPLICATE KEY UPDATE `status` = VALUES(`status`);
+
+INSERT INTO `notifications` (`user_id`, `type`, `title`, `message`, `data`, `is_read`) VALUES
+(5, 'order_created', 'Đơn gọi món mới đã được tạo #1', 'Quý khách đã được xếp bàn tại T-04 (Sảnh Vòm Grand Hall). Đơn gọi món đã được gửi tới nhà bếp.', '{"order_id": 1, "table": "T-04"}', 1),
+(5, 'order_preparing', 'Bếp đang chế biến món ăn — Đơn #1', 'Bếp trưởng đang thực hiện chế biến món Súp nấm Truffle đen và Bò Wagyu A5 cho bàn của bạn.', '{"order_id": 1, "status": "preparing"}', 0),
+(5, 'order_completed', 'Hóa đơn thanh toán hoàn tất — Đơn #2', 'Cảm ơn quý khách đã dùng bữa tại L\'Épicure. Hóa đơn #INV-VIP01 đã được thanh toán thành công qua thẻ tín dụng.', '{"order_id": 2}', 1);
+

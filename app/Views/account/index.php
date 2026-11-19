@@ -8,44 +8,66 @@ $roleLabels = [
     'admin' => 'Quản trị viên',
     'staff' => 'Nhân viên phục vụ',
     'kitchen' => 'Nhân viên bếp',
-    'customer' => 'Thực khách',
+    'customer' => 'Thực khách thân thiết',
 ];
 
 $message = $message ?? '';
 $error = $error ?? '';
 $csrfToken = $csrfToken ?? '';
+$bookingCount = is_countable($bookings ?? null) ? count($bookings) : 0;
 ?>
 
-<div class="max-w-5xl w-full mx-auto p-4 md:p-8 space-y-8">
-    <!-- Profile Card Header -->
-    <div class="bg-surface rounded-3xl p-6 sm:p-10 border border-outline-variant/30 shadow-sm flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6">
-        <div class="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
-            <div class="w-20 h-20 rounded-full bg-primary/10 text-primary border-2 border-primary/20 flex items-center justify-center text-3xl font-bold font-headline overflow-hidden">
+<section class="page-heading">
+    <p class="eyebrow">MON PROFIL · L'ÉPICURE GASTRONOMIE</p>
+    <h1>Thông tin tài khoản</h1>
+    <p class="muted">Quản lý hồ sơ cá nhân, lịch sử ẩm thực và thiết lập bảo mật tài khoản thành viên.</p>
+</section>
+
+<section class="account-shell">
+    <!-- Hero Profile Summary Card -->
+    <div class="account-hero-card">
+        <div class="account-hero-left">
+            <div class="account-avatar">
                 <?php if (!empty($currentUser['avatar'])): ?>
-                    <img src="<?= View::escape($currentUser['avatar']) ?>" alt="<?= View::escape($currentUser['name']) ?>" class="w-full h-full object-cover">
+                    <img src="<?= View::escape($currentUser['avatar']) ?>" alt="<?= View::escape($currentUser['name']) ?>">
                 <?php else: ?>
-                    <?= mb_strtoupper(mb_substr($currentUser['name'], 0, 1)) ?>
+                    <span><?= mb_strtoupper(mb_substr($currentUser['name'], 0, 1)) ?></span>
                 <?php endif; ?>
             </div>
-            <div class="space-y-1">
-                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase bg-tertiary-fixed text-on-tertiary-fixed border border-outline-variant/30">
-                    <span class="material-symbols-outlined text-[14px]">verified</span>
-                    <span><?= View::escape($roleLabels[$currentUser['role']] ?? $currentUser['role']) ?></span>
+            <div class="account-hero-info">
+                <div class="account-badge-wrap">
+                    <span class="badge-role badge-role-<?= View::escape($currentUser['role']) ?>">
+                        ★ <?= View::escape($roleLabels[$currentUser['role']] ?? $currentUser['role']) ?>
+                    </span>
+                    <span class="account-status-pill">Đang hoạt động</span>
                 </div>
-                <h1 class="text-2xl sm:text-3xl font-headline font-bold text-on-surface"><?= View::escape($currentUser['name']) ?></h1>
-                <p class="text-xs text-on-surface-variant"><?= View::escape($currentUser['email'] ?? '') ?> • <?= View::escape(!empty($currentUser['phone']) ? $currentUser['phone'] : 'Chưa cập nhật SĐT') ?></p>
+                <h2 class="account-display-name"><?= View::escape($currentUser['name']) ?></h2>
+                <div class="account-contact-info">
+                    <span>✉ <?= View::escape($currentUser['email'] ?? '') ?></span>
+                    <span>•</span>
+                    <span>☎ <?= View::escape(!empty($currentUser['phone']) ? $currentUser['phone'] : 'Chưa cập nhật SĐT') ?></span>
+                </div>
             </div>
         </div>
 
-        <div class="flex items-center gap-2">
-            <a href="/account/bookings" class="px-4 py-2.5 rounded-xl border border-outline-variant/40 text-on-surface text-xs font-semibold hover:border-primary hover:text-primary transition flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-[18px]">calendar_month</span>
-                <span>Lịch sử đặt bàn</span>
+        <div class="account-hero-actions">
+            <?php if (($currentUser['role'] ?? '') === 'customer'): ?>
+                <a class="button button-small" href="/bookings/new">
+                    <span>+ Đặt bàn mới</span>
+                </a>
+            <?php endif; ?>
+            <a class="button button-small button-outline" href="/account/bookings">
+                <span>Lịch sử đặt bàn (<?= (int) $bookingCount ?>)</span>
+            </a>
+            <a class="button button-small button-outline" href="/account/orders">
+                <span>Đơn của tôi</span>
+            </a>
+            <a class="button button-small button-outline" href="/account/notifications">
+                <span>Thông báo</span>
             </a>
             <?php if (in_array($currentUser['role'], ['admin', 'staff'], true)): ?>
-                <a href="/staff/pos" class="px-4 py-2.5 rounded-xl bg-primary text-on-primary text-xs font-bold hover:bg-primary-container transition flex items-center gap-1.5">
-                    <span class="material-symbols-outlined text-[18px]">dashboard</span>
-                    <span>Vận hành bàn</span>
+                <a class="button button-small button-admin" href="/tables">
+                    <span>⚙ Trang quản trị</span>
                 </a>
             <?php endif; ?>
         </div>
@@ -53,91 +75,91 @@ $csrfToken = $csrfToken ?? '';
 
     <!-- Alert Messages -->
     <?php if ($message === 'profile_updated'): ?>
-        <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2">
-            <span class="material-symbols-outlined text-[20px]">check_circle</span>
-            <span>Hồ sơ cá nhân đã được cập nhật thành công!</span>
+        <div class="alert alert-success" role="status">
+            <strong>Thành công:</strong> Hồ sơ cá nhân của bạn đã được cập nhật thành công!
         </div>
     <?php elseif ($message === 'password_changed'): ?>
-        <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2">
-            <span class="material-symbols-outlined text-[20px]">check_circle</span>
-            <span>Đổi mật khẩu thành công! Mật khẩu mới đã được bảo mật an toàn.</span>
+        <div class="alert alert-success" role="status">
+            <strong>Thành công:</strong> Đổi mật khẩu thành công! Mật khẩu mới đã được mã hóa bảo mật.
         </div>
     <?php endif; ?>
 
     <?php if ($error !== ''): ?>
-        <div class="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-800 text-xs font-semibold flex items-center gap-2">
-            <span class="material-symbols-outlined text-[20px]">error</span>
-            <span><?= View::escape($error) ?></span>
+        <div class="alert alert-error" role="alert">
+            <strong>Lỗi:</strong> <?= View::escape($error) ?>
         </div>
     <?php endif; ?>
 
     <!-- Two-column Forms Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <!-- Form Cập Nhật Thông Tin -->
-        <section class="bg-white rounded-3xl p-6 sm:p-8 border border-outline-variant/30 shadow-sm space-y-5">
-            <div class="flex items-center gap-2 pb-3 border-b border-outline-variant/30 text-on-surface">
-                <span class="material-symbols-outlined text-primary text-[22px]">person_edit</span>
-                <h2 class="text-base font-headline font-bold">Thông Tin Cá Nhân</h2>
+    <div class="account-forms-grid">
+        <!-- Card 1: Thông Tin Cá Nhân -->
+        <article class="account-card">
+            <div class="account-card-header">
+                <div class="card-header-icon">👤</div>
+                <div>
+                    <h2>Thông tin cá nhân</h2>
+                    <p class="card-subtitle">Cập nhật thông tin định danh và liên hệ của bạn.</p>
+                </div>
             </div>
 
-            <form action="/account/profile" method="post" class="space-y-4 text-xs">
+            <form action="/account/profile" method="post" class="account-form">
                 <input type="hidden" name="_csrf_token" value="<?= View::escape($csrfToken) ?>">
 
-                <div>
-                    <label for="profile-name" class="block font-bold text-on-surface uppercase mb-1">Họ và tên *</label>
-                    <input id="profile-name" type="text" name="name" value="<?= View::escape($currentUser['name']) ?>" required class="w-full text-xs py-2.5 px-3 rounded-xl border border-outline-variant/40 focus:ring-1 focus:ring-primary font-semibold">
+                <div class="form-group">
+                    <label for="profile-name">Họ và tên <span class="required">*</span></label>
+                    <input id="profile-name" type="text" name="name" value="<?= View::escape($currentUser['name']) ?>" required maxlength="150" placeholder="Họ và tên của bạn">
                 </div>
 
-                <div>
-                    <label for="profile-email" class="block font-bold text-on-surface uppercase mb-1">Địa chỉ Email (Cố định)</label>
-                    <input id="profile-email" type="email" value="<?= View::escape($currentUser['email']) ?>" disabled class="w-full text-xs py-2.5 px-3 rounded-xl border border-outline-variant/20 bg-stone-100 text-stone-500 cursor-not-allowed">
-                    <span class="text-[10px] text-stone-400">Email dùng để đăng nhập và nhận thông báo xác nhận đặt chỗ.</span>
+                <div class="form-group">
+                    <label for="profile-email">Địa chỉ Email</label>
+                    <input id="profile-email" type="email" value="<?= View::escape($currentUser['email']) ?>" disabled class="input-disabled">
+                    <small class="form-hint">Email dùng làm tài khoản đăng nhập và không thể thay đổi.</small>
                 </div>
 
-                <div>
-                    <label for="profile-phone" class="block font-bold text-on-surface uppercase mb-1">Số điện thoại liên hệ</label>
-                    <input id="profile-phone" type="text" name="phone" value="<?= View::escape($currentUser['phone'] ?? '') ?>" placeholder="0901234567" class="w-full text-xs py-2.5 px-3 rounded-xl border border-outline-variant/40 focus:ring-1 focus:ring-primary">
+                <div class="form-group">
+                    <label for="profile-phone">Số điện thoại liên hệ</label>
+                    <input id="profile-phone" type="tel" name="phone" value="<?= View::escape($currentUser['phone'] ?? '') ?>" placeholder="Ví dụ: 0901234567" maxlength="20">
+                    <small class="form-hint">Dùng để nhà hàng gọi xác nhận hoặc liên hệ đón bàn.</small>
                 </div>
 
-                <div class="pt-3 border-t border-outline-variant/30 flex justify-end">
-                    <button type="submit" class="px-5 py-2.5 bg-inverse-surface text-inverse-on-surface font-bold rounded-xl hover:opacity-90 transition">
-                        Lưu thông tin
-                    </button>
+                <div class="form-actions">
+                    <button type="submit" class="button">Lưu thay đổi</button>
                 </div>
             </form>
-        </section>
+        </article>
 
-        <!-- Form Đổi Mật Khẩu Cá Nhân -->
-        <section class="bg-white rounded-3xl p-6 sm:p-8 border border-outline-variant/30 shadow-sm space-y-5">
-            <div class="flex items-center gap-2 pb-3 border-b border-outline-variant/30 text-on-surface">
-                <span class="material-symbols-outlined text-primary text-[22px]">lock</span>
-                <h2 class="text-base font-headline font-bold">Đổi Mật Khẩu Bảo Mật</h2>
+        <!-- Card 2: Bảo Mật & Đổi Mật Khẩu -->
+        <article class="account-card">
+            <div class="account-card-header">
+                <div class="card-header-icon">🔒</div>
+                <div>
+                    <h2>Bảo mật &amp; Đổi mật khẩu</h2>
+                    <p class="card-subtitle">Nên sử dụng mật khẩu mạnh để bảo vệ tài khoản.</p>
+                </div>
             </div>
 
-            <form action="/account/password" method="post" class="space-y-4 text-xs">
+            <form action="/account/password" method="post" class="account-form">
                 <input type="hidden" name="_csrf_token" value="<?= View::escape($csrfToken) ?>">
 
-                <div>
-                    <label for="old-password" class="block font-bold text-on-surface uppercase mb-1">Mật khẩu hiện tại *</label>
-                    <input id="old-password" type="password" name="old_password" required placeholder="••••••••" class="w-full text-xs py-2.5 px-3 rounded-xl border border-outline-variant/40 focus:ring-1 focus:ring-primary">
+                <div class="form-group">
+                    <label for="old-password">Mật khẩu hiện tại <span class="required">*</span></label>
+                    <input id="old-password" type="password" name="old_password" required placeholder="Nhập mật khẩu hiện tại">
                 </div>
 
-                <div>
-                    <label for="new-password" class="block font-bold text-on-surface uppercase mb-1">Mật khẩu mới * (tối thiểu 6 ký tự)</label>
-                    <input id="new-password" type="password" name="new_password" minlength="6" required placeholder="••••••••" class="w-full text-xs py-2.5 px-3 rounded-xl border border-outline-variant/40 focus:ring-1 focus:ring-primary">
+                <div class="form-group">
+                    <label for="new-password">Mật khẩu mới <span class="required">*</span></label>
+                    <input id="new-password" type="password" name="new_password" minlength="6" required placeholder="Tối thiểu 6 ký tự">
                 </div>
 
-                <div>
-                    <label for="confirm-password" class="block font-bold text-on-surface uppercase mb-1">Xác nhận mật khẩu mới *</label>
-                    <input id="confirm-password" type="password" name="confirm_password" minlength="6" required placeholder="••••••••" class="w-full text-xs py-2.5 px-3 rounded-xl border border-outline-variant/40 focus:ring-1 focus:ring-primary">
+                <div class="form-group">
+                    <label for="confirm-password">Xác nhận mật khẩu mới <span class="required">*</span></label>
+                    <input id="confirm-password" type="password" name="confirm_password" minlength="6" required placeholder="Nhập lại mật khẩu mới">
                 </div>
 
-                <div class="pt-3 border-t border-outline-variant/30 flex justify-end">
-                    <button type="submit" class="px-5 py-2.5 bg-primary text-on-primary font-bold rounded-xl hover:bg-primary-container transition">
-                        Cập nhật mật khẩu
-                    </button>
+                <div class="form-actions">
+                    <button type="submit" class="button button-outline">Cập nhật mật khẩu</button>
                 </div>
             </form>
-        </section>
+        </article>
     </div>
-</div>
+</section>

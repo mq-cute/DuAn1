@@ -192,6 +192,11 @@ final class Booking extends BaseModel
         return $statement->fetchAll();
     }
 
+    public function allForUser(int $userId): array
+    {
+        return $this->allForCustomer($userId);
+    }
+
     public function allForStaff(?string $date = null, ?string $status = null): array
     {
         $conditions = [];

@@ -28,7 +28,7 @@ final class AccountController extends Controller
         }
 
         $bookingModel = new Booking($db);
-        $bookings = $bookingModel->allForUser((int) $user['id']);
+        $bookings = $bookingModel->allForCustomer((int) $user['id']);
 
         $this->render('account/index', [
             'pageTitle' => 'Tài Khoản & Hồ Sơ Cá Nhân — L\'Épicure',

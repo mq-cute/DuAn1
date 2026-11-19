@@ -318,4 +318,113 @@ final class OrderController extends Controller
             'message' => is_string($_GET['message'] ?? null) ? $_GET['message'] : '',
         ], 200, 'layouts/staff');
     }
+
+    public function customerOrders(): void
+    {
+        $currentUser = $this->requireAuthenticated();
+        $db = Database::connection();
+        $orderModel = new Order($db);
+
+        $status = isset($_GET['status']) && is_string($_GET['status']) ? trim($_GET['status']) : '';
+        $orders = $orderModel->getOrdersByCustomer(
+            (int) $currentUser['id'],
+            $currentUser['name'] ?? null,
+            $currentUser['email'] ?? null,
+            $currentUser['phone'] ?? null
+        );
+
+        if ($status !== '') {
+            $orders = array_values(array_filter($orders, static function (array $o) use ($status): bool {
+                if ($status === 'active') {
+                    return !in_array($o['status'], ['completed', 'cancelled'], true);
+                }
+                return $o['status'] === $status;
+            }));
+        }
+
+        $this->render('order/customer-index', [
+            'pageTitle' => 'Đơn Của Tôi — L\'Épicure Gastronomie',
+            'currentUser' => $currentUser,
+            'orders' => $orders,
+            'selectedStatus' => $status,
+            'orderStatuses' => Order::ORDER_STATUSES,
+            'message' => is_string($_GET['message'] ?? null) ? $_GET['message'] : '',
+            'error' => is_string($_GET['error'] ?? null) ? $_GET['error'] : '',
+        ], 200, 'layouts/guest');
+    }
+
+    public function customerOrderDetail(string $id): void
+    {
+        $currentUser = $this->requireAuthenticated();
+        $orderId = (int) $id;
+        $db = Database::connection();
+        $orderModel = new Order($db);
+
+        $order = $orderModel->getCustomerOrderDetails(
+            $orderId,
+            (int) $currentUser['id'],
+            $currentUser['name'] ?? null,
+            $currentUser['email'] ?? null,
+            $currentUser['phone'] ?? null
+        );
+
+        if ($order === null) {
+            $this->redirect('/account/orders?error=not_found');
+        }
+
+        $this->render('order/customer-tracking', [
+            'pageTitle' => 'Theo Dõi Đơn Hàng #' . $orderId . ' — L\'Épicure Gastronomie',
+            'currentUser' => $currentUser,
+            'order' => $order,
+            'orderStatuses' => Order::ORDER_STATUSES,
+            'itemStatuses' => Order::ITEM_STATUSES,
+            'csrfToken' => Csrf::token(),
+        ], 200, 'layouts/guest');
+    }
+
+    public function customerOrderStatus(string $id): void
+    {
+        $currentUser = $this->requireAuthenticated();
+        $orderId = (int) $id;
+        $db = Database::connection();
+        $orderModel = new Order($db);
+
+        $order = $orderModel->getCustomerOrderDetails(
+            $orderId,
+            (int) $currentUser['id'],
+            $currentUser['name'] ?? null,
+            $currentUser['email'] ?? null,
+            $currentUser['phone'] ?? null
+        );
+
+        header('Content-Type: application/json; charset=utf-8');
+
+        if ($order === null) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'error' => 'not_found'], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        // Calculate progress steps
+        $stepMap = ['pending' => 1, 'confirmed' => 2, 'preparing' => 3, 'ready' => 4, 'served' => 5, 'completed' => 6, 'cancelled' => -1];
+        $currentStep = $stepMap[$order['status']] ?? 1;
+
+        echo json_encode([
+            'success' => true,
+            'order_id' => $orderId,
+            'status' => $order['status'],
+            'status_label' => Order::ORDER_STATUSES[$order['status']] ?? $order['status'],
+            'payment_status' => $order['payment_status'],
+            'step' => $currentStep,
+            'items' => array_map(static fn (array $item): array => [
+                'id' => (int) $item['id'],
+                'dish_name' => $item['dish_name'],
+                'quantity' => (int) $item['quantity'],
+                'status' => $item['status'],
+                'status_label' => Order::ITEM_STATUSES[$item['status']] ?? $item['status'],
+            ], $order['items']),
+            'updated_at' => $order['updated_at'],
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
 }

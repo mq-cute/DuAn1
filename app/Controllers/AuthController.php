@@ -16,8 +16,12 @@ final class AuthController extends Controller
 {
     public function showLogin(): void
     {
-        if (Auth::user() !== null) {
-            $this->redirect('/account');
+        $user = Auth::user();
+        if ($user !== null) {
+            if (in_array($user['role'] ?? '', ['admin', 'staff'], true)) {
+                $this->redirect('/tables');
+            }
+            $this->redirect('/');
         }
 
         $this->render('auth/login', [
@@ -63,13 +67,23 @@ final class AuthController extends Controller
         }
 
         Auth::login($user);
-        $this->redirect('/account');
+        if (in_array($user['role'] ?? '', ['admin', 'staff'], true)) {
+            $this->redirect('/tables');
+        } elseif (($user['role'] ?? '') === 'kitchen') {
+            $this->redirect('/staff/orders');
+        } else {
+            $this->redirect('/');
+        }
     }
 
     public function showRegister(): void
     {
-        if (Auth::user() !== null) {
-            $this->redirect('/account');
+        $user = Auth::user();
+        if ($user !== null) {
+            if (in_array($user['role'] ?? '', ['admin', 'staff'], true)) {
+                $this->redirect('/tables');
+            }
+            $this->redirect('/');
         }
 
         $this->render('auth/register', [
@@ -137,7 +151,7 @@ final class AuthController extends Controller
             'email' => $email,
             'role' => 'customer',
         ]);
-        $this->redirect('/account');
+        $this->redirect('/');
     }
 
     public function logout(): void

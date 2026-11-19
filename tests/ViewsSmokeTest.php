@@ -326,6 +326,51 @@ $pages = [
         'activeTab' => 'general',
         'csrfToken' => $token, 'message' => '', 'error' => '',
     ], 'layouts/staff'],
+    ['order/customer-index', [
+        'pageTitle' => 'Đơn Của Tôi',
+        'currentUser' => ['id' => 5, 'name' => 'Jean-Pierre Laurent', 'email' => 'customer@lepicure.com', 'role' => 'customer'],
+        'orders' => [[
+            'id' => 1, 'table_id' => 4, 'table_code' => 'T-04', 'table_name' => 'Bàn 4', 'area_name' => 'Sảnh Vòm',
+            'status' => 'preparing', 'payment_status' => 'unpaid', 'grand_total' => '7401500.00',
+            'item_count' => 4, 'served_count' => 2, 'created_at' => date('Y-m-d H:i:s'), 'booking_id' => 1,
+        ]],
+        'selectedStatus' => '',
+        'orderStatuses' => App\Models\Order::ORDER_STATUSES,
+        'message' => '', 'error' => '',
+    ], 'layouts/guest'],
+    ['order/customer-tracking', [
+        'pageTitle' => 'Theo Dõi Đơn Hàng',
+        'currentUser' => ['id' => 5, 'name' => 'Jean-Pierre Laurent', 'email' => 'customer@lepicure.com', 'role' => 'customer'],
+        'order' => [
+            'id' => 1, 'table_code' => 'T-04', 'table_name' => 'Bàn 4', 'area_name' => 'Sảnh Vòm',
+            'status' => 'preparing', 'payment_status' => 'unpaid', 'total_amount' => '6550000.00',
+            'service_charge' => '327500.00', 'tax' => '524000.00', 'discount' => '0.00', 'grand_total' => '7401500.00',
+            'notes' => 'Ít tiêu', 'created_at' => date('Y-m-d H:i:s'),
+            'items' => [[
+                'id' => 1, 'dish_name' => 'Súp nấm <script>alert(1)</script>', 'dish_image' => null,
+                'category_name' => 'Khai vị', 'note' => 'Không tiêu', 'quantity' => 2, 'subtotal' => '900000.00',
+                'status' => 'ready',
+            ]],
+            'histories' => [[
+                'id' => 1, 'new_status' => 'preparing', 'note' => 'Bếp đang nấu', 'created_at' => date('Y-m-d H:i:s'),
+            ]],
+        ],
+        'orderStatuses' => App\Models\Order::ORDER_STATUSES,
+        'itemStatuses' => App\Models\Order::ITEM_STATUSES,
+        'csrfToken' => $token,
+    ], 'layouts/guest'],
+    ['account/notifications', [
+        'pageTitle' => 'Thông Báo Của Tôi',
+        'currentUser' => ['id' => 5, 'name' => 'Jean-Pierre Laurent', 'email' => 'customer@lepicure.com', 'role' => 'customer'],
+        'notifications' => [[
+            'id' => 1, 'type' => 'order_preparing', 'title' => 'Bếp đang nấu <script>alert(1)</script>',
+            'message' => 'Món đang chế biến', 'is_read' => 0, 'created_at' => date('Y-m-d H:i:s'),
+            'data' => ['order_id' => 1],
+        ]],
+        'unreadCount' => 1,
+        'csrfToken' => $token,
+        'message' => '',
+    ], 'layouts/guest'],
 ];
 
 set_error_handler(static function (int $severity, string $message, string $file, int $line): never {

@@ -467,6 +467,29 @@ final class Order extends BaseModel
             'note' => $note ?: 'Cập nhật trạng thái sang ' . self::ORDER_STATUSES[$newStatus],
         ]);
 
+        try {
+            $cStmt = $this->db->prepare(
+                'SELECT o.booking_id, o.customer_name, b.user_id, t.code AS table_code
+                 FROM orders o
+                 INNER JOIN restaurant_tables t ON t.id = o.table_id
+                 LEFT JOIN bookings b ON b.id = o.booking_id
+                 WHERE o.id = :id'
+            );
+            $cStmt->execute(['id' => $orderId]);
+            $orderInfo = $cStmt->fetch(PDO::FETCH_ASSOC);
+            if ($orderInfo && !empty($orderInfo['user_id'])) {
+                $notif = new Notification($this->db);
+                $statusText = self::ORDER_STATUSES[$newStatus] ?? $newStatus;
+                $notif->create(
+                    (int) $orderInfo['user_id'],
+                    'order_' . $newStatus,
+                    'Cập nhật tiến độ đơn hàng #' . $orderId,
+                    'Đơn gọi món tại bàn ' . $orderInfo['table_code'] . ' hiện đang ở trạng thái: ' . $statusText . '.',
+                    ['order_id' => $orderId, 'status' => $newStatus, 'table' => $orderInfo['table_code']]
+                );
+            }
+        } catch (\Throwable) {}
+
         return true;
     }
 
@@ -715,5 +738,102 @@ final class Order extends BaseModel
                 'service_charge_rate' => self::SERVICE_CHARGE_RATE,
             ];
         }
+    }
+
+    public function getOrdersByCustomer(int $userId, ?string $customerName = null, ?string $customerEmail = null, ?string $customerPhone = null): array
+    {
+        $conditions = ['b.user_id = :user_id'];
+        $params = ['user_id' => $userId];
+
+        if (!empty($customerName)) {
+            $conditions[] = 'o.customer_name = :customer_name';
+            $params['customer_name'] = $customerName;
+        }
+
+        if (!empty($customerEmail)) {
+            $conditions[] = 'b.customer_email = :customer_email';
+            $params['customer_email'] = $customerEmail;
+        }
+
+        if (!empty($customerPhone)) {
+            $conditions[] = 'b.customer_phone = :customer_phone';
+            $params['customer_phone'] = $customerPhone;
+        }
+
+        $sql = 'SELECT o.*, 
+                       t.code AS table_code, t.name AS table_name, 
+                       a.name AS area_name,
+                       b.booking_date, b.booking_time, b.number_of_guests,
+                       (SELECT COUNT(*) FROM order_items oi WHERE oi.order_id = o.id) AS item_count,
+                       (SELECT COUNT(*) FROM order_items oi WHERE oi.order_id = o.id AND oi.status = "served") AS served_count
+                FROM orders o
+                INNER JOIN restaurant_tables t ON t.id = o.table_id
+                INNER JOIN dining_areas a ON a.id = t.area_id
+                LEFT JOIN bookings b ON b.id = o.booking_id
+                WHERE (' . implode(' OR ', $conditions) . ')
+                ORDER BY o.id DESC';
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getCustomerOrderDetails(int $orderId, int $userId, ?string $customerName = null, ?string $customerEmail = null, ?string $customerPhone = null): ?array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT o.*, 
+                    t.code AS table_code, t.name AS table_name, t.capacity AS table_capacity,
+                    a.name AS area_name,
+                    b.id AS booking_id, b.user_id AS booking_user_id, b.booking_date, b.booking_time, b.number_of_guests,
+                    b.customer_phone, b.customer_email,
+                    u.name AS staff_name
+             FROM orders o
+             INNER JOIN restaurant_tables t ON t.id = o.table_id
+             INNER JOIN dining_areas a ON a.id = t.area_id
+             LEFT JOIN bookings b ON b.id = o.booking_id
+             LEFT JOIN users u ON u.id = o.created_by
+             WHERE o.id = :id
+             LIMIT 1'
+        );
+        $stmt->execute(['id' => $orderId]);
+        $order = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($order === false) {
+            return null;
+        }
+
+        $belongsToUser = (
+            (!empty($order['booking_user_id']) && (int) $order['booking_user_id'] === $userId)
+            || (!empty($customerName) && !empty($order['customer_name']) && $order['customer_name'] === $customerName)
+            || (!empty($customerEmail) && !empty($order['customer_email']) && $order['customer_email'] === $customerEmail)
+            || (!empty($customerPhone) && !empty($order['customer_phone']) && $order['customer_phone'] === $customerPhone)
+        );
+
+        if (!$belongsToUser) {
+            return null;
+        }
+
+        $order['items'] = $this->getOrderItems($orderId);
+
+        // Fetch invoice if exists
+        $invStmt = $this->db->prepare(
+            'SELECT * FROM invoices WHERE order_id = :order_id LIMIT 1'
+        );
+        $invStmt->execute(['order_id' => $orderId]);
+        $order['invoice'] = $invStmt->fetch(PDO::FETCH_ASSOC) ?: null;
+
+        // Fetch status histories
+        $histStmt = $this->db->prepare(
+            'SELECT h.*, u.name AS changed_by_name
+             FROM order_status_histories h
+             LEFT JOIN users u ON u.id = h.changed_by
+             WHERE h.order_id = :order_id
+             ORDER BY h.id ASC'
+        );
+        $histStmt->execute(['order_id' => $orderId]);
+        $order['histories'] = $histStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $order;
     }
 }
