@@ -83,8 +83,18 @@ final class InvoiceController extends Controller
         $invoice = $invoiceModel->getInvoiceWithDetails($invId);
 
         if ($invoice === null) {
+            if (($currentUser['role'] ?? '') === 'customer') {
+                $this->redirect('/account/orders?error=invoice_not_found');
+            }
             $this->redirect('/staff/orders?message=invoice_not_found');
         }
+
+        $isCustomer = (($currentUser['role'] ?? '') === 'customer');
+        if ($isCustomer && !$this->customerOwnsInvoice($invoice, $currentUser)) {
+            $this->redirect('/account/orders?error=unauthorized');
+        }
+
+        $layout = $isCustomer ? 'layouts/guest' : 'layouts/staff';
 
         $this->render('invoice/show', [
             'pageTitle' => 'Hóa Đơn #' . $invoice['invoice_number'] . ' — L\'Épicure',
@@ -95,7 +105,9 @@ final class InvoiceController extends Controller
             'csrfToken' => Csrf::token(),
             'message' => is_string($_GET['message'] ?? null) ? $_GET['message'] : '',
             'error' => is_string($_GET['error'] ?? null) ? $_GET['error'] : '',
-        ], 200, 'layouts/staff');
+            'isCustomer' => $isCustomer,
+            'isStaffLayout' => !$isCustomer,
+        ], 200, $layout);
     }
 
     public function refund(string $id): void
@@ -201,7 +213,7 @@ final class InvoiceController extends Controller
 
     public function showByOrder(string $orderId): void
     {
-        $currentUser = $this->requireRole('staff', 'admin');
+        $currentUser = $this->requireRole('staff', 'admin', 'customer');
         $id = (int) $orderId;
 
         $db = Database::connection();
@@ -209,9 +221,52 @@ final class InvoiceController extends Controller
         $invoice = $invoiceModel->findByOrderId($id);
 
         if ($invoice === null) {
+            if (($currentUser['role'] ?? '') === 'customer') {
+                $this->redirect('/account/orders/' . $id . '?error=invoice_not_ready');
+            }
             $this->redirect('/staff/orders/' . $id . '/prebill');
         }
 
         $this->show((string) $invoice['id']);
+    }
+
+    private function customerOwnsInvoice(array $invoice, array $currentUser): bool
+    {
+        $userId = (int) ($currentUser['id'] ?? 0);
+        $bookingUserId = isset($invoice['booking_user_id']) && $invoice['booking_user_id'] !== null ? (int) $invoice['booking_user_id'] : 0;
+        if ($userId > 0 && $bookingUserId > 0 && $userId === $bookingUserId) {
+            return true;
+        }
+
+        $userName = mb_strtolower(trim((string) ($currentUser['name'] ?? '')));
+        $invCustName = mb_strtolower(trim((string) ($invoice['customer_name'] ?? '')));
+        $orderCustName = mb_strtolower(trim((string) ($invoice['order_customer_name'] ?? '')));
+        $bookCustName = mb_strtolower(trim((string) ($invoice['booking_customer_name'] ?? '')));
+
+        if ($userName !== '') {
+            if ($invCustName !== '' && $userName === $invCustName) {
+                return true;
+            }
+            if ($orderCustName !== '' && $userName === $orderCustName) {
+                return true;
+            }
+            if ($bookCustName !== '' && $userName === $bookCustName) {
+                return true;
+            }
+        }
+
+        $userEmail = strtolower(trim((string) ($currentUser['email'] ?? '')));
+        $bookEmail = strtolower(trim((string) ($invoice['booking_customer_email'] ?? '')));
+        if ($userEmail !== '' && $bookEmail !== '' && $userEmail === $bookEmail) {
+            return true;
+        }
+
+        $userPhone = preg_replace('/[^\d]/', '', (string) ($currentUser['phone'] ?? ''));
+        $bookPhone = preg_replace('/[^\d]/', '', (string) ($invoice['booking_customer_phone'] ?? ''));
+        if ($userPhone !== '' && $bookPhone !== '' && $userPhone === $bookPhone) {
+            return true;
+        }
+
+        return false;
     }
 }
