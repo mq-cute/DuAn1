@@ -195,8 +195,9 @@ final class Order extends BaseModel
                 $subtotal += $pi['subtotal'];
             }
 
-            $serviceCharge = round($subtotal * self::SERVICE_CHARGE_RATE);
-            $tax = round($subtotal * self::TAX_RATE);
+            $pricing = $this->getPricingRates();
+            $serviceCharge = round($subtotal * $pricing['service_charge_rate']);
+            $tax = round($subtotal * $pricing['tax_rate']);
             $grandTotal = $subtotal + $serviceCharge + $tax;
 
             // Insert into orders
@@ -518,8 +519,9 @@ final class Order extends BaseModel
                 $subtotal += $unitPrice * (int) $po['quantity'];
             }
 
-            $serviceCharge = round($subtotal * self::SERVICE_CHARGE_RATE);
-            $tax = round($subtotal * self::TAX_RATE);
+            $pricing = $this->getPricingRates();
+            $serviceCharge = round($subtotal * $pricing['service_charge_rate']);
+            $tax = round($subtotal * $pricing['tax_rate']);
             $grandTotal = $subtotal + $serviceCharge + $tax;
 
             // Create Order
@@ -677,8 +679,9 @@ final class Order extends BaseModel
         $stmt->execute(['order_id' => $orderId]);
         $subtotal = (float) ($stmt->fetchColumn() ?: 0.0);
 
-        $serviceCharge = round($subtotal * self::SERVICE_CHARGE_RATE);
-        $tax = round($subtotal * self::TAX_RATE);
+        $pricing = $this->getPricingRates();
+        $serviceCharge = round($subtotal * $pricing['service_charge_rate']);
+        $tax = round($subtotal * $pricing['tax_rate']);
         $grandTotal = $subtotal + $serviceCharge + $tax;
 
         $upd = $this->db->prepare(
@@ -697,5 +700,20 @@ final class Order extends BaseModel
             'grand_total' => $grandTotal,
             'id' => $orderId,
         ]);
+    }
+
+    private function getPricingRates(): array
+    {
+        try {
+            $settingModel = new RestaurantSetting($this->db);
+            return $settingModel->getPricingRates();
+        } catch (\Throwable) {
+            return [
+                'vat_enabled' => true,
+                'tax_rate' => self::TAX_RATE,
+                'service_charge_enabled' => true,
+                'service_charge_rate' => self::SERVICE_CHARGE_RATE,
+            ];
+        }
     }
 }

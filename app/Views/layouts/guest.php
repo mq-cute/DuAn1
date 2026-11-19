@@ -27,10 +27,13 @@
                 <a href="/tables">Sơ đồ bàn</a>
                 <a href="/staff/pos">Phục vụ tại bàn</a>
                 <a href="/staff/orders">Quản lý gọi món</a>
+                <a href="/admin/invoices">Hóa đơn</a>
                 <a href="/admin/bookings">Quản lý đặt bàn</a>
             <?php endif; ?>
             <?php if (($currentUser['role'] ?? '') === 'admin'): ?>
                 <a href="/admin/menu">Quản trị thực đơn</a>
+                <a href="/admin/users">Quản lý tài khoản</a>
+                <a href="/admin/restaurant">Thông tin nhà hàng</a>
             <?php endif; ?>
             <?php if (!empty($currentUser)): ?>
                 <a href="/account">Tài khoản</a>
