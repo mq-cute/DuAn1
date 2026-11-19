@@ -105,6 +105,10 @@
                     <span class="material-symbols-outlined text-[18px]">receipt_long</span>
                     <span>Quản lý gọi món</span>
                 </a>
+                <a href="/kitchen" class="hover:text-primary transition-colors flex items-center gap-1.5 <?= str_starts_with($_SERVER['REQUEST_URI'] ?? '', '/kitchen') ? 'text-primary border-b-2 border-primary pb-0.5' : '' ?>">
+                    <span class="material-symbols-outlined text-[18px]">soup_kitchen</span>
+                    <span>Màn hình bếp</span>
+                </a>
                 <a href="/admin/invoices" class="hover:text-primary transition-colors flex items-center gap-1.5 <?= str_starts_with($_SERVER['REQUEST_URI'] ?? '', '/admin/invoices') || str_starts_with($_SERVER['REQUEST_URI'] ?? '', '/invoices') ? 'text-primary border-b-2 border-primary pb-0.5' : '' ?>">
                     <span class="material-symbols-outlined text-[18px]">receipt</span>
                     <span>Hóa đơn</span>

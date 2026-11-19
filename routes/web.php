@@ -10,6 +10,7 @@ use App\Controllers\CategoryAdminController;
 use App\Controllers\DishAdminController;
 use App\Controllers\HomeController;
 use App\Controllers\InvoiceController;
+use App\Controllers\KitchenController;
 use App\Controllers\MenuController;
 use App\Controllers\NotificationController;
 use App\Controllers\OrderController;
@@ -93,6 +94,14 @@ return static function (): \App\Core\Router {
     // Staff Orders Management (Quản lý gọi món)
     $router->get('/staff/orders', [OrderController::class, 'index']);
     $router->get('/staff/orders/{id}', [OrderController::class, 'show']);
+
+    // CHỨC NĂNG 4: Quản lý Luồng Bếp KDS & Hàng đợi thời gian thực
+    $router->get('/kitchen', [KitchenController::class, 'index']);
+    $router->get('/kitchen/queue', [KitchenController::class, 'index']);
+    $router->get('/kitchen/api/queue', [KitchenController::class, 'apiQueue']);
+    $router->post('/kitchen/items/{id}/status', [KitchenController::class, 'updateItemStatus']);
+    $router->post('/kitchen/tickets/{id}/status', [KitchenController::class, 'updateTicketStatus']);
+    $router->get('/staff/api/ready-items', [KitchenController::class, 'apiReadyItems']);
 
     // CHỨC NĂNG 5: Quản lý Hóa đơn & Thanh toán (Khách xem/tải hóa đơn chính mình)
     $router->get('/account/orders/{id}/invoice', [InvoiceController::class, 'showByOrder']);

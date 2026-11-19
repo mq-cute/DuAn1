@@ -70,7 +70,7 @@ final class AuthController extends Controller
         if (in_array($user['role'] ?? '', ['admin', 'staff'], true)) {
             $this->redirect('/tables');
         } elseif (($user['role'] ?? '') === 'kitchen') {
-            $this->redirect('/staff/orders');
+            $this->redirect('/kitchen');
         } else {
             $this->redirect('/');
         }

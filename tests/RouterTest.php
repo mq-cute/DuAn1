@@ -70,6 +70,12 @@ foreach ([
     'POST /account/notifications/{id}/read',
     'POST /account/notifications/read-all',
     'GET /account/notifications/unread-count',
+    'GET /kitchen',
+    'GET /kitchen/queue',
+    'GET /kitchen/api/queue',
+    'POST /kitchen/items/{id}/status',
+    'POST /kitchen/tickets/{id}/status',
+    'GET /staff/api/ready-items',
 ] as $expectedRoute) {
     if (!in_array($expectedRoute, $routes, true)) {
         throw new RuntimeException('The booking route was not registered: ' . $expectedRoute);

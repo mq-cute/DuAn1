@@ -8,6 +8,7 @@ use DomainException;
 use PDO;
 use RuntimeException;
 use Throwable;
+use App\Models\Notification;
 
 final class Order extends BaseModel
 {
@@ -392,15 +393,26 @@ final class Order extends BaseModel
             $statuses = $checkItemsStmt->fetchAll(PDO::FETCH_COLUMN);
 
             $allServed = true;
+            $allReadyOrServed = true;
+            $hasPreparing = false;
             foreach ($statuses as $s) {
                 if ($s !== 'served' && $s !== 'cancelled') {
                     $allServed = false;
-                    break;
+                }
+                if ($s !== 'ready' && $s !== 'served' && $s !== 'cancelled') {
+                    $allReadyOrServed = false;
+                }
+                if ($s === 'preparing') {
+                    $hasPreparing = true;
                 }
             }
 
             if ($allServed && count($statuses) > 0) {
                 $this->updateOrderStatusInternal($orderId, 'served', $changedBy, 'Tất cả các món đã được phục vụ ra bàn');
+            } elseif ($allReadyOrServed && count($statuses) > 0) {
+                $this->updateOrderStatusInternal($orderId, 'ready', $changedBy, 'Tất cả các món đã chế biến xong, sẵn sàng lên bàn');
+            } elseif ($hasPreparing) {
+                $this->updateOrderStatusInternal($orderId, 'preparing', $changedBy, 'Nhà bếp đang chế biến món ăn');
             }
 
             $this->db->commit();
@@ -835,5 +847,316 @@ final class Order extends BaseModel
         $order['histories'] = $histStmt->fetchAll(PDO::FETCH_ASSOC);
 
         return $order;
+    }
+
+    public function getKitchenItems(?string $statusFilter = null): array
+    {
+        $sql = 'SELECT oi.id AS item_id, oi.order_id, oi.dish_id, oi.dish_name, oi.quantity, oi.unit_price, oi.subtotal, oi.note,
+                       oi.status AS item_status, oi.created_at AS item_created_at, oi.updated_at AS item_updated_at,
+                       o.table_id, o.customer_name, o.notes AS order_notes, o.status AS order_status, o.created_at AS order_created_at,
+                       t.code AS table_code, t.name AS table_name, t.capacity AS table_capacity,
+                       a.id AS area_id, a.name AS area_name,
+                       d.image AS dish_image, c.name AS category_name,
+                       COALESCE(kt.ticket_number, CONCAT("KT-", DATE_FORMAT(o.created_at, "%Y%m%d"), "-", LPAD(o.id, 4, "0"))) AS ticket_number,
+                       kt.id AS ticket_id
+                FROM order_items oi
+                INNER JOIN orders o ON o.id = oi.order_id
+                INNER JOIN restaurant_tables t ON t.id = o.table_id
+                INNER JOIN dining_areas a ON a.id = t.area_id
+                LEFT JOIN dishes d ON d.id = oi.dish_id
+                LEFT JOIN categories c ON c.id = d.category_id
+                LEFT JOIN kitchen_ticket_items kti ON kti.order_item_id = oi.id
+                LEFT JOIN kitchen_tickets kt ON kt.id = kti.ticket_id
+                WHERE o.status NOT IN ("completed", "cancelled")';
+
+        $params = [];
+        if ($statusFilter !== null && $statusFilter !== '' && $statusFilter !== 'all') {
+            $sql .= ' AND oi.status = :status';
+            $params['status'] = $statusFilter;
+        } else {
+            $sql .= ' AND oi.status IN ("pending", "confirmed", "preparing", "ready")';
+        }
+
+        $sql .= ' ORDER BY oi.id ASC';
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $now = time();
+        foreach ($items as &$item) {
+            $itemTime = !empty($item['item_created_at']) ? strtotime((string) $item['item_created_at']) : strtotime((string) $item['order_created_at']);
+            $item['elapsed_minutes'] = max(0, (int) floor(($now - $itemTime) / 60));
+            $item['is_urgent'] = ($item['elapsed_minutes'] >= 15 && in_array($item['item_status'], ['pending', 'confirmed', 'preparing'], true));
+        }
+
+        return $items;
+    }
+
+    public function getKitchenTickets(?string $statusFilter = null): array
+    {
+        $items = $this->getKitchenItems($statusFilter);
+        $tickets = [];
+
+        foreach ($items as $item) {
+            $orderId = (int) $item['order_id'];
+            if (!isset($tickets[$orderId])) {
+                $tickets[$orderId] = [
+                    'order_id' => $orderId,
+                    'ticket_id' => $item['ticket_id'],
+                    'ticket_number' => $item['ticket_number'],
+                    'table_id' => (int) $item['table_id'],
+                    'table_code' => $item['table_code'],
+                    'table_name' => $item['table_name'],
+                    'area_name' => $item['area_name'],
+                    'customer_name' => $item['customer_name'] ?: 'Khách tại bàn',
+                    'order_notes' => $item['order_notes'],
+                    'order_status' => $item['order_status'],
+                    'order_created_at' => $item['order_created_at'],
+                    'elapsed_minutes' => $item['elapsed_minutes'],
+                    'is_urgent' => false,
+                    'items' => [],
+                    'counts' => [
+                        'pending' => 0,
+                        'confirmed' => 0,
+                        'preparing' => 0,
+                        'ready' => 0,
+                        'total' => 0,
+                    ],
+                ];
+            }
+
+            $tickets[$orderId]['items'][] = $item;
+            $st = $item['item_status'];
+            if (isset($tickets[$orderId]['counts'][$st])) {
+                $tickets[$orderId]['counts'][$st]++;
+            }
+            $tickets[$orderId]['counts']['total']++;
+
+            if ($item['is_urgent']) {
+                $tickets[$orderId]['is_urgent'] = true;
+            }
+            if ($item['elapsed_minutes'] > $tickets[$orderId]['elapsed_minutes']) {
+                $tickets[$orderId]['elapsed_minutes'] = $item['elapsed_minutes'];
+            }
+        }
+
+        return array_values($tickets);
+    }
+
+    public function getKitchenSummary(): array
+    {
+        $items = $this->getKitchenItems();
+        $summary = [];
+
+        foreach ($items as $item) {
+            $dishName = (string) $item['dish_name'];
+            if (!isset($summary[$dishName])) {
+                $summary[$dishName] = [
+                    'dish_id' => (int) $item['dish_id'],
+                    'dish_name' => $dishName,
+                    'category_name' => $item['category_name'] ?? 'Món ăn',
+                    'dish_image' => $item['dish_image'] ?? null,
+                    'total_qty' => 0,
+                    'pending_qty' => 0,
+                    'confirmed_qty' => 0,
+                    'preparing_qty' => 0,
+                    'ready_qty' => 0,
+                    'tables' => [],
+                ];
+            }
+
+            $qty = (int) $item['quantity'];
+            $summary[$dishName]['total_qty'] += $qty;
+            $st = $item['item_status'];
+            if ($st === 'pending') {
+                $summary[$dishName]['pending_qty'] += $qty;
+            } elseif ($st === 'confirmed') {
+                $summary[$dishName]['confirmed_qty'] += $qty;
+            } elseif ($st === 'preparing') {
+                $summary[$dishName]['preparing_qty'] += $qty;
+            } elseif ($st === 'ready') {
+                $summary[$dishName]['ready_qty'] += $qty;
+            }
+
+            $tbl = $item['table_code'] . ' (x' . $qty . ')';
+            if (!in_array($tbl, $summary[$dishName]['tables'], true)) {
+                $summary[$dishName]['tables'][] = $tbl;
+            }
+        }
+
+        usort($summary, static fn (array $a, array $b): int => $b['total_qty'] <=> $a['total_qty']);
+        return array_values($summary);
+    }
+
+    public function getKitchenStats(): array
+    {
+        $stmt = $this->db->query(
+            'SELECT oi.status, COUNT(*) AS cnt, SUM(oi.quantity) AS total_qty
+             FROM order_items oi
+             INNER JOIN orders o ON o.id = oi.order_id
+             WHERE o.status NOT IN ("completed", "cancelled")
+             GROUP BY oi.status'
+        );
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $stats = [
+            'total_active' => 0,
+            'pending_count' => 0,
+            'confirmed_count' => 0,
+            'preparing_count' => 0,
+            'ready_count' => 0,
+            'served_today_count' => 0,
+            'urgent_count' => 0,
+        ];
+
+        foreach ($rows as $r) {
+            $st = $r['status'];
+            $qty = (int) $r['total_qty'];
+            if ($st === 'pending') {
+                $stats['pending_count'] += $qty;
+                $stats['total_active'] += $qty;
+            } elseif ($st === 'confirmed') {
+                $stats['confirmed_count'] += $qty;
+                $stats['total_active'] += $qty;
+            } elseif ($st === 'preparing') {
+                $stats['preparing_count'] += $qty;
+                $stats['total_active'] += $qty;
+            } elseif ($st === 'ready') {
+                $stats['ready_count'] += $qty;
+                $stats['total_active'] += $qty;
+            }
+        }
+
+        // Served today
+        $servedStmt = $this->db->query(
+            'SELECT COALESCE(SUM(quantity), 0) FROM order_items
+             WHERE status = "served" AND DATE(updated_at) = CURRENT_DATE'
+        );
+        $stats['served_today_count'] = (int) $servedStmt->fetchColumn();
+
+        // Urgent items (over 15 minutes)
+        $urgentStmt = $this->db->query(
+            'SELECT COUNT(*) FROM order_items oi
+             INNER JOIN orders o ON o.id = oi.order_id
+             WHERE o.status NOT IN ("completed", "cancelled")
+               AND oi.status IN ("pending", "confirmed", "preparing")
+               AND oi.created_at <= (NOW() - INTERVAL 15 MINUTE)'
+        );
+        $stats['urgent_count'] = (int) $urgentStmt->fetchColumn();
+
+        return $stats;
+    }
+
+    public function advanceKitchenItemStatus(int $itemId, ?string $targetStatus = null, ?int $changedBy = null): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT oi.*, o.table_id, t.code AS table_code, t.name AS table_name,
+                    b.user_id AS booking_user_id
+             FROM order_items oi
+             INNER JOIN orders o ON o.id = oi.order_id
+             INNER JOIN restaurant_tables t ON t.id = o.table_id
+             LEFT JOIN bookings b ON b.id = o.booking_id
+             WHERE oi.id = :id
+             LIMIT 1'
+        );
+        $stmt->execute(['id' => $itemId]);
+        $item = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($item === false) {
+            return ['success' => false, 'error' => 'Món không tồn tại trong hệ thống.'];
+        }
+
+        $currentStatus = (string) $item['status'];
+        if ($targetStatus === null || $targetStatus === '') {
+            $nextMap = [
+                'pending' => 'confirmed',
+                'confirmed' => 'preparing',
+                'preparing' => 'ready',
+                'ready' => 'served',
+            ];
+            $targetStatus = $nextMap[$currentStatus] ?? 'ready';
+        }
+
+        $success = $this->updateOrderItemStatus($itemId, $targetStatus, $changedBy);
+        if (!$success) {
+            return ['success' => false, 'error' => 'Không thể cập nhật trạng thái món.'];
+        }
+
+        // Dispatch notifications if dish is ready or served
+        try {
+            $notif = new Notification($this->db);
+            $dishName = (string) $item['dish_name'];
+            $tableCode = (string) $item['table_code'];
+
+            if ($targetStatus === 'ready') {
+                // Notify staff/waiters
+                $notif->create(
+                    null,
+                    'item_ready',
+                    'Món ăn sẵn sàng: ' . $dishName,
+                    'Món ' . $dishName . ' (Bàn ' . $tableCode . ') đã hoàn thành chế biến, sẵn sàng phục vụ.',
+                    ['order_id' => (int) $item['order_id'], 'item_id' => $itemId, 'table_id' => (int) $item['table_id'], 'status' => 'ready']
+                );
+
+                // Notify customer if associated with account
+                if (!empty($item['booking_user_id'])) {
+                    $notif->create(
+                        (int) $item['booking_user_id'],
+                        'item_ready',
+                        'Món ăn của bạn đã hoàn thành: ' . $dishName,
+                        'Đầu bếp vừa hoàn tất món ' . $dishName . ' cho bàn của bạn. Nhân viên đang chuẩn bị mang ra bàn.',
+                        ['order_id' => (int) $item['order_id'], 'item_id' => $itemId, 'status' => 'ready']
+                    );
+                }
+            } elseif ($targetStatus === 'served') {
+                if (!empty($item['booking_user_id'])) {
+                    $notif->create(
+                        (int) $item['booking_user_id'],
+                        'item_served',
+                        'Món ăn đã được phục vụ: ' . $dishName,
+                        'Món ' . $dishName . ' đã lên bàn. Chúc bạn có một bữa ăn ngon miệng!',
+                        ['order_id' => (int) $item['order_id'], 'item_id' => $itemId, 'status' => 'served']
+                    );
+                }
+            }
+        } catch (Throwable) {
+            // Notification dispatch should not block status update
+        }
+
+        return [
+            'success' => true,
+            'item_id' => $itemId,
+            'old_status' => $currentStatus,
+            'new_status' => $targetStatus,
+            'dish_name' => $item['dish_name'],
+            'table_code' => $item['table_code'],
+        ];
+    }
+
+    public function advanceKitchenTicketStatus(int $orderId, string $targetStatus, ?int $changedBy = null): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT id, status FROM order_items
+             WHERE order_id = :order_id AND status NOT IN ("served", "cancelled")'
+        );
+        $stmt->execute(['order_id' => $orderId]);
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $updatedCount = 0;
+        foreach ($items as $it) {
+            $itemId = (int) $it['id'];
+            $res = $this->advanceKitchenItemStatus($itemId, $targetStatus, $changedBy);
+            if ($res['success']) {
+                $updatedCount++;
+            }
+        }
+
+        return [
+            'success' => true,
+            'order_id' => $orderId,
+            'target_status' => $targetStatus,
+            'updated_count' => $updatedCount,
+        ];
     }
 }
