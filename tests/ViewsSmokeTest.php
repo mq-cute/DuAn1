@@ -268,6 +268,64 @@ $pages = [
         ],
         'csrfToken' => $token,
     ], 'layouts/staff'],
+    ['invoice/index', [
+        'pageTitle' => 'Invoices', 'currentUser' => ['id' => 1, 'name' => 'Admin', 'role' => 'admin'],
+        'invoices' => [[
+            'id' => 1, 'order_id' => 1, 'invoice_number' => 'INV-001', 'table_code' => 'T01',
+            'area_name' => 'VIP', 'customer_name' => 'Khách A', 'issued_at' => date('Y-m-d H:i:s'),
+            'total' => 2000000, 'total_refunded' => 0, 'payment_method' => 'card', 'status' => 'paid',
+        ]],
+        'totalCount' => 1, 'page' => 1, 'totalPages' => 1,
+        'search' => '', 'dateFrom' => '', 'dateTo' => '', 'status' => '', 'paymentMethod' => '',
+        'statuses' => \App\Models\Invoice::INVOICE_STATUSES,
+        'paymentMethods' => \App\Models\Invoice::PAYMENT_METHODS,
+        'csrfToken' => $token, 'message' => '', 'error' => '',
+    ], 'layouts/staff'],
+    ['admin/users/index', [
+        'pageTitle' => 'Users', 'currentUser' => ['id' => 1, 'name' => 'Admin', 'role' => 'admin'],
+        'users' => [[
+            'id' => 1, 'name' => 'Admin User', 'email' => 'admin@example.com', 'phone' => '0901234567',
+            'avatar' => null, 'role' => 'admin', 'status' => 'active', 'created_at' => date('Y-m-d H:i:s'),
+        ]],
+        'roles' => [['id' => 1, 'name' => 'admin', 'description' => 'Admin']],
+        'roleLabels' => \App\Models\User::ROLES,
+        'statusLabels' => \App\Models\User::STATUSES,
+        'totalUsers' => 1, 'page' => 1, 'totalPages' => 1,
+        'search' => '', 'selectedRole' => '', 'selectedStatus' => '',
+        'csrfToken' => $token, 'message' => '', 'error' => '',
+    ], 'layouts/staff'],
+    ['admin/users/logs', [
+        'pageTitle' => 'Logs', 'currentUser' => ['id' => 1, 'name' => 'Admin', 'role' => 'admin'],
+        'logs' => [[
+            'id' => 1, 'user_name' => 'Admin', 'user_email' => 'admin@example.com', 'user_role' => 'admin',
+            'action' => 'update_user', 'target_type' => 'users', 'target_id' => 2,
+            'details' => '{"change": "role"}', 'ip_address' => '127.0.0.1', 'created_at' => date('Y-m-d H:i:s'),
+        ]],
+        'totalLogs' => 1, 'page' => 1, 'totalPages' => 1,
+        'action' => '', 'targetType' => '', 'date' => '',
+        'csrfToken' => $token,
+    ], 'layouts/staff'],
+    ['admin/restaurant/index', [
+        'pageTitle' => 'Restaurant Settings', 'currentUser' => ['id' => 1, 'name' => 'Admin', 'role' => 'admin'],
+        'settings' => [
+            'restaurant_name' => "L'Épicure", 'restaurant_tagline' => 'Fine dining',
+            'restaurant_address' => '18 Le Duan', 'restaurant_phone' => '02838228899',
+            'restaurant_email' => 'contact@lepicure.com', 'restaurant_tax_number' => '0314892341',
+            'restaurant_description' => 'Fine French dining', 'restaurant_logo' => '',
+            'restaurant_cover_image' => '', 'booking_policy' => '2 hours',
+            'cancellation_policy' => 'Free before 2h', 'refund_policy' => '100% refund',
+            'general_terms' => 'Smart casual',
+        ],
+        'operatingHours' => [
+            ['day_of_week' => 'monday', 'day_name' => 'Thứ Hai', 'open_time' => '10:00:00', 'close_time' => '23:00:00', 'is_closed' => 0],
+        ],
+        'pricing' => [
+            'vat_enabled' => true, 'tax_rate_percent' => 8.0, 'tax_rate' => 0.08,
+            'service_charge_enabled' => true, 'service_charge_rate_percent' => 5.0, 'service_charge_rate' => 0.05,
+        ],
+        'activeTab' => 'general',
+        'csrfToken' => $token, 'message' => '', 'error' => '',
+    ], 'layouts/staff'],
 ];
 
 set_error_handler(static function (int $severity, string $message, string $file, int $line): never {

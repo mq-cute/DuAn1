@@ -105,14 +105,26 @@
                     <span class="material-symbols-outlined text-[18px]">receipt_long</span>
                     <span>Quản lý gọi món</span>
                 </a>
+                <a href="/admin/invoices" class="hover:text-primary transition-colors flex items-center gap-1.5 <?= str_starts_with($_SERVER['REQUEST_URI'] ?? '', '/admin/invoices') || str_starts_with($_SERVER['REQUEST_URI'] ?? '', '/invoices') ? 'text-primary border-b-2 border-primary pb-0.5' : '' ?>">
+                    <span class="material-symbols-outlined text-[18px]">receipt</span>
+                    <span>Hóa đơn</span>
+                </a>
                 <a href="/admin/bookings" class="hover:text-primary transition-colors flex items-center gap-1.5 <?= str_starts_with($_SERVER['REQUEST_URI'] ?? '', '/admin/bookings') ? 'text-primary border-b-2 border-primary pb-0.5' : '' ?>">
                     <span class="material-symbols-outlined text-[18px]">calendar_month</span>
                     <span>Đặt bàn</span>
                 </a>
                 <?php if (($currentUser['role'] ?? '') === 'admin'): ?>
-                    <a href="/admin/menu" class="hover:text-primary transition-colors flex items-center gap-1.5">
+                    <a href="/admin/menu" class="hover:text-primary transition-colors flex items-center gap-1.5 <?= str_starts_with($_SERVER['REQUEST_URI'] ?? '', '/admin/menu') ? 'text-primary border-b-2 border-primary pb-0.5' : '' ?>">
                         <span class="material-symbols-outlined text-[18px]">restaurant_menu</span>
                         <span>Thực đơn</span>
+                    </a>
+                    <a href="/admin/users" class="hover:text-primary transition-colors flex items-center gap-1.5 <?= str_starts_with($_SERVER['REQUEST_URI'] ?? '', '/admin/users') ? 'text-primary border-b-2 border-primary pb-0.5' : '' ?>">
+                        <span class="material-symbols-outlined text-[18px]">manage_accounts</span>
+                        <span>Tài khoản</span>
+                    </a>
+                    <a href="/admin/restaurant" class="hover:text-primary transition-colors flex items-center gap-1.5 <?= str_starts_with($_SERVER['REQUEST_URI'] ?? '', '/admin/restaurant') ? 'text-primary border-b-2 border-primary pb-0.5' : '' ?>">
+                        <span class="material-symbols-outlined text-[18px]">storefront</span>
+                        <span>Nhà hàng</span>
                     </a>
                 <?php endif; ?>
             </nav>
