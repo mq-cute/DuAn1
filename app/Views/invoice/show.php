@@ -28,18 +28,90 @@ $invStatus = $invoice['status'] ?? 'paid';
 $stInfo = $statusConfig[$invStatus] ?? ['label' => strtoupper($invStatus), 'badge' => 'bg-stone-100 text-stone-700 border-stone-200'];
 $remainingRefundable = (float) ($invoice['remaining_refundable'] ?? ($invoice['total'] ?? 0));
 $totalRefunded = (float) ($invoice['total_refunded'] ?? 0);
+$isCustomer = ($currentUser['role'] ?? '') === 'customer';
 $isStaffOrAdmin = in_array($currentUser['role'] ?? '', ['staff', 'admin'], true);
 $canRefund = $isStaffOrAdmin && in_array($invStatus, ['paid', 'partially_refunded'], true) && $remainingRefundable > 0;
 $canEdit = $isStaffOrAdmin && !in_array($invStatus, ['cancelled', 'refunded'], true);
 ?>
 
+<?php if ($isCustomer): ?>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#870000",
+                "primary-container": "#af140b",
+                "primary-fixed": "#ffdad4",
+                "on-primary": "#ffffff",
+                "secondary": "#4a6633",
+                "secondary-container": "#c8eaa9",
+                "on-secondary": "#ffffff",
+                "background": "#fff8f5",
+                "surface": "#fff8f5",
+                "surface-container-low": "#fff1e8",
+                "on-surface": "#231a11",
+                "on-surface-variant": "#5b403c",
+                "outline": "#906f6a",
+                "outline-variant": "#e4beb8",
+                "tertiary-container": "#844800",
+              },
+              fontFamily: {
+                "headline": ["Playfair Display", "Georgia", "serif"],
+                "body": ["Plus Jakarta Sans", "Arial", "sans-serif"],
+              }
+            }
+          }
+        };
+    </script>
+    <style>
+        .site-header { margin-bottom: 24px; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+            line-height: 1;
+        }
+    </style>
+<?php endif; ?>
+
+<style>
+@media print {
+    .no-print, header, footer, .site-header, .site-footer {
+        display: none !important;
+    }
+    body {
+        background: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    .print-area {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+}
+</style>
+
 <div class="max-w-4xl w-full mx-auto p-4 md:p-8 space-y-6">
     <!-- Action Bar (Not shown in print) -->
     <div class="no-print flex flex-col sm:flex-row items-center justify-between pb-4 border-b border-outline-variant/30 gap-4">
         <div class="flex items-center space-x-3">
-            <a href="/admin/invoices" class="p-2 rounded-xl border border-outline-variant/40 hover:bg-stone-100 text-on-surface-variant" title="Trở về danh sách hóa đơn">
-                <span class="material-symbols-outlined text-[20px]">arrow_back</span>
-            </a>
+            <?php if ($isCustomer): ?>
+                <a href="/account/orders/<?= (int) ($invoice['order_id'] ?? 0) ?>" class="p-2 rounded-xl border border-outline-variant/40 hover:bg-stone-100 text-on-surface-variant flex items-center justify-center" title="Quay lại chi tiết đơn hàng">
+                    <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+                </a>
+            <?php else: ?>
+                <a href="/admin/invoices" class="p-2 rounded-xl border border-outline-variant/40 hover:bg-stone-100 text-on-surface-variant flex items-center justify-center" title="Trở về danh sách hóa đơn">
+                    <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+                </a>
+            <?php endif; ?>
             <div>
                 <div class="flex items-center space-x-2">
                     <span class="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase border <?= $stInfo['badge'] ?>">
@@ -66,13 +138,23 @@ $canEdit = $isStaffOrAdmin && !in_array($invStatus, ['cancelled', 'refunded'], t
                 </button>
             <?php endif; ?>
 
-            <button type="button" onclick="window.print()" class="px-4 py-2 rounded-xl bg-primary text-on-primary text-xs font-bold hover:bg-primary-container shadow-sm transition flex items-center gap-1.5">
+            <button type="button" onclick="window.print()" class="px-4 py-2 rounded-xl bg-primary text-on-primary text-xs font-bold hover:bg-primary-container shadow-sm transition flex items-center gap-1.5" title="In hoặc lưu file PDF">
                 <span class="material-symbols-outlined text-[18px]">print</span>
-                <span>In Hóa Đơn / PDF</span>
+                <span>In Hóa Đơn / Tải PDF</span>
             </button>
-            <a href="/staff/pos?table_id=<?= (int) ($invoice['table_id'] ?? 0) ?>" class="px-3 py-2 rounded-xl border border-outline-variant/40 text-on-surface text-xs font-semibold hover:bg-stone-50 transition">
-                Thu ngân POS
-            </a>
+
+            <?php if ($isCustomer): ?>
+                <a href="/account/orders" class="px-3.5 py-2 rounded-xl border border-outline-variant/40 text-on-surface text-xs font-semibold hover:bg-stone-50 transition flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[16px]">receipt_long</span>
+                    <span>Đơn của tôi</span>
+                </a>
+            <?php endif; ?>
+
+            <?php if ($isStaffOrAdmin): ?>
+                <a href="/staff/pos?table_id=<?= (int) ($invoice['table_id'] ?? 0) ?>" class="px-3 py-2 rounded-xl border border-outline-variant/40 text-on-surface text-xs font-semibold hover:bg-stone-50 transition">
+                    Thu ngân POS
+                </a>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -235,8 +317,8 @@ $canEdit = $isStaffOrAdmin && !in_array($invStatus, ['cancelled', 'refunded'], t
         </div>
     </div>
 
-    <!-- Refund History Section (Nếu có hoàn tiền) -->
-    <?php if (!empty($invoice['refunds'])): ?>
+    <!-- Refund History Section (Chỉ hiển thị cho Staff / Admin nếu có hoàn tiền) -->
+    <?php if ($isStaffOrAdmin && !empty($invoice['refunds'])): ?>
         <div class="bg-white rounded-3xl p-6 sm:p-8 border border-outline-variant/30 shadow-sm space-y-4 no-print">
             <div class="flex items-center justify-between pb-3 border-b border-outline-variant/30">
                 <div class="flex items-center gap-2 text-purple-900 font-bold text-sm">
@@ -270,8 +352,8 @@ $canEdit = $isStaffOrAdmin && !in_array($invStatus, ['cancelled', 'refunded'], t
         </div>
     <?php endif; ?>
 
-    <!-- Edit History Section (Nếu có sửa sai) -->
-    <?php if (!empty($invoice['edit_histories'])): ?>
+    <!-- Edit History Section (Chỉ hiển thị cho Staff / Admin nếu có sửa sai) -->
+    <?php if ($isStaffOrAdmin && !empty($invoice['edit_histories'])): ?>
         <div class="bg-white rounded-3xl p-6 sm:p-8 border border-outline-variant/30 shadow-sm space-y-4 no-print">
             <div class="flex items-center gap-2 text-on-surface font-bold text-sm pb-3 border-b border-outline-variant/30">
                 <span class="material-symbols-outlined text-[20px]">history</span>

@@ -174,11 +174,16 @@ final class Invoice extends BaseModel
     public function getInvoiceWithDetails(int $id): ?array
     {
         $stmt = $this->db->prepare(
-            'SELECT i.*, o.id AS order_id, o.notes AS order_notes, o.created_at AS order_created_at,
+            'SELECT i.*, 
+                    o.id AS order_id, o.notes AS order_notes, o.created_at AS order_created_at,
+                    o.customer_name AS order_customer_name, o.booking_id,
+                    b.user_id AS booking_user_id, b.customer_name AS booking_customer_name,
+                    b.customer_email AS booking_customer_email, b.customer_phone AS booking_customer_phone,
                     t.code AS table_code, t.name AS table_name, a.name AS area_name,
                     u.name AS cashier_name, u.phone AS cashier_phone
              FROM invoices i
              INNER JOIN orders o ON o.id = i.order_id
+             LEFT JOIN bookings b ON b.id = o.booking_id
              INNER JOIN restaurant_tables t ON t.id = o.table_id
              INNER JOIN dining_areas a ON a.id = t.area_id
              LEFT JOIN payments p ON p.invoice_id = i.id

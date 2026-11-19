@@ -61,6 +61,8 @@ foreach ([
     'POST /staff/orders/{id}/pay',
     'GET /staff/orders/{id}/invoice',
     'GET /invoices/{id}',
+    'GET /account/orders/{id}/invoice',
+    'GET /account/invoices/{id}',
     'GET /account/orders',
     'GET /account/orders/{id}',
     'GET /account/orders/{id}/status',

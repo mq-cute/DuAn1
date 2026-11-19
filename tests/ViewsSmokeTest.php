@@ -251,6 +251,21 @@ $pages = [
         'paymentMethods' => \App\Models\Invoice::PAYMENT_METHODS,
         'csrfToken' => $token, 'message' => '',
     ], 'layouts/staff'],
+    ['invoice/show', [
+        'pageTitle' => 'Invoice Customer', 'currentUser' => ['id' => 5, 'name' => 'Jean-Pierre Laurent', 'email' => 'customer@lepicure.com', 'role' => 'customer'],
+        'invoice' => [
+            'id' => 1, 'order_id' => 2, 'invoice_number' => 'INV-20261119-VIP01', 'customer_name' => 'Jean-Pierre Laurent',
+            'table_code' => 'VIP-01', 'area_name' => 'Phòng VIP', 'cashier_name' => 'Staff',
+            'payment_method' => 'card', 'subtotal' => 4860000, 'service_charge' => 243000,
+            'tax' => 388800, 'discount' => 0, 'total' => 5491800, 'issued_at' => date('Y-m-d H:i:s'),
+            'items' => [[
+                'dish_name' => 'Hàu tươi Gillardeau', 'quantity' => 2, 'unit_price' => 680000,
+                'subtotal' => 1360000, 'note' => '',
+            ]],
+        ],
+        'paymentMethods' => \App\Models\Invoice::PAYMENT_METHODS,
+        'csrfToken' => $token, 'message' => '',
+    ], 'layouts/guest'],
     ['invoice/prebill', [
         'pageTitle' => 'Prebill', 'currentUser' => ['id' => 1, 'name' => 'Staff', 'role' => 'staff'],
         'prebill' => [

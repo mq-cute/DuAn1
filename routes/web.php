@@ -94,7 +94,9 @@ return static function (): \App\Core\Router {
     $router->get('/staff/orders', [OrderController::class, 'index']);
     $router->get('/staff/orders/{id}', [OrderController::class, 'show']);
 
-    // CHỨC NĂNG 5: Quản lý Hóa đơn & Thanh toán
+    // CHỨC NĂNG 5: Quản lý Hóa đơn & Thanh toán (Khách xem/tải hóa đơn chính mình)
+    $router->get('/account/orders/{id}/invoice', [InvoiceController::class, 'showByOrder']);
+    $router->get('/account/invoices/{id}', [InvoiceController::class, 'show']);
     $router->get('/staff/orders/{id}/prebill', [InvoiceController::class, 'prebill']);
     $router->post('/staff/orders/{id}/pay', [InvoiceController::class, 'confirmPayment']);
     $router->get('/staff/orders/{id}/invoice', [InvoiceController::class, 'showByOrder']);

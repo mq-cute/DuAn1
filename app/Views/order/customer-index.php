@@ -113,8 +113,8 @@ $paymentStatusLabels = [
                             <span>→</span>
                         </a>
                         <?php if ($order['payment_status'] === 'paid'): ?>
-                            <a class="text-button-subtle" href="/staff/orders/<?= (int) $order['id'] ?>/invoice" target="_blank">
-                                <span>Xem hóa đơn</span>
+                            <a class="text-button-subtle" href="/account/orders/<?= (int) $order['id'] ?>/invoice" target="_blank" title="Xem và tải hóa đơn điện tử">
+                                <span>📄 Xem &amp; tải hóa đơn</span>
                             </a>
                         <?php endif; ?>
                     </div>
