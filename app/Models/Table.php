@@ -18,6 +18,160 @@ final class Table extends BaseModel
         'locked' => 'Tạm khóa',
     ];
 
+    public function findAreaById(int $id): ?array
+    {
+        $stmt = $this->db->prepare('SELECT * FROM dining_areas WHERE id = :id LIMIT 1');
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row === false ? null : $row;
+    }
+
+    public function createArea(array $data): int
+    {
+        $stmt = $this->db->prepare(
+            'INSERT INTO dining_areas (name, description, sort_order, created_at, updated_at)
+             VALUES (:name, :description, :sort_order, NOW(), NOW())'
+        );
+        $stmt->execute([
+            'name' => trim((string)($data['name'] ?? '')),
+            'description' => trim((string)($data['description'] ?? '')),
+            'sort_order' => (int)($data['sort_order'] ?? 0),
+        ]);
+
+        return (int)$this->db->lastInsertId();
+    }
+
+    public function updateArea(int $id, array $data): bool
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE dining_areas
+             SET name = :name, description = :description, sort_order = :sort_order, updated_at = NOW()
+             WHERE id = :id'
+        );
+
+        return $stmt->execute([
+            'name' => trim((string)($data['name'] ?? '')),
+            'description' => trim((string)($data['description'] ?? '')),
+            'sort_order' => (int)($data['sort_order'] ?? 0),
+            'id' => $id,
+        ]);
+    }
+
+    public function deleteArea(int $id): bool
+    {
+        // Kiểm tra xem khu vực có bàn trực thuộc không
+        $checkStmt = $this->db->prepare('SELECT COUNT(*) FROM restaurant_tables WHERE area_id = :id');
+        $checkStmt->execute(['id' => $id]);
+        if ((int)$checkStmt->fetchColumn() > 0) {
+            return false;
+        }
+
+        $stmt = $this->db->prepare('DELETE FROM dining_areas WHERE id = :id');
+        return $stmt->execute(['id' => $id]);
+    }
+
+    public function createTable(array $data): int
+    {
+        $stmt = $this->db->prepare(
+            'INSERT INTO restaurant_tables 
+             (area_id, code, name, capacity, status, position_x, position_y, is_vip, table_fee, vip_privileges, description, created_at, updated_at)
+             VALUES (:area_id, :code, :name, :capacity, :status, :position_x, :position_y, :is_vip, :table_fee, :vip_privileges, :description, NOW(), NOW())'
+        );
+        $stmt->execute([
+            'area_id' => (int)$data['area_id'],
+            'code' => strtoupper(trim((string)$data['code'])),
+            'name' => trim((string)$data['name']),
+            'capacity' => max(1, (int)$data['capacity']),
+            'status' => in_array($data['status'] ?? '', array_keys(self::VALID_STATUSES), true) ? $data['status'] : 'empty',
+            'position_x' => isset($data['position_x']) ? (int)$data['position_x'] : 50,
+            'position_y' => isset($data['position_y']) ? (int)$data['position_y'] : 50,
+            'is_vip' => !empty($data['is_vip']) ? 1 : 0,
+            'table_fee' => isset($data['table_fee']) ? (float)$data['table_fee'] : 0.0,
+            'vip_privileges' => trim((string)($data['vip_privileges'] ?? '')),
+            'description' => trim((string)($data['description'] ?? '')),
+        ]);
+
+        return (int)$this->db->lastInsertId();
+    }
+
+    public function updateTable(int $id, array $data): bool
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE restaurant_tables
+             SET area_id = :area_id,
+                 code = :code,
+                 name = :name,
+                 capacity = :capacity,
+                 status = :status,
+                 position_x = :position_x,
+                 position_y = :position_y,
+                 is_vip = :is_vip,
+                 table_fee = :table_fee,
+                 vip_privileges = :vip_privileges,
+                 description = :description,
+                 updated_at = NOW()
+             WHERE id = :id'
+        );
+
+        return $stmt->execute([
+            'area_id' => (int)$data['area_id'],
+            'code' => strtoupper(trim((string)$data['code'])),
+            'name' => trim((string)$data['name']),
+            'capacity' => max(1, (int)$data['capacity']),
+            'status' => in_array($data['status'] ?? '', array_keys(self::VALID_STATUSES), true) ? $data['status'] : 'empty',
+            'position_x' => isset($data['position_x']) ? (int)$data['position_x'] : 50,
+            'position_y' => isset($data['position_y']) ? (int)$data['position_y'] : 50,
+            'is_vip' => !empty($data['is_vip']) ? 1 : 0,
+            'table_fee' => isset($data['table_fee']) ? (float)$data['table_fee'] : 0.0,
+            'vip_privileges' => trim((string)($data['vip_privileges'] ?? '')),
+            'description' => trim((string)($data['description'] ?? '')),
+            'id' => $id,
+        ]);
+    }
+
+    public function deleteTable(int $id): bool
+    {
+        // Kiểm tra xem bàn có đang phục vụ hoặc có đơn hàng active / booking không
+        $orderStmt = $this->db->prepare(
+            "SELECT COUNT(*) FROM orders WHERE table_id = :id AND status NOT IN ('completed', 'cancelled')"
+        );
+        $orderStmt->execute(['id' => $id]);
+        if ((int)$orderStmt->fetchColumn() > 0) {
+            return false;
+        }
+
+        $bookingStmt = $this->db->prepare(
+            "SELECT COUNT(*) FROM bookings WHERE table_id = :id AND status IN ('pending', 'confirmed', 'seated')"
+        );
+        $bookingStmt->execute(['id' => $id]);
+        if ((int)$bookingStmt->fetchColumn() > 0) {
+            return false;
+        }
+
+        $stmt = $this->db->prepare('DELETE FROM restaurant_tables WHERE id = :id');
+        return $stmt->execute(['id' => $id]);
+    }
+
+    public function updatePositions(array $positions): bool
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE restaurant_tables SET position_x = :x, position_y = :y, updated_at = NOW() WHERE id = :id'
+        );
+
+        foreach ($positions as $pos) {
+            if (isset($pos['id'], $pos['x'], $pos['y'])) {
+                $stmt->execute([
+                    'id' => (int)$pos['id'],
+                    'x' => (int)$pos['x'],
+                    'y' => (int)$pos['y'],
+                ]);
+            }
+        }
+
+        return true;
+    }
+
     public function allAreas(): array
     {
         $stmt = $this->db->query(

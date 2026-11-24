@@ -24,7 +24,7 @@ final class CategoryAdminController extends Controller
             'errors' => [],
             'old' => [],
             'message' => $this->stringInput($_GET, 'message'),
-        ]);
+        ], 200, 'layouts/admin');
     }
 
     public function edit(string $id): void
@@ -48,7 +48,7 @@ final class CategoryAdminController extends Controller
             'category' => $category,
             'csrfToken' => Csrf::token(),
             'errors' => [],
-        ]);
+        ], 200, 'layouts/admin');
     }
 
     public function create(): void

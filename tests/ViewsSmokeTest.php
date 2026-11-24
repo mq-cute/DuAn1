@@ -468,6 +468,110 @@ $pages = [
         'message' => '',
         'error' => '',
     ], 'layouts/staff'],
+    ['admin/dashboard', [
+        'pageTitle' => 'Tổng quan Vận hành & Doanh thu — FOODIES Admin',
+        'currentUser' => ['id' => 1, 'name' => 'Admin <script>alert(1)</script>', 'role' => 'admin'],
+        'todayRevenue' => '128450000',
+        'todayBookingsCount' => 56,
+        'tableStats' => ['active' => 21, 'total' => 24, 'empty' => 3, 'reserved' => 10, 'cleaning' => 1, 'locked' => 0],
+        'dishesDoneCount' => 142,
+        'topDishes' => [
+            ['dish_name' => 'Bò Wagyu A5 <script>alert(1)</script>', 'qty' => 34, 'total' => '83300000'],
+        ],
+        'upcomingBookings' => [
+            [
+                'id' => 1, 'customer_name' => 'Vũ Hoàng Quân <script>alert(1)</script>', 'customer_phone' => '0908921888',
+                'booking_time' => '19:00:00', 'booking_date' => date('Y-m-d'), 'number_of_guests' => 4,
+                'table_code' => 'VIP-02', 'table_name' => 'Phòng VIP', 'is_vip' => 1, 'combo_name' => 'Kỷ niệm ngày cưới',
+            ]
+        ],
+        'floorData' => [
+            'tablesByArea' => [
+                [
+                    'area' => ['name' => 'Sảnh Vòm'],
+                    'tables' => [
+                        ['code' => 'T-01', 'name' => 'Bàn 01', 'status' => 'empty']
+                    ]
+                ]
+            ]
+        ],
+        'csrfToken' => $token,
+    ], 'layouts/admin'],
+    ['admin/tables/index', [
+        'pageTitle' => 'Sơ đồ bàn ăn',
+        'currentUser' => ['id' => 1, 'name' => 'Admin', 'role' => 'admin'],
+        'areas' => [['id' => 1, 'name' => 'Sảnh Vòm', 'description' => 'Sảnh chính', 'sort_order' => 1]],
+        'tablesByArea' => [
+            1 => [
+                'area' => ['id' => 1, 'name' => 'Sảnh Vòm', 'description' => 'Sảnh chính', 'sort_order' => 1],
+                'tables' => [[
+                    'id' => 1, 'code' => 'VIP-01', 'name' => 'Bàn 01', 'capacity' => 4,
+                    'status' => 'empty', 'is_vip' => 1, 'table_fee' => 500000,
+                    'vip_privileges' => 'Quản gia riêng', 'description' => 'Phòng view đẹp',
+                    'position_x' => 100, 'position_y' => 100,
+                ]],
+            ]
+        ],
+        'allTables' => [[
+            'id' => 1, 'area_id' => 1, 'code' => 'VIP-01', 'name' => 'Bàn 01', 'capacity' => 4,
+            'status' => 'empty', 'is_vip' => 1, 'table_fee' => 500000,
+            'vip_privileges' => 'Quản gia riêng', 'description' => 'Phòng view đẹp',
+            'position_x' => 100, 'position_y' => 100, 'area_name' => 'Sảnh Vòm',
+        ]],
+        'totalTables' => 1,
+        'counts' => ['empty' => 1, 'reserved' => 0, 'in_use' => 0, 'cleaning' => 0, 'locked' => 0],
+        'selectedAreaId' => null,
+        'setupRequests' => [],
+        'csrfToken' => $token,
+        'message' => '',
+    ], 'layouts/admin'],
+    ['admin/promotions/index', [
+        'pageTitle' => 'Combos and Vouchers',
+        'currentUser' => ['id' => 1, 'name' => 'Admin', 'role' => 'admin'],
+        'combos' => [[
+            'id' => 1, 'name' => 'Combo Tiệc Sinh Nhật', 'price' => 1500000,
+            'target_occasion' => 'Sinh Nhật', 'description' => 'Setup trọn gói',
+            'includes' => 'Bánh kem & hoa',
+        ]],
+        'vouchers' => [[
+            'id' => 1, 'code' => 'VIP15', 'title' => 'Giảm 15%', 'discount_type' => 'percentage',
+            'discount_value' => 15, 'min_order_amount' => 2000000, 'start_date' => date('Y-m-d'),
+            'end_date' => date('Y-m-d', strtotime('+30 days')), 'description' => 'Ưu đãi',
+        ]],
+        'csrfToken' => $token,
+        'message' => '',
+        'error' => '',
+    ], 'layouts/admin'],
+    ['admin/setups/index', [
+        'pageTitle' => 'Setups Management',
+        'currentUser' => ['id' => 1, 'name' => 'Admin', 'role' => 'admin'],
+        'setups' => [[
+            'id' => 1, 'table_code' => 'VIP-01', 'table_name' => 'Bàn VIP', 'is_vip' => 1,
+            'customer_name' => 'Nguyễn Văn A', 'customer_phone' => '0901234567',
+            'booking_date' => date('Y-m-d'), 'booking_time' => '19:00:00', 'number_of_guests' => 4,
+            'combo_name' => 'Setup Kỷ Niệm', 'combo_price' => 850000, 'table_fee' => 500000,
+            'setup_details' => 'Nến & hoa', 'notes' => 'Yêu cầu lãng mạn',
+        ]],
+        'csrfToken' => $token,
+    ], 'layouts/admin'],
+    ['admin/reports/index', [
+        'pageTitle' => 'Financial Reports',
+        'currentUser' => ['id' => 1, 'name' => 'Admin', 'role' => 'admin'],
+        'totalRevenue' => 128450000,
+        'dailyRevenues' => [
+            ['order_date' => date('Y-m-d'), 'daily_total' => 128450000, 'order_count' => 15],
+        ],
+        'orderRatio' => [
+            'completed_orders' => 14, 'cancelled_orders' => 1, 'total_orders' => 15,
+        ],
+        'topDishes' => [
+            ['dish_name' => 'Thăn Lưng Bò Wagyu A5', 'total_qty' => 34, 'total_sales' => 83300000],
+        ],
+        'areaStats' => [
+            ['area_name' => 'Sảnh Hoàng Gia', 'total_orders' => 10, 'total_revenue' => 90000000],
+        ],
+        'csrfToken' => $token,
+    ], 'layouts/admin'],
 ];
 
 set_error_handler(static function (int $severity, string $message, string $file, int $line): never {

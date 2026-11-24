@@ -712,16 +712,30 @@ final class Order extends BaseModel
             'SELECT SUM(subtotal) AS total FROM order_items WHERE order_id = :order_id AND status <> "cancelled"'
         );
         $stmt->execute(['order_id' => $orderId]);
-        $subtotal = (float) ($stmt->fetchColumn() ?: 0.0);
+        $foodSubtotal = (float) ($stmt->fetchColumn() ?: 0.0);
+
+        // Lấy phí bàn, phí setup và voucher discount từ bảng orders
+        $ordStmt = $this->db->prepare(
+            'SELECT table_fee, setup_fee, discount, voucher_code FROM orders WHERE id = :id LIMIT 1'
+        );
+        $ordStmt->execute(['id' => $orderId]);
+        $ordData = $ordStmt->fetch(PDO::FETCH_ASSOC);
+
+        $tableFee = !empty($ordData['table_fee']) ? (float)$ordData['table_fee'] : 0.0;
+        $setupFee = !empty($ordData['setup_fee']) ? (float)$ordData['setup_fee'] : 0.0;
+        $discount = !empty($ordData['discount']) ? (float)$ordData['discount'] : 0.0;
+
+        // Tổng phụ thu + đồ ăn trước thuế & phí dịch vụ
+        $billableSubtotal = max(0.0, ($foodSubtotal + $tableFee + $setupFee) - $discount);
 
         $pricing = $this->getPricingRates();
-        $serviceCharge = round($subtotal * $pricing['service_charge_rate']);
-        $tax = round($subtotal * $pricing['tax_rate']);
-        $grandTotal = $subtotal + $serviceCharge + $tax;
+        $serviceCharge = round($billableSubtotal * $pricing['service_charge_rate']);
+        $tax = round($billableSubtotal * $pricing['tax_rate']);
+        $grandTotal = $billableSubtotal + $serviceCharge + $tax;
 
         $upd = $this->db->prepare(
             'UPDATE orders
-             SET total_amount = :subtotal,
+             SET total_amount = :food_total,
                  service_charge = :service_charge,
                  tax = :tax,
                  grand_total = :grand_total,
@@ -729,7 +743,7 @@ final class Order extends BaseModel
              WHERE id = :id'
         );
         $upd->execute([
-            'subtotal' => $subtotal,
+            'food_total' => $foodSubtotal,
             'service_charge' => $serviceCharge,
             'tax' => $tax,
             'grand_total' => $grandTotal,

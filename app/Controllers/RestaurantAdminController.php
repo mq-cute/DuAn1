@@ -26,7 +26,7 @@ final class RestaurantAdminController extends Controller
         $activeTab = isset($_GET['tab']) && is_string($_GET['tab']) ? trim($_GET['tab']) : 'general';
 
         $this->render('admin/restaurant/index', [
-            'pageTitle' => 'Quản Lý Thông Tin Nhà Hàng & Thiết Lập — L\'Épicure',
+            'pageTitle' => 'Quản Lý Thông Tin Nhà Hàng & Thiết Lập — FOODIES Admin',
             'currentUser' => $currentUser,
             'settings' => $settings,
             'operatingHours' => $operatingHours,
@@ -35,7 +35,7 @@ final class RestaurantAdminController extends Controller
             'csrfToken' => Csrf::token(),
             'message' => is_string($_GET['message'] ?? null) ? $_GET['message'] : '',
             'error' => is_string($_GET['error'] ?? null) ? $_GET['error'] : '',
-        ], 200, 'layouts/staff');
+        ], 200, 'layouts/admin');
     }
 
     public function updateGeneral(): void

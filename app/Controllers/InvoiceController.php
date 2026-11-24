@@ -53,8 +53,10 @@ final class InvoiceController extends Controller
 
         $invoices = $invoiceModel->listInvoices($filters, $page, $perPage);
 
+        $layout = ($currentUser['role'] ?? '') === 'admin' ? 'layouts/admin' : 'layouts/staff';
+
         $this->render('invoice/index', [
-            'pageTitle' => 'Quản Lý Hóa Đơn & Thanh Toán — L\'Épicure',
+            'pageTitle' => 'Quản Lý Hóa Đơn & Thanh Toán — FOODIES',
             'currentUser' => $currentUser,
             'invoices' => $invoices,
             'totalCount' => $totalCount,
@@ -70,7 +72,7 @@ final class InvoiceController extends Controller
             'csrfToken' => Csrf::token(),
             'message' => is_string($_GET['message'] ?? null) ? $_GET['message'] : '',
             'error' => is_string($_GET['error'] ?? null) ? $_GET['error'] : '',
-        ], 200, 'layouts/staff');
+        ], 200, $layout);
     }
 
     public function show(string $id): void

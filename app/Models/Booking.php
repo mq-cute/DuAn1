@@ -443,6 +443,176 @@ final class Booking extends BaseModel
         return $dishes;
     }
 
+    public function autoReleaseLateBookings(?int $overrideLateMinutes = null): int
+    {
+        $minutes = $overrideLateMinutes;
+        if ($minutes === null) {
+            $stmt = $this->db->prepare("SELECT `value` FROM restaurant_settings WHERE `key` = 'auto_release_late_minutes' LIMIT 1");
+            $stmt->execute();
+            $val = $stmt->fetchColumn();
+            $minutes = $val !== false ? (int)$val : 30;
+        }
+
+        // Tìm các đặt bàn hôm nay có status = 'confirmed', giờ đến + minutes < thời gian hiện tại
+        $findStmt = $this->db->prepare(
+            "SELECT b.id, b.table_id, b.booking_date, b.booking_time
+             FROM bookings b
+             WHERE b.status = 'confirmed'
+               AND b.table_id IS NOT NULL
+               AND TIMESTAMP(b.booking_date, b.booking_time) < DATE_SUB(NOW(), INTERVAL :late_mins MINUTE)"
+        );
+        $findStmt->execute(['late_mins' => $minutes]);
+        $lateBookings = $findStmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        $releasedCount = 0;
+        foreach ($lateBookings as $lb) {
+            // Chuyển sang no_show và giải phóng bàn về empty
+            $upStmt = $this->db->prepare("UPDATE bookings SET status = 'no_show', updated_at = NOW() WHERE id = :id");
+            $upStmt->execute(['id' => $lb['id']]);
+
+            if (!empty($lb['table_id'])) {
+                $this->releaseTableIfNoOtherBooking((int)$lb['table_id'], $lb);
+            }
+            $releasedCount++;
+        }
+
+        return $releasedCount;
+    }
+
+    public function changeBookingTable(int $bookingId, int $newTableId, ?int $userId = null, ?string $reason = null): bool
+    {
+        $bStmt = $this->db->prepare("SELECT * FROM bookings WHERE id = :id LIMIT 1");
+        $bStmt->execute(['id' => $bookingId]);
+        $booking = $bStmt->fetch(\PDO::FETCH_ASSOC);
+        if (!$booking) {
+            throw new DomainException('booking_not_found');
+        }
+
+        $oldTableId = !empty($booking['table_id']) ? (int)$booking['table_id'] : null;
+
+        // Kiểm tra bàn mới có trống không
+        $tStmt = $this->db->prepare("SELECT * FROM restaurant_tables WHERE id = :id LIMIT 1");
+        $tStmt->execute(['id' => $newTableId]);
+        $newTable = $tStmt->fetch(\PDO::FETCH_ASSOC);
+        if (!$newTable || in_array($newTable['status'], ['in_use', 'serving', 'locked'])) {
+            throw new DomainException('table_busy');
+        }
+
+        // Cập nhật booking sang bàn mới
+        $up = $this->db->prepare("UPDATE bookings SET table_id = :new_table, updated_at = NOW() WHERE id = :id");
+        $up->execute(['new_table' => $newTableId, 'id' => $bookingId]);
+
+        // Đổi trạng thái bàn mới sang reserved nếu booking chưa seated
+        if ($booking['status'] === 'seated') {
+            $this->setTableStatus($newTableId, 'in_use');
+        } else {
+            $this->setTableStatus($newTableId, 'reserved');
+        }
+
+        // Giải phóng bàn cũ
+        if ($oldTableId !== null && $oldTableId !== $newTableId) {
+            $this->releaseTableIfNoOtherBooking($oldTableId, $booking);
+        }
+
+        // Nếu đã có order đang mở trên bàn cũ, chuyển order sang bàn mới
+        $ordUp = $this->db->prepare("UPDATE orders SET table_id = :new_table WHERE booking_id = :bid AND status NOT IN ('completed', 'cancelled')");
+        $ordUp->execute(['new_table' => $newTableId, 'bid' => $bookingId]);
+
+        return true;
+    }
+
+    public function checkinAndOpenTable(int $bookingId, int $userId): array
+    {
+        $bStmt = $this->db->prepare("SELECT b.*, t.table_fee, t.is_vip, c.price as combo_price FROM bookings b LEFT JOIN restaurant_tables t ON t.id = b.table_id LEFT JOIN combo_setups c ON c.id = b.combo_id WHERE b.id = :id LIMIT 1");
+        $bStmt->execute(['id' => $bookingId]);
+        $booking = $bStmt->fetch(\PDO::FETCH_ASSOC);
+        if (!$booking) {
+            throw new DomainException('booking_not_found');
+        }
+
+        if (empty($booking['table_id'])) {
+            throw new DomainException('table_not_assigned');
+        }
+
+        $tableId = (int)$booking['table_id'];
+
+        // Cập nhật booking thành seated
+        $up = $this->db->prepare("UPDATE bookings SET status = 'seated', updated_at = NOW() WHERE id = :id");
+        $up->execute(['id' => $bookingId]);
+
+        // Cập nhật bàn thành in_use
+        $this->setTableStatus($tableId, 'in_use');
+
+        // Tạo Order từ đơn đặt trước (bao gồm tiền bàn, setup, pre-ordered dishes)
+        $ordCheck = $this->db->prepare("SELECT id FROM orders WHERE booking_id = :bid AND status NOT IN ('completed', 'cancelled') LIMIT 1");
+        $ordCheck->execute(['bid' => $bookingId]);
+        $existingOrderId = $ordCheck->fetchColumn();
+
+        if ($existingOrderId) {
+            return ['order_id' => (int)$existingOrderId, 'table_id' => $tableId];
+        }
+
+        // Tính tiền bàn & setup
+        $tableFee = !empty($booking['table_fee']) ? (float)$booking['table_fee'] : 0.0;
+        $setupFee = !empty($booking['combo_price']) ? (float)$booking['combo_price'] : 0.0;
+
+        // Lấy chi tiết món đã đặt trước
+        $dStmt = $this->db->prepare("SELECT bd.*, d.name as dish_name FROM booking_details bd JOIN dishes d ON d.id = bd.dish_id WHERE bd.booking_id = :bid");
+        $dStmt->execute(['bid' => $bookingId]);
+        $items = $dStmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        $foodTotal = 0.0;
+        foreach ($items as $it) {
+            $foodTotal += (float)$it['unit_price'] * (int)$it['quantity'];
+        }
+
+        $subtotal = $foodTotal + $tableFee + $setupFee;
+        $discount = 0.0;
+        $serviceCharge = round($subtotal * 0.05, 2);
+        $tax = round(($subtotal + $serviceCharge) * 0.08, 2);
+        $grandTotal = $subtotal + $serviceCharge + $tax;
+
+        $insOrd = $this->db->prepare(
+            "INSERT INTO orders (booking_id, table_id, created_by, customer_name, status, payment_status, total_amount, table_fee, setup_fee, discount, service_charge, tax, grand_total, notes, created_at, updated_at)
+             VALUES (:bid, :tid, :uid, :cname, 'confirmed', 'unpaid', :total, :tfee, :sfee, :disc, :serv, :tax, :gtotal, :notes, NOW(), NOW())"
+        );
+        $insOrd->execute([
+            'bid' => $bookingId,
+            'tid' => $tableId,
+            'uid' => $userId,
+            'cname' => $booking['customer_name'],
+            'total' => $foodTotal,
+            'tfee' => $tableFee,
+            'sfee' => $setupFee,
+            'disc' => $discount,
+            'serv' => $serviceCharge,
+            'tax' => $tax,
+            'gtotal' => $grandTotal,
+            'notes' => $booking['notes'] ?? '',
+        ]);
+        $newOrderId = (int)$this->db->lastInsertId();
+
+        // Chuyển món từ booking_details sang order_items
+        $insItem = $this->db->prepare(
+            "INSERT INTO order_items (order_id, dish_id, dish_name, quantity, unit_price, subtotal, note, status, created_at, updated_at)
+             VALUES (:oid, :did, :dname, :qty, :price, :sub, :note, 'confirmed', NOW(), NOW())"
+        );
+        foreach ($items as $it) {
+            $sub = (float)$it['unit_price'] * (int)$it['quantity'];
+            $insItem->execute([
+                'oid' => $newOrderId,
+                'did' => $it['dish_id'],
+                'dname' => $it['dish_name'],
+                'qty' => $it['quantity'],
+                'price' => $it['unit_price'],
+                'sub' => $sub,
+                'note' => $it['note'] ?? '',
+            ]);
+        }
+
+        return ['order_id' => $newOrderId, 'table_id' => $tableId];
+    }
+
     private function releaseTableIfNoOtherBooking(int $tableId, array $booking): void
     {
         $statement = $this->db->prepare(

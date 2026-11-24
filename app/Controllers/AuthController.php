@@ -18,7 +18,9 @@ final class AuthController extends Controller
     {
         $user = Auth::user();
         if ($user !== null) {
-            if (in_array($user['role'] ?? '', ['admin', 'staff'], true)) {
+            if (($user['role'] ?? '') === 'admin') {
+                $this->redirect('/admin/dashboard');
+            } elseif (in_array($user['role'] ?? '', ['staff'], true)) {
                 $this->redirect('/tables');
             }
             $this->redirect('/');
@@ -67,7 +69,9 @@ final class AuthController extends Controller
         }
 
         Auth::login($user);
-        if (in_array($user['role'] ?? '', ['admin', 'staff'], true)) {
+        if (($user['role'] ?? '') === 'admin') {
+            $this->redirect('/admin/dashboard');
+        } elseif (in_array($user['role'] ?? '', ['staff'], true)) {
             $this->redirect('/tables');
         } elseif (($user['role'] ?? '') === 'kitchen') {
             $this->redirect('/kitchen');
@@ -80,7 +84,9 @@ final class AuthController extends Controller
     {
         $user = Auth::user();
         if ($user !== null) {
-            if (in_array($user['role'] ?? '', ['admin', 'staff'], true)) {
+            if (($user['role'] ?? '') === 'admin') {
+                $this->redirect('/admin/dashboard');
+            } elseif (in_array($user['role'] ?? '', ['staff'], true)) {
                 $this->redirect('/tables');
             }
             $this->redirect('/');

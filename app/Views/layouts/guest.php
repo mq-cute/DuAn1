@@ -29,18 +29,15 @@
 
                 <?php if (($currentUser['role'] ?? '') === 'customer'): ?>
                     <a href="/account/bookings" class="nav-link">Lịch sử đặt bàn</a>
-                <?php elseif (in_array(($currentUser['role'] ?? ''), ['admin', 'staff'], true)): ?>
+                <?php elseif (($currentUser['role'] ?? '') === 'admin'): ?>
+                    <a href="/admin/dashboard" class="nav-link font-bold text-gold">Vào trang Quản Trị</a>
+                <?php elseif (($currentUser['role'] ?? '') === 'staff'): ?>
                     <a href="/tables" class="nav-link">Sơ đồ bàn</a>
                     <a href="/staff/pos" class="nav-link">Phục vụ</a>
-                    <a href="/kitchen" class="nav-link">KDS Bếp</a>
                     <a href="/staff/orders" class="nav-link">Gọi món</a>
-                    <a href="/admin/invoices" class="nav-link">Hóa đơn</a>
-                <?php endif; ?>
-
-                <?php if (($currentUser['role'] ?? '') === 'admin'): ?>
-                    <a href="/admin/menu" class="nav-link">Thực đơn</a>
-                    <a href="/admin/tables" class="nav-link">Q.lý bàn</a>
-                    <a href="/admin/restaurant" class="nav-link">Nhà hàng</a>
+                    <a href="/kitchen" class="nav-link">KDS Bếp</a>
+                <?php elseif (($currentUser['role'] ?? '') === 'kitchen'): ?>
+                    <a href="/kitchen" class="nav-link">Màn hình Bếp</a>
                 <?php endif; ?>
             </nav>
 
