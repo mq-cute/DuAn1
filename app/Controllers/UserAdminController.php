@@ -62,7 +62,7 @@ final class UserAdminController extends Controller
             'csrfToken' => Csrf::token(),
             'message' => is_string($_GET['message'] ?? null) ? $_GET['message'] : '',
             'error' => is_string($_GET['error'] ?? null) ? $_GET['error'] : '',
-        ], 200, 'layouts/staff');
+        ], 200, 'layouts/admin');
     }
 
     public function create(): void
@@ -237,7 +237,7 @@ final class UserAdminController extends Controller
             'targetType' => $targetType,
             'date' => $date,
             'csrfToken' => Csrf::token(),
-        ], 200, 'layouts/staff');
+        ], 200, 'layouts/admin');
     }
 
     private function postString(string $key): string

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Controllers\AccountController;
 use App\Controllers\AuthController;
+use App\Controllers\AdminDashboardController;
 use App\Controllers\BookingAdminController;
 use App\Controllers\BookingController;
 use App\Controllers\CategoryAdminController;
@@ -14,7 +15,9 @@ use App\Controllers\KitchenController;
 use App\Controllers\MenuController;
 use App\Controllers\NotificationController;
 use App\Controllers\OrderController;
+use App\Controllers\PromotionAdminController;
 use App\Controllers\RestaurantAdminController;
+use App\Controllers\TableAdminController;
 use App\Controllers\TableController;
 use App\Controllers\UserAdminController;
 
@@ -59,9 +62,36 @@ return static function (): \App\Core\Router {
     $router->post('/account/notifications/read-all', [NotificationController::class, 'markAllRead']);
     $router->get('/account/notifications/unread-count', [NotificationController::class, 'unreadCountJson']);
 
+    // Quản trị trung tâm Admin (Dashboard)
+    $router->get('/admin/dashboard', [AdminDashboardController::class, 'index']);
+
     // Quản lý đặt bàn
     $router->get('/admin/bookings', [BookingAdminController::class, 'index']);
     $router->post('/admin/bookings/{id}/status', [BookingAdminController::class, 'updateStatus']);
+    $router->post('/admin/bookings/{id}/open-table', [BookingAdminController::class, 'openTable']);
+    $router->post('/admin/bookings/{id}/change-table', [BookingAdminController::class, 'changeTable']);
+
+    // Quản lý bàn & Sơ đồ Admin
+    $router->get('/admin/tables', [TableAdminController::class, 'index']);
+    $router->post('/admin/tables', [TableAdminController::class, 'createTable']);
+    $router->post('/admin/tables/save-positions', [TableAdminController::class, 'savePositions']);
+    $router->post('/admin/tables/{id}/status', [TableAdminController::class, 'updateStatus']);
+    $router->post('/admin/tables/{id}/vip', [TableAdminController::class, 'updateVip']);
+    $router->post('/admin/tables/{id}/edit', [TableAdminController::class, 'updateTable']);
+    $router->post('/admin/tables/{id}/delete', [TableAdminController::class, 'deleteTable']);
+
+    // Quản lý khu vực bàn
+    $router->post('/admin/dining-areas', [TableAdminController::class, 'createArea']);
+    $router->post('/admin/dining-areas/{id}/edit', [TableAdminController::class, 'updateArea']);
+    $router->post('/admin/dining-areas/{id}/delete', [TableAdminController::class, 'deleteArea']);
+
+    // Quản lý Combo, Setup & Vouchers
+    $router->get('/admin/combos', [PromotionAdminController::class, 'combos']);
+    $router->post('/admin/vouchers', [PromotionAdminController::class, 'createVoucher']);
+    $router->get('/admin/setups', [PromotionAdminController::class, 'setups']);
+
+    // Báo cáo & Doanh thu Admin
+    $router->get('/admin/reports', [AdminDashboardController::class, 'reports']);
 
     // Quản lý thực đơn
     $router->get('/admin/menu', [DishAdminController::class, 'index']);

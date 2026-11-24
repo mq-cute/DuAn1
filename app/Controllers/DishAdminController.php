@@ -25,7 +25,7 @@ final class DishAdminController extends Controller
         $search = trim($this->stringInput($_GET, 'q'));
 
         $this->render('admin/dishes/index', [
-            'pageTitle' => 'Quản lý thực đơn',
+            'pageTitle' => 'Quản lý Thực đơn & Danh mục Món ăn — FOODIES Admin',
             'currentUser' => Auth::user(),
             'categories' => (new Category($db))->allForAdmin(),
             'dishes' => (new Dish($db))->allForAdmin(
@@ -36,7 +36,7 @@ final class DishAdminController extends Controller
             'selectedCategoryId' => $categoryId !== false && $categoryId > 0 ? $categoryId : null,
             'csrfToken' => Csrf::token(),
             'message' => $this->stringInput($_GET, 'message'),
-        ]);
+        ], 200, 'layouts/admin');
     }
 
     public function createForm(): void
@@ -287,7 +287,7 @@ final class DishAdminController extends Controller
             'csrfToken' => Csrf::token(),
             'errors' => $errors,
             'old' => $old,
-        ], $status);
+        ], $status, 'layouts/admin');
     }
 
     private function validId(string $id): ?int

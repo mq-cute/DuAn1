@@ -8,8 +8,10 @@ use App\Core\Controller;
 use App\Core\Csrf;
 use App\Core\Database;
 use App\Models\Booking;
+use App\Models\Table;
 use DateTimeImmutable;
 use DomainException;
+use PDO;
 
 final class BookingAdminController extends Controller
 {
@@ -25,6 +27,12 @@ final class BookingAdminController extends Controller
     public function index(): void
     {
         $user = $this->requireRole('admin', 'staff');
+        $db = Database::connection();
+        $model = new Booking($db);
+
+        // Kích hoạt tự động hủy các bàn đến muộn
+        $model->autoReleaseLateBookings();
+
         $date = $this->queryString('date');
         if ($date !== '' && !$this->isValidDate($date)) {
             $date = '';
@@ -34,7 +42,6 @@ final class BookingAdminController extends Controller
             $status = '';
         }
 
-        $model = new Booking(Database::connection());
         $bookings = $model->allForStaff(
             $date === '' ? null : $date,
             $status === '' ? null : $status
@@ -48,16 +55,27 @@ final class BookingAdminController extends Controller
         }
         unset($booking);
 
+        // Lấy danh sách bàn khả dụng để hỗ trợ đổi bàn
+        $tableModel = new Table($db);
+        $allTables = $tableModel->allWithAreas();
+
+        // Lấy các khu vực để lọc
+        $areas = $tableModel->allAreas();
+
+        $layout = ($user['role'] ?? '') === 'admin' ? 'layouts/admin' : 'layouts/staff';
+
         $this->render('booking/admin-index', [
-            'pageTitle' => 'Quản lý đặt bàn',
+            'pageTitle' => 'Quản lý Đặt bàn & Tiếp nhận Khách — FOODIES Admin',
             'currentUser' => $user,
             'bookings' => $bookings,
+            'allTables' => $allTables,
+            'areas' => $areas,
             'date' => $date,
             'status' => $status,
             'statuses' => self::STATUSES,
             'csrfToken' => Csrf::token(),
             'message' => $this->queryString('message'),
-        ]);
+        ], 200, $layout);
     }
 
     public function updateStatus(string $id): void
@@ -96,6 +114,56 @@ final class BookingAdminController extends Controller
         }
 
         $this->redirect('/admin/bookings?message=updated');
+    }
+
+    // MỞ BÀN TỪ ĐƠN ĐẶT TRƯỚC (NHẬN KHÁCH & TẠO ORDER ĐẦY ĐỦ TIỀN BÀN + SETUP + MÓN)
+    public function openTable(string $id): void
+    {
+        $user = $this->requireRole('admin', 'staff');
+        $bookingId = filter_var($id, FILTER_VALIDATE_INT);
+
+        if ($bookingId === false || $bookingId < 1 || !$this->verifyCsrf()) {
+            $this->redirect('/admin/bookings?message=invalid');
+        }
+
+        try {
+            $bookingModel = new Booking(Database::connection());
+            $result = $bookingModel->checkinAndOpenTable($bookingId, (int)$user['id']);
+            $this->redirect('/admin/bookings?message=table-opened');
+        } catch (DomainException $e) {
+            $msg = match ($e->getMessage()) {
+                'table_not_assigned' => 'table-not-assigned',
+                'booking_not_found' => 'missing',
+                default => 'cannot-open',
+            };
+            $this->redirect('/admin/bookings?message=' . $msg);
+        }
+    }
+
+    // ĐỔI BÀN CHO KHÁCH (KHI BÀN GẶP SỰ CỐ HOẶC KHÁCH ĐỔI Ý)
+    public function changeTable(string $id): void
+    {
+        $user = $this->requireRole('admin', 'staff');
+        $bookingId = filter_var($id, FILTER_VALIDATE_INT);
+        $newTableId = filter_var($_POST['new_table_id'] ?? null, FILTER_VALIDATE_INT);
+        $reason = trim($this->stringInput($_POST, 'reason'));
+
+        if ($bookingId === false || $newTableId === false || !$this->verifyCsrf()) {
+            $this->redirect('/admin/bookings?message=invalid');
+        }
+
+        try {
+            $bookingModel = new Booking(Database::connection());
+            $bookingModel->changeBookingTable($bookingId, $newTableId, (int)$user['id'], $reason);
+            $this->redirect('/admin/bookings?message=table-changed');
+        } catch (DomainException $e) {
+            $msg = match ($e->getMessage()) {
+                'table_busy' => 'table-busy',
+                'booking_not_found' => 'missing',
+                default => 'cannot-change',
+            };
+            $this->redirect('/admin/bookings?message=' . $msg);
+        }
     }
 
     private function isValidDate(string $date): bool
