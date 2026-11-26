@@ -138,9 +138,14 @@ $canEdit = $isStaffOrAdmin && !in_array($invStatus, ['cancelled', 'refunded'], t
                 </button>
             <?php endif; ?>
 
-            <button type="button" onclick="window.print()" class="px-4 py-2 rounded-xl bg-primary text-on-primary text-xs font-bold hover:bg-primary-container shadow-sm transition flex items-center gap-1.5" title="In hoặc lưu file PDF">
+            <a href="/invoices/<?= $invoice['id'] ?>/pdf" target="_blank" class="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 text-xs font-bold hover:from-amber-600 hover:to-amber-700 shadow-sm transition flex items-center gap-1.5" title="Xuất file PDF chính thức từ Backend máy chủ">
+                <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+                <span>Xuất File PDF (Backend)</span>
+            </a>
+
+            <button type="button" onclick="window.print()" class="px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-slate-700 text-xs font-bold hover:bg-slate-50 transition flex items-center gap-1.5 shadow-sm" title="In trực tiếp trên trình duyệt">
                 <span class="material-symbols-outlined text-[18px]">print</span>
-                <span>In Hóa Đơn / Tải PDF</span>
+                <span>In Nhanh</span>
             </button>
 
             <?php if ($isCustomer): ?>

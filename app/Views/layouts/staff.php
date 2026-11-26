@@ -128,6 +128,10 @@
                 </div>
 
                 <div class="flex items-center space-x-2">
+                    <a href="/account/notifications" class="relative p-2 rounded-xl border border-outline-variant/40 text-on-surface-variant hover:text-primary hover:border-primary transition" title="Thông báo hệ thống">
+                        <span class="material-symbols-outlined text-[20px]">notifications</span>
+                        <span id="staffNotifBadge" class="hidden absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-red-600 text-white text-[9px] font-bold flex items-center justify-center">0</span>
+                    </a>
                     <a href="/staff/pos" class="bg-primary text-on-primary text-xs font-bold px-3.5 py-2 rounded-xl hover:bg-primary-container transition flex items-center space-x-1.5 shadow-sm">
                         <span class="material-symbols-outlined text-[18px]">add_circle</span>
                         <span class="hidden md:inline">Mở bàn mới</span>
@@ -161,5 +165,26 @@
             </div>
         </div>
     </footer>
+
+    <script>
+    (function() {
+        function checkStaffNotifs() {
+            fetch('/api/notifications/poll')
+                .then(r => r.json())
+                .then(d => {
+                    const badge = document.getElementById('staffNotifBadge');
+                    if (badge && d && d.unread_count > 0) {
+                        badge.textContent = d.unread_count > 99 ? '99+' : d.unread_count;
+                        badge.classList.remove('hidden');
+                    } else if (badge) {
+                        badge.classList.add('hidden');
+                    }
+                })
+                .catch(() => {});
+        }
+        checkStaffNotifs();
+        setInterval(checkStaffNotifs, 8000);
+    })();
+    </script>
 </body>
 </html>

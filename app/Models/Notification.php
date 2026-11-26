@@ -59,6 +59,25 @@ final class Notification extends BaseModel
         return (int) $stmt->fetchColumn();
     }
 
+    public function recentForUser(int $userId, int $limit = 5): array
+    {
+        $lim = max(1, (int) $limit);
+        $stmt = $this->db->prepare(
+            "SELECT * FROM notifications
+             WHERE user_id = :user_id OR user_id IS NULL
+             ORDER BY created_at DESC
+             LIMIT $lim"
+        );
+        $stmt->execute(['user_id' => $userId]);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($rows as &$row) {
+            $row['data'] = !empty($row['data']) ? json_decode((string) $row['data'], true) : [];
+        }
+
+        return $rows;
+    }
+
     public function markAsRead(int $id, int $userId): bool
     {
         $stmt = $this->db->prepare(

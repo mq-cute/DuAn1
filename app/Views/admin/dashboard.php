@@ -4,6 +4,11 @@ use App\Core\View;
 $activeTables = (int)($tableStats['active'] ?? 0);
 $totalTables = (int)($tableStats['total'] ?? 24);
 $occupancyRate = $totalTables > 0 ? round(($activeTables / $totalTables) * 100, 1) : 0;
+$growthPercent = (float)($growthPercent ?? 18.4);
+$todayRevenue = (float)($todayRevenue ?? 128450000);
+$todayBookingsCount = (int)($todayBookingsCount ?? 56);
+$dishesDoneCount = (int)($dishesDoneCount ?? 142);
+$orderRatioData = $orderRatioData ?? ['completed' => 48];
 ?>
 
 <div class="space-y-6">
@@ -27,10 +32,13 @@ $occupancyRate = $totalTables > 0 ? round(($activeTables / $totalTables) * 100, 
 
         <div class="flex items-center gap-2 flex-wrap">
             <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1 text-xs font-semibold text-slate-600 shadow-sm">
-                <button class="px-3 py-1.5 bg-admin-navy text-gold rounded-lg font-bold">Hôm nay</button>
-                <button class="px-3 py-1.5 hover:text-slate-900">7 ngày qua</button>
-                <button class="px-3 py-1.5 hover:text-slate-900">Tháng này</button>
-                <button class="px-3 py-1.5 hover:text-slate-900">Tùy chỉnh lịch</button>
+                <a href="/admin/reports?period=today" class="px-3 py-1.5 hover:text-slate-900">Hôm nay</a>
+                <a href="/admin/reports?period=7days" class="px-3 py-1.5 bg-admin-navy text-gold rounded-lg font-bold">7 ngày qua</a>
+                <a href="/admin/reports?period=this_month" class="px-3 py-1.5 hover:text-slate-900">Tháng này</a>
+                <a href="/admin/reports" class="px-3 py-1.5 text-gold-dark hover:underline flex items-center gap-1">
+                    <span>Xem Báo Cáo</span>
+                    <span class="material-symbols-outlined text-[14px]">insights</span>
+                </a>
             </div>
             <a href="/admin/bookings" class="px-4 py-2 bg-gradient-to-r from-admin-navy to-slate-800 text-gold text-xs font-bold rounded-xl border border-gold/30 shadow-sm hover:shadow flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-[16px]">add_circle</span>
@@ -125,60 +133,47 @@ $occupancyRate = $totalTables > 0 ? round(($activeTables / $totalTables) * 100, 
         <!-- Cột Trái (2 spans): Biểu đồ Doanh thu & Danh sách đặt bàn hôm nay -->
         <div class="lg:col-span-2 space-y-6">
             
-            <!-- Doanh thu & Lượng khách theo giờ (Mô phỏng biểu đồ cột + đường trực quan) -->
+            <!-- Doanh thu & Lượng khách theo ngày gần nhất (Chart.js Interactive) -->
             <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                 <div class="flex items-center justify-between flex-wrap gap-2">
                     <div>
-                        <h3 class="font-headline font-bold text-base text-slate-900">
-                            Doanh thu & Lượng khách theo Giờ
-                        </h3>
-                        <p class="text-xs text-slate-500">So sánh hiệu suất giữa Thực đơn Gọi món À la carte & Combo Tiệc Đặt Trước</p>
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-gold">insights</span>
+                            <h3 class="font-headline font-bold text-base text-slate-900">
+                                Biểu Đồ Doanh Thu 7 Ngày Gần Nhất
+                            </h3>
+                        </div>
+                        <p class="text-xs text-slate-500">Phân tích thực tế doanh số hoàn tất và số lượt tiệc phục vụ theo thời gian</p>
                     </div>
                     <div class="flex items-center gap-4 text-xs font-semibold">
-                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-admin-navy"></span> À la carte</span>
-                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-gold"></span> Combo Tiệc</span>
-                        <span class="flex items-center gap-1.5"><span class="w-3 h-0.5 bg-emerald-600"></span> Lượng khách</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-gold"></span> Doanh thu (VNĐ)</span>
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-1 rounded bg-admin-navy"></span> Số lượt đơn</span>
+                        <a href="/admin/reports" class="text-gold hover:underline flex items-center gap-0.5 text-xs">
+                            <span>Chi tiết</span>
+                            <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+                        </a>
                     </div>
                 </div>
 
-                <!-- Chart bars visual container -->
-                <div class="h-56 bg-slate-50 rounded-xl p-4 flex items-end justify-between gap-3 border border-slate-100">
-                    <?php
-                    $hours = [
-                        ['time' => '11:00', 'h1' => 30, 'h2' => 45],
-                        ['time' => '12:00', 'h1' => 60, 'h2' => 80],
-                        ['time' => '13:00', 'h1' => 45, 'h2' => 50],
-                        ['time' => '14:00', 'h1' => 20, 'h2' => 25],
-                        ['time' => '17:30', 'h1' => 50, 'h2' => 70],
-                        ['time' => '18:30', 'h1' => 85, 'h2' => 95],
-                        ['time' => '19:30', 'h1' => 100, 'h2' => 120],
-                        ['time' => '20:30', 'h1' => 75, 'h2' => 90],
-                        ['time' => '21:30', 'h1' => 40, 'h2' => 50],
-                    ];
-                    foreach ($hours as $hr):
-                    ?>
-                        <div class="flex-1 flex flex-col items-center gap-1.5 h-full justify-end group">
-                            <div class="w-full flex items-end justify-center gap-1 max-w-[36px]">
-                                <div class="w-1/2 bg-admin-navy rounded-t transition-all group-hover:opacity-80" style="height: <?= $hr['h1'] ?>px" title="À la carte"></div>
-                                <div class="w-1/2 bg-gold rounded-t transition-all group-hover:opacity-80" style="height: <?= $hr['h2'] ?>px" title="Combo tiệc"></div>
-                            </div>
-                            <span class="text-[10px] font-semibold text-slate-500"><?= $hr['time'] ?></span>
-                        </div>
-                    <?php endforeach; ?>
+                <!-- Chart.js canvas container -->
+                <div class="h-64 bg-slate-50/50 rounded-xl p-3 border border-slate-100 relative">
+                    <canvas id="dashboardRevenueChart"></canvas>
                 </div>
 
                 <div class="grid grid-cols-3 gap-3 pt-2 text-center text-xs">
                     <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <span class="text-slate-500 block text-[11px]">DOANH THU COMBO ĐẶT TRƯỚC</span>
-                        <strong class="text-slate-900 text-sm font-headline">74.200.000 ₫</strong>
+                        <span class="text-slate-500 block text-[11px]">DOANH THU HÔM NAY</span>
+                        <strong class="text-slate-900 text-sm font-headline"><?= View::currency((string)(int)$todayRevenue) ?></strong>
                     </div>
                     <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <span class="text-slate-500 block text-[11px]">DOANH THU GỌI MÓN À LA CARTE</span>
-                        <strong class="text-slate-900 text-sm font-headline">54.250.000 ₫</strong>
+                        <span class="text-slate-500 block text-[11px]">TĂNG TRƯỞNG VS HÔM QUA</span>
+                        <strong class="<?= $growthPercent >= 0 ? 'text-emerald-700' : 'text-rose-600' ?> text-sm font-headline">
+                            <?= $growthPercent >= 0 ? '+' : '' ?><?= $growthPercent ?>%
+                        </strong>
                     </div>
                     <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <span class="text-slate-500 block text-[11px]">KHÁCH PHỤC VỤ CAO ĐIỂM</span>
-                        <strong class="text-gold-dark text-sm font-headline">19:30 &bull; 78 khách</strong>
+                        <span class="text-slate-500 block text-[11px]">ĐƠN ĐÃ HOÀN TẤT</span>
+                        <strong class="text-gold-dark text-sm font-headline"><?= (int)($orderRatioData['completed'] ?? 0) ?> đơn</strong>
                     </div>
                 </div>
             </div>
@@ -331,3 +326,105 @@ $occupancyRate = $totalTables > 0 ? round(($activeTables / $totalTables) * 100, 
 
     </div>
 </div>
+
+<!-- Chart.js Script for Dashboard -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const canvas = document.getElementById('dashboardRevenueChart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const labels = <?= json_encode($dashboardChartLabels ?? []) ?>;
+    const totals = <?= json_encode($dashboardChartTotals ?? []) ?>;
+    const orders = <?= json_encode($dashboardChartOrders ?? []) ?>;
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    type: 'bar',
+                    label: 'Doanh thu (VNĐ)',
+                    data: totals,
+                    backgroundColor: 'rgba(197, 160, 89, 0.85)',
+                    hoverBackgroundColor: '#c5a059',
+                    borderRadius: 6,
+                    yAxisID: 'y',
+                    order: 2
+                },
+                {
+                    type: 'line',
+                    label: 'Số đơn phục vụ',
+                    data: orders,
+                    borderColor: '#121820',
+                    backgroundColor: '#121820',
+                    borderWidth: 2.5,
+                    pointBackgroundColor: '#c5a059',
+                    pointBorderColor: '#121820',
+                    pointRadius: 4,
+                    fill: false,
+                    tension: 0.3,
+                    yAxisID: 'y1',
+                    order: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return (value / 1000000).toFixed(1) + ' Tr';
+                        },
+                        font: { size: 10 }
+                    },
+                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    beginAtZero: true,
+                    grid: { drawOnChartArea: false },
+                    ticks: {
+                        stepSize: 1,
+                        font: { size: 10 }
+                    }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { size: 11, weight: 'bold' } }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: { boxWidth: 12, font: { size: 11 } }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            if (context.dataset.yAxisID === 'y') {
+                                return ' Doanh thu: ' + new Intl.NumberFormat('vi-VN').format(context.raw) + ' ₫';
+                            }
+                            return ' Số đơn: ' + context.raw + ' đơn';
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>

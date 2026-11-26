@@ -619,14 +619,20 @@ $messages = [
                 </div>
             </div>
 
-            <div class="pt-4 flex items-center justify-end space-x-3 border-t border-outline-variant/20">
-                <button type="button" onclick="closePaymentModal()" class="px-5 py-2.5 rounded-xl border border-outline-variant/40 text-xs font-semibold hover:bg-stone-100">
-                    Hủy bỏ
-                </button>
-                <button type="submit" class="px-6 py-2.5 rounded-xl bg-primary text-on-primary text-xs font-bold hover:bg-primary-container shadow-md flex items-center gap-1.5">
-                    <span class="material-symbols-outlined text-[18px]">verified</span>
-                    <span>Xác nhận &amp; Xuất Hóa Đơn</span>
-                </button>
+            <div class="pt-4 flex items-center justify-between border-t border-outline-variant/20 flex-wrap gap-2">
+                <a id="posOnlineGatewayLink" href="#" target="_blank" class="px-3.5 py-2 rounded-xl bg-amber-50 text-amber-900 border border-amber-300 text-xs font-bold hover:bg-amber-100 flex items-center gap-1.5 shadow-sm">
+                    <span class="material-symbols-outlined text-[16px]">qr_code_scanner</span>
+                    <span>Cổng VNPAY / VietQR</span>
+                </a>
+                <div class="flex items-center space-x-2">
+                    <button type="button" onclick="closePaymentModal()" class="px-4 py-2 rounded-xl border border-outline-variant/40 text-xs font-semibold hover:bg-stone-100">
+                        Hủy bỏ
+                    </button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-primary text-on-primary text-xs font-bold hover:bg-primary-container shadow-md flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[18px]">verified</span>
+                        <span>Xác nhận &amp; Xuất Hóa Đơn</span>
+                    </button>
+                </div>
             </div>
         </form>
     </div>
@@ -660,6 +666,10 @@ $messages = [
         document.getElementById('paymentTableCode').innerText = tableCode;
         document.getElementById('paymentTotalAmount').innerText = totalFormatted;
         document.getElementById('paymentForm').action = '/staff/orders/' + orderId + '/pay';
+        var gatewayLink = document.getElementById('posOnlineGatewayLink');
+        if (gatewayLink) {
+            gatewayLink.href = '/payment/checkout/' + orderId;
+        }
         document.getElementById('paymentModal').classList.remove('hidden');
     }
     function closePaymentModal() {

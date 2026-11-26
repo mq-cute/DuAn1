@@ -112,6 +112,52 @@ final class InvoiceController extends Controller
         ], 200, $layout);
     }
 
+    public function pdf(string $id): void
+    {
+        $this->outputPdf($id, false);
+    }
+
+    public function downloadPdf(string $id): void
+    {
+        $this->outputPdf($id, true);
+    }
+
+    private function outputPdf(string $id, bool $download = false): void
+    {
+        $currentUser = $this->requireRole('staff', 'admin', 'customer');
+        $invId = (int) $id;
+
+        $db = Database::connection();
+        $invoiceModel = new Invoice($db);
+        $invoice = $invoiceModel->getInvoiceWithDetails($invId);
+
+        if ($invoice === null) {
+            http_response_code(404);
+            echo 'Hóa đơn không tồn tại';
+            exit;
+        }
+
+        $isCustomer = (($currentUser['role'] ?? '') === 'customer');
+        if ($isCustomer && !$this->customerOwnsInvoice($invoice, $currentUser)) {
+            http_response_code(403);
+            echo 'Bạn không có quyền xem hóa đơn này';
+            exit;
+        }
+
+        $pdfBinary = \App\Services\InvoicePdfService::generate($invoice);
+        $filename = 'Hoa_Don_' . preg_replace('/[^a-zA-Z0-9_-]/', '', (string)$invoice['invoice_number']) . '.pdf';
+        $disposition = $download ? 'attachment' : 'inline';
+
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: ' . $disposition . '; filename="' . $filename . '"');
+        header('Content-Length: ' . strlen($pdfBinary));
+        header('Cache-Control: private, max-age=0, must-revalidate');
+        header('Pragma: public');
+
+        echo $pdfBinary;
+        exit;
+    }
+
     public function refund(string $id): void
     {
         $currentUser = $this->requireRole('staff', 'admin');

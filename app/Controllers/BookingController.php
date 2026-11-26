@@ -110,6 +110,40 @@ final class BookingController extends Controller
                 'table_id' => $input['table_id'],
                 'notes' => $input['notes'] === '' ? null : $input['notes'],
             ], Cart::contents(), $input['dish_notes']);
+
+            // Tạo thông báo nghiệp vụ thời gian thực
+            try {
+                $notifModel = new \App\Models\Notification(Database::connection());
+                // 1. Broadcast thông báo cho Admin & Nhân viên
+                $notifModel->create(
+                    null,
+                    'booking_new',
+                    'Đơn Đặt Bàn Mới #' . $bookingId,
+                    "Khách hàng {$input['customer_name']} vừa đặt bàn ngày {$input['booking_date']} lúc {$input['booking_time']} cho {$input['number_of_guests']} khách.",
+                    [
+                        'booking_id' => $bookingId,
+                        'customer_name' => $input['customer_name'],
+                        'booking_date' => $input['booking_date'],
+                        'booking_time' => $input['booking_time'],
+                        'guests' => $input['number_of_guests'],
+                        'phone' => $input['customer_phone'],
+                    ]
+                );
+                // 2. Thông báo riêng cho tài khoản khách hàng
+                $notifModel->create(
+                    (int) $user['id'],
+                    'booking_created',
+                    'Đặt Bàn Thành Công #' . $bookingId,
+                    "Yêu cầu đặt bàn ngày {$input['booking_date']} lúc {$input['booking_time']} của quý khách đã được ghi nhận. Nhà hàng sẽ liên hệ xác nhận sớm nhất.",
+                    [
+                        'booking_id' => $bookingId,
+                        'booking_date' => $input['booking_date'],
+                        'booking_time' => $input['booking_time'],
+                    ]
+                );
+            } catch (\Throwable) {
+                // Tiếp tục luồng đặt bàn nếu thông báo gặp sự cố
+            }
         } catch (DomainException $exception) {
             $message = match ($exception->getMessage()) {
                 'table_unavailable' => 'Bàn vừa được đặt hoặc không còn phù hợp. Hãy chọn bàn khác.',
@@ -176,6 +210,19 @@ final class BookingController extends Controller
                 $user['id'],
                 'Khách hàng yêu cầu hủy đặt bàn.'
             );
+
+            // Tạo thông báo khi khách hủy đặt bàn
+            try {
+                $notifModel = new \App\Models\Notification(Database::connection());
+                $notifModel->create(
+                    null,
+                    'booking_cancelled',
+                    'Khách Hàng Hủy Đặt Bàn #' . $bookingId,
+                    "Khách hàng {$user['name']} đã hủy đơn đặt bàn #{$bookingId}.",
+                    ['booking_id' => $bookingId]
+                );
+            } catch (\Throwable) {
+            }
         } catch (DomainException $exception) {
             $message = $exception->getMessage() === 'invalid_transition' ? 'cannot-cancel' : 'missing';
             $this->redirect('/account/bookings/' . $bookingId . '?message=' . $message);

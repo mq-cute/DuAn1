@@ -168,10 +168,11 @@ DuAn1/
 │   │   ├── BookingController.php          # Đặt bàn, chọn món trước, lịch sử đặt
 │   │   ├── OrderController.php            # Nhân viên POS, phục vụ bàn, đơn hàng khách
 │   │   ├── KitchenController.php          # Màn hình điều phối bếp KDS
-│   │   ├── InvoiceController.php          # Quản lý hóa đơn & thanh toán
+│   │   ├── InvoiceController.php          # Quản lý hóa đơn & xuất file PDF Backend
+│   │   ├── PaymentController.php          # Cổng thanh toán trực tuyến (VNPAY Sandbox & VietQR)
 │   │   ├── TableController.php            # Sơ đồ bàn cho nhân viên
-│   │   ├── NotificationController.php     # Hệ thống thông báo
-│   │   ├── AdminDashboardController.php   # Dashboard trung tâm & Báo cáo doanh thu
+│   │   ├── NotificationController.php     # Hệ thống thông báo & Polling thời gian thực
+│   │   ├── AdminDashboardController.php   # Dashboard trung tâm & Báo cáo doanh thu Chart.js
 │   │   ├── BookingAdminController.php     # Quản lý đặt bàn, mở bàn, đổi bàn sự cố
 │   │   ├── TableAdminController.php       # Quản lý bàn ăn, khu vực, đặc quyền VIP
 │   │   ├── DishAdminController.php        # Quản lý món ăn & kho KDS
@@ -179,6 +180,10 @@ DuAn1/
 │   │   ├── PromotionAdminController.php   # Quản lý Combo setup tiệc & Vouchers
 │   │   ├── UserAdminController.php        # Quản lý tài khoản & phân quyền
 │   │   └── RestaurantAdminController.php  # Cấu hình thông tin & chính sách nhà hàng
+│   │
+│   ├── Services/
+│   │   ├── PaymentGatewayService.php      # Dịch vụ tích hợp Cổng VNPAY (HMAC-SHA512) & VietQR
+│   │   └── InvoicePdfService.php          # Dịch vụ tạo file PDF hóa đơn chuẩn ISO 32000-1
 │   │
 │   ├── Models/
 │   │   ├── BaseModel.php                  # Model cha chứa kết nối PDO
@@ -197,7 +202,7 @@ DuAn1/
 │   │
 │   ├── Views/
 │   │   ├── layouts/
-│   │   │   ├── admin.php                  # Layout Sidebar độc lập cho Quản trị viên
+│   │   │   ├── admin.php                  # Layout Sidebar độc lập cho Quản trị viên (Chuông realtime)
 │   │   │   ├── guest.php                  # Layout sang trọng cho Khách hàng
 │   │   │   └── staff.php                  # Layout gọn gàng cho Nhân viên phục vụ/Bếp
 │   │   ├── home/                          # Giao diện trang chủ FOODIES
@@ -206,30 +211,35 @@ DuAn1/
 │   │   ├── admin/                         # Các trang quản trị (Dashboard, Bàn, Thực đơn, Danh mục, Combo, Báo cáo...)
 │   │   ├── order/                         # Giao diện POS phục vụ bàn
 │   │   ├── kitchen/                       # Màn hình bếp KDS
-│   │   └── invoice/                       # Hóa đơn thanh toán
+│   │   ├── invoice/                       # Hóa đơn thanh toán & Xuất PDF
+│   │   └── payment/                       # Checkout Cổng VNPAY & Quét mã VietQR
 │   │
 │   └── Core/                              # Thư viện hạt nhân (Router, PDO Database, View, Session, Csrf, Validator...)
 │
 ├── config/
 │   ├── database.php                       # Cấu hình kết nối MySQL PDO
+│   ├── payment.php                        # Cấu hình Cổng thanh toán VNPAY & VietQR
 │   └── app.php                            # Thiết lập môi trường ứng dụng
 │
 ├── database/
-│   ├── schema.sql                         # Cấu trúc toàn bộ bảng cơ sở dữ liệu
+│   ├── schema.sql                         # Cấu trúc hợp nhất 24 bảng cơ sở dữ liệu
 │   ├── migrations/                        # Các tệp cập nhật cấu trúc DB bổ sung
 │   └── seeders/                           # Dữ liệu mẫu (món ăn, bàn ăn, tài khoản, combo)
 │
 ├── public/
 │   ├── index.php                          # Front Controller duy nhất tiếp nhận request
 │   ├── .htaccess                          # Định tuyến URL về index.php
-│   └── assets/                            # Ảnh món ăn, uploads, CSS, JS
+│   └── assets/                            # Ảnh món ăn, uploads, hóa đơn PDF, CSS, JS
 │
 ├── routes/
 │   └── web.php                            # Khai báo tập trung toàn bộ route của hệ thống
 │
 ├── tests/
 │   ├── RouterTest.php                     # Kiểm thử định tuyến Route
-│   └── ViewsSmokeTest.php                 # Kiểm thử tự động render toàn bộ 38 trang view
+│   ├── ViewsSmokeTest.php                 # Kiểm thử tự động render toàn bộ 40 trang view
+│   ├── PdfServiceTest.php                 # Kiểm thử sinh file PDF Hóa đơn
+│   ├── PaymentGatewayTest.php             # Kiểm thử chữ ký số VNPAY & VietQR
+│   └── NotificationWorkflowTest.php       # Kiểm thử luồng thông báo nghiệp vụ
 │
 ├── AGENTS.md                              # Bộ quy tắc kiến trúc & tiêu chuẩn dự án
 └── README.md                              # Tài liệu dự án
@@ -260,6 +270,17 @@ Hệ thống bao gồm các bảng chính:
 - XAMPP / WampServer / Docker hoặc PHP CLI built-in server.
 
 ### 2. Các bước cài đặt
+
+> [!IMPORTANT]
+> **Lưu ý cài đặt quan trọng (Database Migration):**  
+> Tệp [`database/schema.sql`](./database/schema.sql) đã được hợp nhất toàn diện, bao gồm đầy đủ 24 bảng: các bảng cơ sở và toàn bộ bảng mở rộng quản trị (`activity_logs`, `restaurant_settings`, `restaurant_operating_hours`, `invoice_refunds`, `invoice_edit_histories`, `combo_setups`, `vouchers`, các cột cấu hình Bàn VIP, phụ thu, đặt cọc và enum trạng thái hóa đơn hoàn tiền).  
+> 
+> - **Cài đặt mới từ đầu:** Chỉ cần import duy nhất [`database/schema.sql`](./database/schema.sql) rồi import dữ liệu mẫu [`database/seeders/sample_data.php`](./database/seeders/sample_data.php).
+> - **Cập nhật database cũ đã có dữ liệu:** Chạy tuần tự các migration trong [`database/migrations/`](./database/migrations/):
+>   1. `20261119_admin_features.sql` (bảng quản lý hoàn tiền, sửa hóa đơn, activity log, cấu hình nhà hàng)
+>   2. `20261124_combos_vouchers.sql` (bảng combo setup và voucher)
+>   3. `php database/migrations/update_vip_and_fees.php` (cột bàn VIP, phụ thu phí, hủy bàn muộn)
+
 1. **Clone mã nguồn dự án:**
    ```bash
    git clone <repository_url> DuAn1
@@ -267,10 +288,22 @@ Hệ thống bao gồm các bảng chính:
    ```
 2. **Tạo Database:**
    Tạo cơ sở dữ liệu MySQL mới tên `restaurant_booking` với charset `utf8mb4` và collation `utf8mb4_unicode_ci`.
-3. **Import dữ liệu:**
-   - Import file [`database/schema.sql`](./database/schema.sql).
-   - Chạy các migration bổ sung trong [`database/migrations/`](./database/migrations/).
-   - Import dữ liệu mẫu trong [`database/seeders/sample_data.php`](./database/seeders/sample_data.php) (tùy chọn).
+3. **Import dữ liệu chuẩn:**
+   - **Cách 1 (Khuyên dùng - Nhanh & Đầy đủ 100%):**
+     ```bash
+     # Import toàn bộ cấu trúc bảng và cài đặt hệ thống
+     mysql -u root -p restaurant_booking < database/schema.sql
+
+     # Import dữ liệu vai trò & dữ liệu mẫu hoàn chỉnh
+     mysql -u root -p restaurant_booking < database/seeders/roles.sql
+     php database/seeders/sample_data.php
+     ```
+   - **Cách 2 (Nâng cấp DB cũ qua migrations):**
+     ```bash
+     mysql -u root -p restaurant_booking < database/migrations/20261119_admin_features.sql
+     mysql -u root -p restaurant_booking < database/migrations/20261124_combos_vouchers.sql
+     php database/migrations/update_vip_and_fees.php
+     ```
 4. **Cấu hình môi trường:**
    Tạo tệp `.env` từ `.env.example`:
    ```ini

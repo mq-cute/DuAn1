@@ -47,6 +47,10 @@
                 </a>
 
                 <?php if (!empty($currentUser)): ?>
+                    <a href="/account/notifications" class="relative p-2 text-gold hover:text-white transition flex items-center" title="Thông báo của tôi">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                        <span id="guestNotifBadge" class="hidden absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-red-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center">0</span>
+                    </a>
                     <div class="user-dropdown-wrap">
                         <a href="/account" class="btn-user-profile" title="Tài khoản">
                             <span class="user-initial"><?= mb_substr(\App\Core\View::escape($currentUser['name'] ?? 'U'), 0, 1) ?></span>
@@ -145,5 +149,28 @@
             </div>
         </div>
     </footer>
+
+    <?php if (!empty($currentUser)): ?>
+    <script>
+    (function() {
+        function checkGuestNotifs() {
+            fetch('/api/notifications/poll')
+                .then(function(r) { return r.json(); })
+                .then(function(d) {
+                    var badge = document.getElementById('guestNotifBadge');
+                    if (badge && d && d.unread_count > 0) {
+                        badge.textContent = d.unread_count > 99 ? '99+' : d.unread_count;
+                        badge.classList.remove('hidden');
+                    } else if (badge) {
+                        badge.classList.add('hidden');
+                    }
+                })
+                .catch(function() {});
+        }
+        checkGuestNotifs();
+        setInterval(checkGuestNotifs, 10000);
+    })();
+    </script>
+    <?php endif; ?>
 </body>
 </html>

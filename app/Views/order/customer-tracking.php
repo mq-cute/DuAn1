@@ -219,8 +219,11 @@ $isLive = in_array($order['status'], ['pending', 'confirmed', 'preparing', 'read
                         </a>
                     <?php else: ?>
                         <div class="payment-pending-banner">
-                            <p>Đơn hàng sẽ được thanh toán tại bàn hoặc quầy thu ngân khi quý khách hoàn tất dùng bữa.</p>
+                            <p>Đơn hàng có thể thanh toán trực tuyến ngay bây giờ hoặc thanh toán tại bàn khi hoàn tất dùng bữa.</p>
                         </div>
+                        <a class="button button-primary button-block" href="/payment/checkout/<?= (int) $order['id'] ?>" style="margin-top: 10px; background: linear-gradient(135deg, #121820 0%, #1e293b 100%); color: #c5a059; border: 1px solid rgba(197,160,89,0.4); font-weight: bold; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;">
+                            💳 Thanh Toán Điện Tử Trực Tuyến (VNPAY / VietQR)
+                        </a>
                     <?php endif; ?>
                 </div>
             </section>

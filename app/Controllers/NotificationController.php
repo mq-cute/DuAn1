@@ -71,4 +71,55 @@ final class NotificationController extends Controller
         echo json_encode(['unread_count' => $count], JSON_UNESCAPED_UNICODE);
         exit;
     }
+
+    public function pollJson(): void
+    {
+        $currentUser = \App\Core\Auth::user();
+        if ($currentUser === null) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['success' => false, 'unread_count' => 0, 'items' => []]);
+            exit;
+        }
+
+        $userId = (int) $currentUser['id'];
+        $db = Database::connection();
+        $notifModel = new Notification($db);
+
+        $unreadCount = $notifModel->unreadCount($userId);
+        $recentRows = $notifModel->recentForUser($userId, 6);
+
+        $items = [];
+        foreach ($recentRows as $r) {
+            $createdTs = strtotime((string) $r['created_at']);
+            $diff = time() - $createdTs;
+            if ($diff < 60) {
+                $timeAgo = 'Vừa xong';
+            } elseif ($diff < 3600) {
+                $timeAgo = floor($diff / 60) . ' phút trước';
+            } elseif ($diff < 86400) {
+                $timeAgo = floor($diff / 3600) . ' giờ trước';
+            } else {
+                $timeAgo = date('d/m H:i', $createdTs);
+            }
+
+            $items[] = [
+                'id' => (int) $r['id'],
+                'type' => (string) $r['type'],
+                'title' => (string) $r['title'],
+                'message' => (string) $r['message'],
+                'is_read' => (bool) $r['is_read'],
+                'time_ago' => $timeAgo,
+                'created_at' => (string) $r['created_at'],
+                'data' => $r['data'] ?? [],
+            ];
+        }
+
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode([
+            'success' => true,
+            'unread_count' => $unreadCount,
+            'items' => $items,
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
 }

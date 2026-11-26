@@ -203,11 +203,37 @@
                     <span class="material-symbols-outlined text-[18px] text-slate-400 absolute left-2.5 top-2">search</span>
                 </div>
 
-                <!-- Notifications Button -->
-                <a href="/account/notifications" class="relative p-2 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition">
-                    <span class="material-symbols-outlined text-[20px]">notifications</span>
-                    <span class="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-red-600 text-white text-[9px] font-bold flex items-center justify-center">5</span>
-                </a>
+                <!-- Notifications Dropdown & Realtime Polling -->
+                <div class="relative" id="notifWrapper">
+                    <button type="button" id="notifBellBtn" onclick="toggleNotifDropdown()" class="relative p-2 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition focus:outline-none" title="Thông báo hệ thống">
+                        <span class="material-symbols-outlined text-[20px]">notifications</span>
+                        <span id="notifBadge" class="hidden absolute -top-0.5 -right-0.5 min-w-[18px] h-4.5 px-1 rounded-full bg-red-600 text-white text-[9px] font-bold flex items-center justify-center shadow-sm">0</span>
+                    </button>
+
+                    <!-- Dropdown Panel -->
+                    <div id="notifDropdown" class="hidden absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-xl border border-slate-200 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                        <div class="p-3.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                            <div class="flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[18px] text-gold">notifications_active</span>
+                                <strong class="text-xs text-slate-900 font-bold">Thông Báo Thời Gian Thực</strong>
+                            </div>
+                            <span id="notifCountText" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">0 mới</span>
+                        </div>
+
+                        <!-- Items List -->
+                        <div id="notifItemsList" class="max-h-72 overflow-y-auto divide-y divide-slate-100 text-xs">
+                            <div class="p-6 text-center text-slate-400">Đang tải thông báo...</div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="p-2.5 bg-slate-50 border-t border-slate-100 text-center">
+                            <a href="/account/notifications" class="text-xs font-bold text-gold-dark hover:underline inline-flex items-center gap-1">
+                                <span>Xem tất cả thông báo</span>
+                                <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- User Profile Dropdown -->
                 <div class="flex items-center gap-2 pl-2 border-l border-slate-200">
@@ -237,6 +263,192 @@
         </main>
 
     </div>
+
+    <!-- Real-time Toast Notification Container -->
+    <div id="notifToastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-3 pointer-events-none max-w-sm w-full"></div>
+
+    <script>
+    (function() {
+        let lastNotifId = 0;
+        let isFirstPoll = true;
+
+        // Toggle Dropdown
+        window.toggleNotifDropdown = function() {
+            const dd = document.getElementById('notifDropdown');
+            if (!dd) return;
+            dd.classList.toggle('hidden');
+        };
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const wrapper = document.getElementById('notifWrapper');
+            const dd = document.getElementById('notifDropdown');
+            if (wrapper && dd && !wrapper.contains(e.target)) {
+                dd.classList.add('hidden');
+            }
+        });
+
+        // Web Audio Chime Sound (No external asset needed)
+        function playChime() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const now = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, now); // D5
+                osc.frequency.exponentialRampToValueAtTime(880, now + 0.15); // A5
+                
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } catch (err) {}
+        }
+
+        // Show Toast Popup
+        function showToast(notif) {
+            const container = document.getElementById('notifToastContainer');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = 'pointer-events-auto bg-slate-900/95 text-white p-4 rounded-2xl shadow-2xl border border-gold/40 flex items-start gap-3 backdrop-blur-md transform transition-all duration-300 translate-y-[-20px] opacity-0';
+            
+            let icon = 'notifications';
+            if (notif.type === 'booking_new') icon = 'calendar_add_on';
+            else if (notif.type === 'booking_confirmed') icon = 'verified';
+            else if (notif.type === 'booking_cancelled') icon = 'event_busy';
+            else if (notif.type === 'payment_success') icon = 'paid';
+            else if (notif.type === 'table_opened') icon = 'table_restaurant';
+
+            toast.innerHTML = `
+                <div class="w-8 h-8 rounded-xl bg-gold/20 text-gold flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span class="material-symbols-outlined text-[18px]">${icon}</span>
+                </div>
+                <div class="flex-1 text-xs space-y-1">
+                    <strong class="font-headline font-bold text-gold text-sm block">${escapeHtml(notif.title)}</strong>
+                    <p class="text-slate-300 leading-snug">${escapeHtml(notif.message)}</p>
+                    <span class="text-[10px] text-slate-400 block">${notif.time_ago || 'Vừa xong'}</span>
+                </div>
+                <button type="button" class="text-slate-400 hover:text-white p-1" onclick="this.parentElement.remove()">
+                    <span class="material-symbols-outlined text-[16px]">close</span>
+                </button>
+            `;
+
+            container.appendChild(toast);
+
+            // Animate in
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-[-20px]', 'opacity-0');
+            });
+
+            // Auto dismiss after 6 seconds
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-x-full');
+                setTimeout(() => toast.remove(), 300);
+            }, 6000);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text || '';
+            return div.innerHTML;
+        }
+
+        // Render Dropdown items
+        function renderItems(items) {
+            const list = document.getElementById('notifItemsList');
+            if (!list) return;
+
+            if (!items || items.length === 0) {
+                list.innerHTML = '<div class="p-6 text-center text-slate-400">Không có thông báo mới nào.</div>';
+                return;
+            }
+
+            let html = '';
+            items.forEach(function(it) {
+                let icon = 'notifications';
+                if (it.type === 'booking_new') icon = 'calendar_add_on';
+                else if (it.type === 'booking_confirmed') icon = 'verified';
+                else if (it.type === 'booking_cancelled') icon = 'event_busy';
+                else if (it.type === 'payment_success') icon = 'paid';
+
+                const unreadCls = !it.is_read ? 'bg-amber-50/40 font-semibold' : 'opacity-80';
+
+                html += `
+                    <div class="p-3.5 hover:bg-slate-50 transition flex items-start gap-3 ${unreadCls}">
+                        <div class="w-7 h-7 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-[16px]">${icon}</span>
+                        </div>
+                        <div class="flex-1 space-y-0.5">
+                            <strong class="text-slate-900 block leading-tight text-xs">${escapeHtml(it.title)}</strong>
+                            <p class="text-slate-500 text-[11px] leading-snug">${escapeHtml(it.message)}</p>
+                            <span class="text-[10px] text-slate-400 block">${it.time_ago}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
+        }
+
+        // Main polling function
+        function poll() {
+            fetch('/api/notifications/poll', {
+                headers: { 'Accept': 'application/json' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data || !data.success) return;
+
+                const badge = document.getElementById('notifBadge');
+                const countText = document.getElementById('notifCountText');
+
+                // Update badge count
+                if (data.unread_count > 0) {
+                    if (badge) {
+                        badge.textContent = data.unread_count > 99 ? '99+' : data.unread_count;
+                        badge.classList.remove('hidden');
+                    }
+                    if (countText) countText.textContent = data.unread_count + ' mới';
+                } else {
+                    if (badge) badge.classList.add('hidden');
+                    if (countText) countText.textContent = '0 mới';
+                }
+
+                // Render items in dropdown
+                renderItems(data.items);
+
+                // Check for new notifications to trigger toast
+                if (data.items && data.items.length > 0) {
+                    const latestId = data.items[0].id;
+                    if (!isFirstPoll && latestId > lastNotifId) {
+                        // There are brand new notifications!
+                        data.items.forEach(function(it) {
+                            if (it.id > lastNotifId) {
+                                showToast(it);
+                            }
+                        });
+                        playChime();
+                    }
+                    lastNotifId = Math.max(lastNotifId, latestId);
+                }
+                isFirstPoll = false;
+            })
+            .catch(err => {
+                // Silently ignore background polling errors
+            });
+        }
+
+        // Start polling immediately and every 8 seconds
+        poll();
+        setInterval(poll, 8000);
+    })();
+    </script>
 
 </body>
 </html>

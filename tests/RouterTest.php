@@ -92,6 +92,14 @@ foreach ([
     'POST /admin/vouchers',
     'GET /admin/setups',
     'GET /admin/reports',
+    'GET /invoices/{id}/pdf',
+    'GET /invoices/{id}/download',
+    'GET /payment/checkout/{orderId}',
+    'POST /payment/process/{orderId}',
+    'GET /payment/vnpay/callback',
+    'POST /payment/vietqr/confirm/{orderId}',
+    'GET /payment/vnpay/ipn',
+    'GET /api/notifications/poll',
 ] as $expectedRoute) {
     if (!in_array($expectedRoute, $routes, true)) {
         throw new RuntimeException('The booking route was not registered: ' . $expectedRoute);

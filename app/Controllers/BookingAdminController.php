@@ -96,13 +96,49 @@ final class BookingAdminController extends Controller
         }
 
         try {
-            (new Booking(Database::connection()))->transitionStatus(
+            $db = Database::connection();
+            $bookingStmt = $db->prepare('SELECT * FROM bookings WHERE id = :id');
+            $bookingStmt->execute(['id' => $bookingId]);
+            $bookingData = $bookingStmt->fetch(PDO::FETCH_ASSOC);
+
+            (new Booking($db))->transitionStatus(
                 $bookingId,
                 $status,
                 $user['id'],
                 null,
                 $note === '' ? null : $note
             );
+
+            // Gửi thông báo tương ứng cho khách hàng & hệ thống
+            if ($bookingData) {
+                try {
+                    $notifModel = new \App\Models\Notification($db);
+                    $userId = isset($bookingData['user_id']) && $bookingData['user_id'] !== null ? (int)$bookingData['user_id'] : null;
+
+                    if ($status === 'confirmed') {
+                        if ($userId !== null) {
+                            $notifModel->create(
+                                $userId,
+                                'booking_confirmed',
+                                'Đặt Bàn Đã Được Xác Nhận',
+                                "Đơn đặt bàn ngày {$bookingData['booking_date']} lúc {$bookingData['booking_time']} cho {$bookingData['number_of_guests']} khách đã được L'Épicure xác nhận thành công.",
+                                ['booking_id' => $bookingId, 'status' => 'confirmed']
+                            );
+                        }
+                    } elseif ($status === 'cancelled') {
+                        if ($userId !== null) {
+                            $notifModel->create(
+                                $userId,
+                                'booking_cancelled',
+                                'Đơn Đặt Bàn Đã Hủy',
+                                "Đơn đặt bàn ngày {$bookingData['booking_date']} lúc {$bookingData['booking_time']} đã bị hủy" . ($note !== '' ? ": $note" : "."),
+                                ['booking_id' => $bookingId, 'status' => 'cancelled', 'note' => $note]
+                            );
+                        }
+                    }
+                } catch (\Throwable) {
+                }
+            }
         } catch (DomainException $exception) {
             $message = match ($exception->getMessage()) {
                 'booking_not_found' => 'missing',
@@ -129,6 +165,19 @@ final class BookingAdminController extends Controller
         try {
             $bookingModel = new Booking(Database::connection());
             $result = $bookingModel->checkinAndOpenTable($bookingId, (int)$user['id']);
+
+            try {
+                $notifModel = new \App\Models\Notification(Database::connection());
+                $notifModel->create(
+                    null,
+                    'table_opened',
+                    'Đã Mở Bàn Cho Đơn #' . $bookingId,
+                    "Bàn đã được tiếp nhận và chuyển sang trạng thái đang phục vụ.",
+                    ['booking_id' => $bookingId]
+                );
+            } catch (\Throwable) {
+            }
+
             $this->redirect('/admin/bookings?message=table-opened');
         } catch (DomainException $e) {
             $msg = match ($e->getMessage()) {

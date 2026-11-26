@@ -572,6 +572,36 @@ $pages = [
         ],
         'csrfToken' => $token,
     ], 'layouts/admin'],
+    ['payment/checkout', [
+        'pageTitle' => 'Thanh toán đơn hàng',
+        'currentUser' => ['id' => 1, 'name' => 'Nguyễn Văn Khách', 'email' => 'client@lepicure.com', 'role' => 'customer'],
+        'order' => [
+            'id' => 1,
+            'table_code' => 'T-01',
+            'customer_name' => 'Nguyễn Văn Khách &lt;script&gt;alert(1)&lt;/script&gt;',
+            'created_at' => date('Y-m-d H:i:s'),
+            'status' => 'served',
+            'items' => [
+                ['dish_name' => 'Bò Wagyu A5 &lt;script&gt;alert(1)&lt;/script&gt;', 'quantity' => 1, 'unit_price' => 1000000, 'subtotal' => 1000000],
+            ],
+            'grand_total' => 1130000,
+        ],
+        'totalAmount' => 1130000,
+        'vietQr' => ['qr_url' => 'https://img.vietqr.io/demo.png', 'account_no' => '0314892341', 'account_name' => 'LEPICURE', 'syntax' => 'FDS ORD 1'],
+        'csrfToken' => $token,
+        'isCustomer' => true,
+    ], 'layouts/guest'],
+    ['payment/result', [
+        'pageTitle' => 'Kết quả thanh toán',
+        'currentUser' => ['id' => 1, 'name' => 'Nguyễn Văn Khách', 'email' => 'client@lepicure.com', 'role' => 'customer'],
+        'isSuccess' => true,
+        'orderId' => 1,
+        'invoiceId' => 1,
+        'amount' => 1130000,
+        'transactionNo' => 'TXN123456 &lt;script&gt;alert(1)&lt;/script&gt;',
+        'gateway' => 'VNPAY',
+        'responseCode' => '00',
+    ], 'layouts/guest'],
 ];
 
 set_error_handler(static function (int $severity, string $message, string $file, int $line): never {

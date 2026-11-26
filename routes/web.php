@@ -56,11 +56,13 @@ return static function (): \App\Core\Router {
     $router->get('/account/orders/{id}', [OrderController::class, 'customerOrderDetail']);
     $router->get('/account/orders/{id}/status', [OrderController::class, 'customerOrderStatus']);
 
-    // Thông báo cho khách hàng
+    // Thông báo cho khách hàng & Quản trị
     $router->get('/account/notifications', [NotificationController::class, 'index']);
     $router->post('/account/notifications/{id}/read', [NotificationController::class, 'markRead']);
     $router->post('/account/notifications/read-all', [NotificationController::class, 'markAllRead']);
     $router->get('/account/notifications/unread-count', [NotificationController::class, 'unreadCountJson']);
+    $router->get('/notifications/unread-count', [NotificationController::class, 'unreadCountJson']);
+    $router->get('/api/notifications/poll', [NotificationController::class, 'pollJson']);
 
     // Quản trị trung tâm Admin (Dashboard)
     $router->get('/admin/dashboard', [AdminDashboardController::class, 'index']);
@@ -133,13 +135,22 @@ return static function (): \App\Core\Router {
     $router->post('/kitchen/tickets/{id}/status', [KitchenController::class, 'updateTicketStatus']);
     $router->get('/staff/api/ready-items', [KitchenController::class, 'apiReadyItems']);
 
-    // CHỨC NĂNG 5: Quản lý Hóa đơn & Thanh toán (Khách xem/tải hóa đơn chính mình)
+    // CHỨC NĂNG 5: Quản lý Hóa đơn & Cổng Thanh toán Điện tử (VNPAY / VietQR)
+    $router->get('/payment/checkout/{orderId}', [PaymentController::class, 'checkout']);
+    $router->post('/payment/process/{orderId}', [PaymentController::class, 'processVnPay']);
+    $router->get('/payment/vnpay/callback', [PaymentController::class, 'vnpayCallback']);
+    $router->post('/payment/vietqr/confirm/{orderId}', [PaymentController::class, 'vietQrConfirm']);
+    $router->get('/payment/vnpay/ipn', [PaymentController::class, 'vnpayIpn']);
+
     $router->get('/account/orders/{id}/invoice', [InvoiceController::class, 'showByOrder']);
     $router->get('/account/invoices/{id}', [InvoiceController::class, 'show']);
+    $router->get('/account/invoices/{id}/pdf', [InvoiceController::class, 'pdf']);
     $router->get('/staff/orders/{id}/prebill', [InvoiceController::class, 'prebill']);
     $router->post('/staff/orders/{id}/pay', [InvoiceController::class, 'confirmPayment']);
     $router->get('/staff/orders/{id}/invoice', [InvoiceController::class, 'showByOrder']);
     $router->get('/invoices/{id}', [InvoiceController::class, 'show']);
+    $router->get('/invoices/{id}/pdf', [InvoiceController::class, 'pdf']);
+    $router->get('/invoices/{id}/download', [InvoiceController::class, 'downloadPdf']);
     $router->get('/admin/invoices', [InvoiceController::class, 'index']);
     $router->post('/admin/invoices/{id}/refund', [InvoiceController::class, 'refund']);
     $router->post('/admin/invoices/{id}/edit', [InvoiceController::class, 'edit']);
