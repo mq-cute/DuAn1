@@ -149,7 +149,7 @@ final class BookingAdminController extends Controller
             $this->redirect('/admin/bookings?message=' . $message);
         }
 
-        $this->redirect('/admin/bookings?message=updated');
+        $this->redirect('/admin/bookings?message=' . ($status === 'confirmed' ? 'confirmed' : 'updated'));
     }
 
     // MỞ BÀN TỪ ĐƠN ĐẶT TRƯỚC (NHẬN KHÁCH & TẠO ORDER ĐẦY ĐỦ TIỀN BÀN + SETUP + MÓN)

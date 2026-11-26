@@ -10,8 +10,8 @@ $message = $message ?? '';
 $csrfToken = $csrfToken ?? '';
 
 $statusConfig = [
-    'pending' => ['label' => 'Chờ xếp bàn', 'badge' => 'bg-amber-100 text-amber-800 border-amber-300'],
-    'confirmed' => ['label' => 'Đã xác nhận & Cọc', 'badge' => 'bg-emerald-100 text-emerald-800 border-emerald-300'],
+    'pending' => ['label' => 'Chờ xác nhận', 'badge' => 'bg-amber-100 text-amber-800 border-amber-300'],
+    'confirmed' => ['label' => 'Đã xác nhận', 'badge' => 'bg-emerald-100 text-emerald-800 border-emerald-300'],
     'seated' => ['label' => 'Đang phục vụ', 'badge' => 'bg-blue-100 text-blue-800 border-blue-300'],
     'completed' => ['label' => 'Hoàn tất', 'badge' => 'bg-slate-100 text-slate-800 border-slate-300'],
     'cancelled' => ['label' => 'Đã hủy', 'badge' => 'bg-rose-100 text-rose-800 border-rose-300'],
@@ -20,6 +20,7 @@ $statusConfig = [
 
 $messages = [
     'updated' => 'Cập nhật trạng thái đặt bàn thành công.',
+    'confirmed' => 'Đã xác nhận đặt bàn và giữ bàn thành công. Khách hàng đã được thông báo.',
     'invalid' => 'Thông tin không hợp lệ hoặc phiên bảo mật hết hạn.',
     'missing' => 'Không tìm thấy lượt đặt bàn.',
     'table-busy' => 'Bàn được chọn đang có khách sử dụng, không thể nhận lượt này.',
@@ -79,8 +80,8 @@ foreach ($bookings as $b) {
 
     <!-- Alert Flash -->
     <?php if (isset($messages[$message])): ?>
-        <div class="p-4 rounded-xl text-xs font-semibold flex items-center gap-2 <?= in_array($message, ['updated', 'table-opened', 'table-changed']) ? 'bg-emerald-50 text-emerald-900 border border-emerald-300' : 'bg-rose-50 text-rose-900 border border-rose-300' ?>">
-            <span class="material-symbols-outlined text-[18px]"><?= in_array($message, ['updated', 'table-opened', 'table-changed']) ? 'check_circle' : 'error' ?></span>
+        <div class="p-4 rounded-xl text-xs font-semibold flex items-center gap-2 <?= in_array($message, ['updated', 'confirmed', 'table-opened', 'table-changed'], true) ? 'bg-emerald-50 text-emerald-900 border border-emerald-300' : 'bg-rose-50 text-rose-900 border border-rose-300' ?>">
+            <span class="material-symbols-outlined text-[18px]"><?= in_array($message, ['updated', 'confirmed', 'table-opened', 'table-changed'], true) ? 'check_circle' : 'error' ?></span>
             <span><?= View::escape($messages[$message]) ?></span>
         </div>
     <?php endif; ?>
@@ -136,7 +137,7 @@ foreach ($bookings as $b) {
             </a>
             <a href="/admin/bookings?status=confirmed<?= !empty($date) ? '&date=' . urlencode($date) : '' ?>" 
                class="px-4 py-2 rounded-xl transition whitespace-nowrap <?= $status === 'confirmed' ? 'bg-admin-navy text-gold font-bold shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' ?>">
-                &bull; Đã xác nhận & Cọc (<?= $confirmedCount ?>)
+                &bull; Đã xác nhận (<?= $confirmedCount ?>)
             </a>
             <a href="/admin/bookings?status=seated<?= !empty($date) ? '&date=' . urlencode($date) : '' ?>" 
                class="px-4 py-2 rounded-xl transition whitespace-nowrap <?= $status === 'seated' ? 'bg-admin-navy text-gold font-bold shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' ?>">
@@ -257,12 +258,13 @@ foreach ($bookings as $b) {
                                             <span class="px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-bold">Chưa xếp bàn</span>
                                         <?php endif; ?>
 
-                                        <!-- Nút đổi bàn (khi gặp sự cố) -->
+                                        <!-- Xếp bàn trước khi xác nhận hoặc đổi bàn khi cần -->
                                         <?php if (in_array($b['status'], ['pending', 'confirmed', 'seated'], true)): ?>
                                             <button type="button" 
                                                     onclick="openChangeTableModal(<?= (int)$b['id'] ?>, '<?= View::escape($b['table_code'] ?? '') ?>')"
                                                     class="text-[10px] text-gold-dark hover:underline block font-semibold flex items-center gap-0.5 mt-1">
-                                                <span class="material-symbols-outlined text-[12px]">swap_horiz</span> Đổi bàn sự cố
+                                                <span class="material-symbols-outlined text-[12px]"><?= empty($b['table_id']) ? 'add_circle' : 'swap_horiz' ?></span>
+                                                <?= empty($b['table_id']) ? 'Xếp bàn' : 'Đổi bàn sự cố' ?>
                                             </button>
                                         <?php endif; ?>
                                     </div>
@@ -295,12 +297,14 @@ foreach ($bookings as $b) {
                                 <!-- Cọc / Chi Phí Dự Tính -->
                                 <td class="py-4 px-4">
                                     <strong class="text-slate-900 block font-bold">
-                                        <?= !empty($b['estimated_total']) && $b['estimated_total'] > 0 ? View::currency($b['estimated_total']) : '6.748.860 ₫' ?>
+                                        <?= !empty($b['estimated_total']) && $b['estimated_total'] > 0 ? View::currency($b['estimated_total']) : 'Chưa tính' ?>
                                     </strong>
                                     <span class="text-[10px] text-emerald-700 font-semibold block flex items-center gap-0.5">
-                                        <span class="material-symbols-outlined text-[12px]">verified</span> Đã cọc 2.500.000 ₫
+                                        <span class="material-symbols-outlined text-[12px]">verified</span>
+                                        <?= !empty($b['deposit_amount']) && $b['deposit_amount'] > 0
+                                            ? 'Tiền cọc: ' . View::currency($b['deposit_amount'])
+                                            : 'Chưa ghi nhận tiền cọc' ?>
                                     </span>
-                                    <span class="text-[9px] text-slate-400">VietQR tự động</span>
                                 </td>
 
                                 <!-- Trạng Thái -->
@@ -313,6 +317,19 @@ foreach ($bookings as $b) {
                                 <!-- Thao Tác: Nhận bàn & Mở POS -->
                                 <td class="py-4 px-4 text-right">
                                     <div class="flex items-center justify-end gap-1.5">
+                                        <?php if ($b['status'] === 'pending' && !empty($b['table_id'])): ?>
+                                            <form action="/admin/bookings/<?= (int)$b['id'] ?>/status" method="POST" class="inline" onsubmit="return confirm('Xác nhận đặt bàn này và giữ bàn <?= View::escape($b['table_code'] ?? '') ?>?')">
+                                                <input type="hidden" name="_csrf_token" value="<?= View::escape($csrfToken) ?>">
+                                                <input type="hidden" name="status" value="confirmed">
+                                                <button type="submit" class="px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white text-[10px] font-bold hover:bg-emerald-700 transition shadow-sm inline-flex items-center gap-1" title="Xác nhận đặt bàn">
+                                                    <span aria-hidden="true">✓</span>
+                                                    <span>Xác nhận</span>
+                                                </button>
+                                            </form>
+                                        <?php elseif ($b['status'] === 'pending' && empty($b['table_id'])): ?>
+                                            <span class="text-[9px] text-amber-700 font-semibold">Xếp bàn trước</span>
+                                        <?php endif; ?>
+
                                         <!-- Nút Nhận Khách (Mở bàn từ đơn đặt trước) -->
                                         <?php if (in_array($b['status'], ['pending', 'confirmed'], true) && !empty($b['table_id'])): ?>
                                             <form action="/admin/bookings/<?= (int)$b['id'] ?>/open-table" method="POST" class="inline">
