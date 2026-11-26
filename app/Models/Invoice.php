@@ -289,7 +289,12 @@ final class Invoice extends BaseModel
         ];
     }
 
-    public function confirmPayment(int $orderId, string $method, ?int $receivedBy = null): int
+    public function confirmPayment(
+        int $orderId,
+        string $method,
+        ?int $receivedBy = null,
+        ?string $transactionId = null
+    ): int
     {
         if (!array_key_exists($method, self::PAYMENT_METHODS)) {
             throw new DomainException('Phương thức thanh toán không hợp lệ.');
@@ -371,14 +376,15 @@ final class Invoice extends BaseModel
 
             // Create payment record
             $insPayment = $this->db->prepare(
-                'INSERT INTO payments (invoice_id, amount, method, paid_at, received_by)
-                 VALUES (:invoice_id, :amount, :method, CURRENT_TIMESTAMP, :received_by)'
+                'INSERT INTO payments (invoice_id, amount, method, paid_at, received_by, transaction_id)
+                 VALUES (:invoice_id, :amount, :method, CURRENT_TIMESTAMP, :received_by, :transaction_id)'
             );
             $insPayment->execute([
                 'invoice_id' => $invId,
                 'amount' => $total,
                 'method' => $method,
                 'received_by' => $receivedBy,
+                'transaction_id' => $transactionId,
             ]);
 
             // Update order

@@ -15,6 +15,7 @@ use App\Controllers\KitchenController;
 use App\Controllers\MenuController;
 use App\Controllers\NotificationController;
 use App\Controllers\OrderController;
+use App\Controllers\PaymentController;
 use App\Controllers\PromotionAdminController;
 use App\Controllers\RestaurantAdminController;
 use App\Controllers\TableAdminController;

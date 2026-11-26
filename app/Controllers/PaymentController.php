@@ -22,12 +22,12 @@ final class PaymentController extends Controller
      */
     public function checkout(string $orderId): void
     {
-        $currentUser = $this->requireAuthenticated();
+        $currentUser = $this->requireRole('customer', 'staff', 'admin');
         $id = (int)$orderId;
 
         $db = Database::connection();
         $orderModel = new Order($db);
-        $order = $orderModel->getOrderWithDetails($id);
+        $order = $this->findAuthorizedOrder($orderModel, $id, $currentUser);
 
         if ($order === null) {
             $this->redirect('/account/orders?error=order_not_found');
@@ -35,18 +35,6 @@ final class PaymentController extends Controller
 
         // Kiểm tra quyền: khách sở hữu đơn hoặc nhân viên / admin
         $isCustomer = (($currentUser['role'] ?? '') === 'customer');
-        if ($isCustomer) {
-            $orderCustName = mb_strtolower(trim((string)($order['customer_name'] ?? '')));
-            $currentName = mb_strtolower(trim((string)($currentUser['name'] ?? '')));
-            if ($orderCustName !== '' && $currentName !== '' && $orderCustName !== $currentName) {
-                // kiểm tra qua booking
-                $bookingUserId = (int)($order['booking_user_id'] ?? 0);
-                if ($bookingUserId > 0 && $bookingUserId !== (int)$currentUser['id']) {
-                    $this->redirect('/account/orders?error=unauthorized');
-                }
-            }
-        }
-
         // Nếu đơn đã thanh toán -> chuyển thẳng sang hóa đơn
         if ($order['payment_status'] === 'paid') {
             $invoiceModel = new Invoice($db);
@@ -56,16 +44,11 @@ final class PaymentController extends Controller
             }
         }
 
-        $totalAmount = (float)($order['grand_total'] > 0 ? $order['grand_total'] : $order['total_amount']);
+        $invoiceModel = new Invoice($db);
+        $prebill = $invoiceModel->generatePrebillData($id);
+        $totalAmount = (float)($prebill['grandTotal'] ?? 0);
         if ($totalAmount <= 0) {
-            // Tính tạm nếu grand_total chưa cập nhật
-            $itemSubtotal = 0;
-            foreach ($order['items'] ?? [] as $it) {
-                if (($it['status'] ?? '') !== 'cancelled') {
-                    $itemSubtotal += (float)$it['subtotal'];
-                }
-            }
-            $totalAmount = $itemSubtotal > 0 ? round($itemSubtotal * 1.13) : 500000;
+            $this->redirect('/account/orders?error=invalid_order_total');
         }
 
         $gatewayService = new PaymentGatewayService();
@@ -89,7 +72,7 @@ final class PaymentController extends Controller
      */
     public function processVnPay(string $orderId): void
     {
-        $currentUser = $this->requireAuthenticated();
+        $currentUser = $this->requireRole('customer', 'staff', 'admin');
         if (!$this->verifyCsrf()) {
             $this->redirect('/payment/checkout/' . $orderId . '?error=csrf_expired');
         }
@@ -97,15 +80,16 @@ final class PaymentController extends Controller
         $id = (int)$orderId;
         $db = Database::connection();
         $orderModel = new Order($db);
-        $order = $orderModel->getOrderWithDetails($id);
+        $order = $this->findAuthorizedOrder($orderModel, $id, $currentUser);
 
         if ($order === null) {
             $this->redirect('/account/orders?error=order_not_found');
         }
 
-        $totalAmount = (float)($order['grand_total'] > 0 ? $order['grand_total'] : $order['total_amount']);
-        if ($totalAmount <= 0) {
-            $totalAmount = 500000;
+        $prebill = (new Invoice($db))->generatePrebillData($id);
+        $totalAmount = (float)($prebill['grandTotal'] ?? 0);
+        if ($totalAmount <= 0 || $order['payment_status'] === 'paid') {
+            $this->redirect('/account/orders?error=invalid_order_total');
         }
 
         $orderInfo = 'Thanh toan don hang FOODIES #' . $id . ' - Ban ' . ($order['table_code'] ?? 'VIP');
@@ -113,25 +97,12 @@ final class PaymentController extends Controller
 
         $gatewayService = new PaymentGatewayService();
 
-        // Kiểm tra nếu người dùng chọn chế độ Sandbox Simulation Test
-        $simulate = isset($_POST['simulate']) && $_POST['simulate'] === '1';
-        if ($simulate) {
-            // Chuyển hướng tới URL callback giả lập thành công tức thì cho môi trường Local Dev
-            $callbackUrl = '/payment/vnpay/callback?vnp_Amount=' . ((int)round($totalAmount * 100))
-                . '&vnp_BankCode=NCB&vnp_BankTranNo=VNP' . time()
-                . '&vnp_CardType=ATM&vnp_OrderInfo=' . urlencode($orderInfo)
-                . '&vnp_PayDate=' . date('YmdHis')
-                . '&vnp_ResponseCode=00&vnp_TmnCode=5WBGMYV8'
-                . '&vnp_TransactionNo=' . time()
-                . '&vnp_TransactionStatus=00'
-                . '&vnp_TxnRef=' . $id . '_' . time()
-                . '&is_simulated=1';
-            $this->redirect($callbackUrl);
-            return;
+        try {
+            $vnpayUrl = $gatewayService->createVnPayUrl($id, $totalAmount, $orderInfo, $clientIp);
+            $this->redirect($vnpayUrl);
+        } catch (DomainException $exception) {
+            $this->redirect('/payment/checkout/' . $id . '?error=merchant_not_configured');
         }
-
-        $vnpayUrl = $gatewayService->createVnPayUrl($id, $totalAmount, $orderInfo, $clientIp);
-        $this->redirect($vnpayUrl);
     }
 
     /**
@@ -143,56 +114,84 @@ final class PaymentController extends Controller
         $params = $_GET;
 
         $gatewayService = new PaymentGatewayService();
-        $isSimulated = isset($params['is_simulated']) && $params['is_simulated'] === '1';
-
         $orderId = 0;
         $amount = 0.0;
         $transactionNo = '';
-        $isSuccess = false;
-
-        if ($isSimulated) {
-            $txnRef = (string)($params['vnp_TxnRef'] ?? '');
-            $orderId = (int)explode('_', $txnRef)[0];
-            $amount = (float)($params['vnp_Amount'] ?? 0) / 100;
-            $transactionNo = (string)($params['vnp_TransactionNo'] ?? 'SIM-' . time());
-            $isSuccess = ($params['vnp_ResponseCode'] ?? '') === '00';
-        } else {
-            $verifyResult = $gatewayService->verifyVnPayCallback($params);
-            $orderId = $verifyResult['order_id'];
-            $amount = $verifyResult['amount'];
-            $transactionNo = $verifyResult['transaction_no'];
-            $isSuccess = $verifyResult['is_success'];
-        }
+        $verifyResult = $gatewayService->verifyVnPayCallback($params);
+        $orderId = $verifyResult['order_id'];
+        $amount = $verifyResult['amount'];
+        $transactionNo = $verifyResult['transaction_no'];
+        $isSuccess = $verifyResult['is_success'];
 
         $db = Database::connection();
         $invoiceModel = new Invoice($db);
         $invoiceId = 0;
 
+        $orderModel = new Order($db);
+        $order = $orderId > 0 ? $orderModel->getOrderDetails($orderId) : null;
+        $prebill = $order === null ? null : (new Invoice($db))->generatePrebillData($orderId);
+        $expectedTotal = (float)($prebill['grandTotal'] ?? 0);
+        $paymentConfig = require dirname(__DIR__, 2) . '/config/payment.php';
+        $responseCode = (string)($params['vnp_ResponseCode'] ?? '');
+        $transactionStatus = (string)($params['vnp_TransactionStatus'] ?? '');
+        $merchantMatches = $verifyResult['merchant_code'] !== ''
+            && hash_equals((string)$paymentConfig['vnpay']['tmn_code'], $verifyResult['merchant_code']);
+        $amountMatches = $order !== null && abs($amount - $expectedTotal) < 0.005;
+        $isSuccess = $verifyResult['is_valid']
+            && $responseCode === '00'
+            && $transactionStatus === '00'
+            && $order !== null
+            && $merchantMatches
+            && $amountMatches;
+
+        $this->logVnpayDiagnostic(sprintf(
+            'return order=%d response=%s transaction_status=%s signature=%s merchant=%s order_exists=%s amount_matches=%s returned_amount=%.2f expected_amount=%.2f',
+            $orderId,
+            $responseCode !== '' ? $responseCode : 'missing',
+            $transactionStatus !== '' ? $transactionStatus : 'missing',
+            $verifyResult['is_valid'] ? 'valid' : 'invalid',
+            $merchantMatches ? 'match' : 'mismatch',
+            $order !== null ? 'yes' : 'no',
+            $amountMatches ? 'yes' : 'no',
+            $amount,
+            $expectedTotal
+        ));
+
         if ($isSuccess && $orderId > 0) {
             try {
                 $userId = $currentUser !== null ? (int)$currentUser['id'] : null;
-                $invoiceId = $invoiceModel->confirmPayment($orderId, 'ewallet', $userId);
+                if ($order['payment_status'] === 'paid') {
+                    $existing = $invoiceModel->findByOrderId($orderId);
+                    $invoiceId = (int)($existing['id'] ?? 0);
+                } else {
+                    $invoiceId = $invoiceModel->confirmPayment($orderId, 'ewallet', $userId, $transactionNo);
+                }
 
                 // Tạo thông báo xác nhận thanh toán
-                $notifModel = new Notification($db);
-                $notifModel->create(
-                    $userId,
-                    'payment_success',
-                    'Thanh toán điện tử thành công',
-                    'Đơn hàng #' . $orderId . ' đã được thanh toán thành công qua cổng VNPAY. Mã GD: ' . $transactionNo,
-                    [
-                        'order_id' => $orderId,
-                        'invoice_id' => $invoiceId,
-                        'amount' => $amount,
-                        'transaction_no' => $transactionNo,
-                        'gateway' => 'VNPAY',
-                    ]
-                );
+                if ($userId !== null && $order['payment_status'] !== 'paid') {
+                    $notifModel = new Notification($db);
+                    $notifModel->create(
+                        $userId,
+                        'payment_success',
+                        'Thanh toán điện tử thành công',
+                        'Đơn hàng #' . $orderId . ' đã được thanh toán thành công qua cổng VNPAY. Mã GD: ' . $transactionNo,
+                        [
+                            'order_id' => $orderId,
+                            'invoice_id' => $invoiceId,
+                            'amount' => $amount,
+                            'transaction_no' => $transactionNo,
+                            'gateway' => 'VNPAY',
+                        ]
+                    );
+                }
             } catch (Throwable $e) {
-                // Đã thanh toán hoặc lỗi xử lý
+                $this->logVnpayDiagnostic('invoice persistence failed: ' . get_class($e) . ' ' . $e->getMessage());
+                // Chỉ giữ kết quả thành công nếu hóa đơn đã được ghi nhận là đã thanh toán.
                 $existing = $invoiceModel->findByOrderId($orderId);
-                if ($existing !== null) {
+                if ($existing !== null && ($existing['status'] ?? '') === 'paid') {
                     $invoiceId = (int)$existing['id'];
+                } else {
+                    $isSuccess = false;
                 }
             }
         }
@@ -210,18 +209,29 @@ final class PaymentController extends Controller
         ], 200, 'layouts/guest');
     }
 
+    private function logVnpayDiagnostic(string $message): void
+    {
+        $logFile = dirname(__DIR__, 2) . '/storage/logs/app.log';
+        error_log('[' . date(DATE_ATOM) . '] VNPAY ' . $message . PHP_EOL, 3, $logFile);
+    }
+
     /**
      * Xác nhận thanh toán Chuyển khoản VietQR
      */
     public function vietQrConfirm(string $orderId): void
     {
-        $currentUser = $this->requireAuthenticated();
+        $currentUser = $this->requireRole('customer', 'staff', 'admin');
         if (!$this->verifyCsrf()) {
             $this->redirect('/payment/checkout/' . $orderId . '?error=csrf_expired');
         }
 
         $id = (int)$orderId;
         $db = Database::connection();
+        $orderModel = new Order($db);
+        $order = $this->findAuthorizedOrder($orderModel, $id, $currentUser);
+        if ($order === null || $order['payment_status'] === 'paid') {
+            $this->redirect('/account/orders?error=order_not_found');
+        }
         $invoiceModel = new Invoice($db);
 
         try {
@@ -281,13 +291,31 @@ final class PaymentController extends Controller
             exit;
         }
 
-        if ($verify['is_success']) {
+        $prebill = (new Invoice($db))->generatePrebillData($orderId);
+        $paymentConfig = require dirname(__DIR__, 2) . '/config/payment.php';
+        $matchesOrder = $prebill !== null
+            && abs($verify['amount'] - (float)$prebill['grandTotal']) < 0.005
+            && $verify['merchant_code'] === (string)$paymentConfig['vnpay']['tmn_code'];
+        if (!$matchesOrder) {
+            echo json_encode(['RspCode' => '04', 'Message' => 'Invalid Amount']);
+            exit;
+        }
+        if ($verify['is_success'] && $matchesOrder) {
             $invoiceModel = new Invoice($db);
-            $invoiceModel->confirmPayment($orderId, 'ewallet', null);
+            $invoiceModel->confirmPayment($orderId, 'ewallet', null, $verify['transaction_no']);
             echo json_encode(['RspCode' => '00', 'Message' => 'Confirm Success']);
         } else {
             echo json_encode(['RspCode' => '00', 'Message' => 'Payment Cancelled or Failed']);
         }
         exit;
+    }
+
+    private function findAuthorizedOrder(Order $orders, int $orderId, array $user): ?array
+    {
+        if (($user['role'] ?? '') === 'customer') {
+            return $orders->getCustomerOrderDetails($orderId, (int)$user['id']);
+        }
+
+        return $orders->getOrderDetails($orderId);
     }
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use DomainException;
+
 final class PaymentGatewayService
 {
     private array $config;
@@ -11,24 +13,11 @@ final class PaymentGatewayService
     public function __construct()
     {
         $configFile = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'payment.php';
-        if (is_file($configFile)) {
-            $this->config = require $configFile;
-        } else {
-            $this->config = [
-                'vnpay' => [
-                    'tmn_code' => '5WBGMYV8',
-                    'hash_secret' => 'WSAMYXXSYDVDPNCPHFXBZSUMYGHLGUBS',
-                    'url' => 'https://sandbox.vnpaytest.vn/paymentv2/vpcpay.html',
-                    'return_url' => 'http://localhost:8000/payment/vnpay/callback',
-                ],
-                'vietqr' => [
-                    'bank_id' => 'MB',
-                    'account_no' => '0314892341',
-                    'account_name' => 'LEPICURE GASTRONOMIE FOODIES',
-                    'template' => 'compact2',
-                ]
-            ];
+        if (!is_file($configFile)) {
+            throw new DomainException('Thiếu cấu hình cổng thanh toán.');
         }
+
+        $this->config = require $configFile;
     }
 
     /**
@@ -37,10 +26,13 @@ final class PaymentGatewayService
     public function createVnPayUrl(int $orderId, float $amount, string $orderInfo, string $clientIp): string
     {
         $vnpay = $this->config['vnpay'] ?? [];
-        $tmnCode = (string)($vnpay['tmn_code'] ?? '5WBGMYV8');
-        $hashSecret = (string)($vnpay['hash_secret'] ?? 'WSAMYXXSYDVDPNCPHFXBZSUMYGHLGUBS');
-        $vnpUrl = (string)($vnpay['url'] ?? 'https://sandbox.vnpaytest.vn/paymentv2/vpcpay.html');
-        $returnUrl = (string)($vnpay['return_url'] ?? 'http://localhost:8000/payment/vnpay/callback');
+        $tmnCode = trim((string)($vnpay['tmn_code'] ?? ''));
+        $hashSecret = trim((string)($vnpay['hash_secret'] ?? ''));
+        $vnpUrl = trim((string)($vnpay['url'] ?? ''));
+        $returnUrl = trim((string)($vnpay['return_url'] ?? ''));
+        if ($tmnCode === '' || $hashSecret === '' || $vnpUrl === '' || $returnUrl === '') {
+            throw new DomainException('Chưa cấu hình mã merchant và khóa bí mật VNPAY.');
+        }
 
         $txnRef = (string)$orderId . '_' . time();
         $vnpAmount = (int)round($amount * 100); // VNPAY yêu cầu nhân 100
@@ -86,7 +78,7 @@ final class PaymentGatewayService
     public function verifyVnPayCallback(array $params): array
     {
         $vnpay = $this->config['vnpay'] ?? [];
-        $hashSecret = (string)($vnpay['hash_secret'] ?? 'FDSSECRETKEY2026FINEFOOD');
+        $hashSecret = trim((string)($vnpay['hash_secret'] ?? ''));
 
         $vnpSecureHash = $params['vnp_SecureHash'] ?? '';
         unset($params['vnp_SecureHash'], $params['vnp_SecureHashType']);
@@ -105,8 +97,8 @@ final class PaymentGatewayService
             }
         }
 
-        $secureHash = hash_hmac('sha512', $hashData, $hashSecret);
-        $isValidSignature = hash_equals($secureHash, (string)$vnpSecureHash);
+        $secureHash = $hashSecret === '' ? '' : hash_hmac('sha512', $hashData, $hashSecret);
+        $isValidSignature = $secureHash !== '' && hash_equals($secureHash, (string)$vnpSecureHash);
         $isSuccess = ($params['vnp_ResponseCode'] ?? '') === '00' && ($params['vnp_TransactionStatus'] ?? '') === '00';
 
         $txnRef = (string)($params['vnp_TxnRef'] ?? '');
@@ -120,6 +112,7 @@ final class PaymentGatewayService
             'amount' => $amount,
             'transaction_no' => (string)($params['vnp_TransactionNo'] ?? ''),
             'bank_code' => (string)($params['vnp_BankCode'] ?? ''),
+            'merchant_code' => (string)($params['vnp_TmnCode'] ?? ''),
             'response_code' => (string)($params['vnp_ResponseCode'] ?? ''),
             'raw_params' => $params,
         ];

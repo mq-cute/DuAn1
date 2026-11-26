@@ -1,6 +1,12 @@
 <?php
-$pdo = new PDO('mysql:host=127.0.0.1;dbname=restaurant_booking;charset=utf8mb4', 'root', '');
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+declare(strict_types=1);
+
+$root = dirname(__DIR__, 2);
+require_once $root . '/app/Core/Environment.php';
+App\Core\Environment::load($root . '/.env');
+require_once $root . '/app/Core/Database.php';
+$pdo = App\Core\Database::connection();
 
 // 1. Thêm các cột cho restaurant_tables
 $cols = $pdo->query('SHOW COLUMNS FROM restaurant_tables')->fetchAll(PDO::FETCH_COLUMN);
@@ -41,11 +47,17 @@ if (!in_array('voucher_code', $oCols)) {
     $pdo->exec('ALTER TABLE orders ADD COLUMN voucher_code VARCHAR(50) NULL AFTER discount');
 }
 
-// 4. Thêm setting tự động hủy bàn quá hạn
+// 4. Lưu mã giao dịch từ cổng thanh toán nếu database được tạo từ schema cũ
+$pCols = $pdo->query('SHOW COLUMNS FROM payments')->fetchAll(PDO::FETCH_COLUMN);
+if (!in_array('transaction_id', $pCols, true)) {
+    $pdo->exec('ALTER TABLE payments ADD COLUMN transaction_id VARCHAR(100) NULL AFTER received_by');
+}
+
+// 5. Thêm setting tự động hủy bàn quá hạn
 $st = $pdo->prepare('INSERT IGNORE INTO restaurant_settings (`key`, `value`, `group_name`, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())');
 $st->execute(['auto_release_late_minutes', '30', 'booking']);
 
-// 5. Cập nhật VIP cho một số bàn để có dữ liệu thực tế
+// 6. Cập nhật VIP cho một số bàn để có dữ liệu thực tế
 $pdo->exec("UPDATE restaurant_tables SET is_vip = 1, table_fee = 500000.00, vip_privileges = 'Quản gia riêng phục vụ, Khăn nóng ướp tinh dầu hoa hồng, 01 Đĩa trái cây cao cấp, Hoa tươi trên bàn', description = 'Không gian VIP sang trọng, view sông Sài Gòn, cách âm riêng tư' WHERE code LIKE 'VIP%' OR id IN (2, 3)");
 
 echo "Database schema updated successfully!\n";

@@ -9,12 +9,12 @@ return [
     |--------------------------------------------------------------------------
     */
     'vnpay' => [
-        'tmn_code' => getenv('VNPAY_TMN_CODE') ?: '5WBGMYV8',
-        'hash_secret' => getenv('VNPAY_HASH_SECRET') ?: 'WSAMYXXSYDVDPNCPHFXBZSUMYGHLGUBS',
+        'tmn_code' => getenv('VNPAY_TMN_CODE') ?: '',
+        'hash_secret' => getenv('VNPAY_HASH_SECRET') ?: '',
         'url' => getenv('VNPAY_URL') ?: 'https://sandbox.vnpaytest.vn/paymentv2/vpcpay.html',
         'return_url' => getenv('VNPAY_RETURN_URL') ?: ((getenv('APP_URL') ?: 'http://localhost:8000') . '/payment/vnpay/callback'),
         'ipn_url' => getenv('VNPAY_IPN_URL') ?: ((getenv('APP_URL') ?: 'http://localhost:8000') . '/payment/vnpay/ipn'),
-        'sandbox' => true,
+        'sandbox' => (getenv('VNPAY_ENV') ?: 'sandbox') !== 'live',
     ],
 
     /*

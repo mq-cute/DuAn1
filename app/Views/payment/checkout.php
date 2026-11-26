@@ -5,9 +5,19 @@ $order = $order ?? [];
 $items = $order['items'] ?? [];
 $totalAmount = (float)($totalAmount ?? 0);
 $vietQr = $vietQr ?? [];
+$paymentError = (string)($_GET['error'] ?? '');
 ?>
 
 <div class="max-w-5xl mx-auto space-y-8 py-6">
+    <?php if ($paymentError === 'merchant_not_configured'): ?>
+        <div role="alert" class="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            VNPAY Sandbox chưa được cấu hình. Hãy nhập mã merchant và khóa bí mật Sandbox do VNPAY cấp vào file .env.
+        </div>
+    <?php elseif ($paymentError === 'csrf_expired'): ?>
+        <div role="alert" class="rounded-xl border border-rose-300 bg-rose-50 px-4 py-3 text-sm text-rose-900">
+            Phiên thanh toán đã hết hạn. Vui lòng thử lại.
+        </div>
+    <?php endif; ?>
     <!-- Header -->
     <div class="text-center space-y-2">
         <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase bg-amber-500/10 text-amber-800 border border-amber-300">
@@ -130,18 +140,13 @@ $vietQr = $vietQr ?? [];
 
                 <!-- Action Forms -->
                 <form method="POST" action="/payment/process/<?= (int)($order['id'] ?? 0) ?>" class="space-y-3">
-                    <input type="hidden" name="csrf_token" value="<?= View::escape($csrfToken) ?>">
+                    <input type="hidden" name="_csrf_token" value="<?= View::escape($csrfToken) ?>">
                     
                     <button type="submit" class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-blue-700 to-blue-900 text-white font-bold text-sm hover:from-blue-800 hover:to-blue-950 shadow-lg shadow-blue-900/10 transition flex items-center justify-center gap-2">
                         <span>Chuyển đến Cổng VNPAY (Thanh toán <?= View::currency((string)(int)$totalAmount) ?>)</span>
                         <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
                     </button>
 
-                    <!-- Sandbox Quick Simulation Button for Testing -->
-                    <button type="submit" name="simulate" value="1" class="w-full py-2.5 px-4 rounded-xl border border-slate-300 bg-slate-50 text-slate-700 font-semibold text-xs hover:bg-slate-100 transition flex items-center justify-center gap-1.5" title="Thử nghiệm thanh toán thành công tức thì trong môi trường phát triển">
-                        <span class="material-symbols-outlined text-[16px] text-amber-600">bolt</span>
-                        <span>[Sandbox / Dev] Thử Nghiệm Mô Phỏng Thành Công Ngay</span>
-                    </button>
                 </form>
             </div>
 
@@ -195,7 +200,7 @@ $vietQr = $vietQr ?? [];
 
                 <!-- Confirm Form -->
                 <form method="POST" action="/payment/vietqr/confirm/<?= (int)($order['id'] ?? 0) ?>">
-                    <input type="hidden" name="csrf_token" value="<?= View::escape($csrfToken) ?>">
+                    <input type="hidden" name="_csrf_token" value="<?= View::escape($csrfToken) ?>">
                     <button type="submit" class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold text-sm hover:from-emerald-700 hover:to-emerald-800 shadow-lg shadow-emerald-900/10 transition flex items-center justify-center gap-2">
                         <span class="material-symbols-outlined text-[18px]">done_all</span>
                         <span>Tôi Đã Chuyển Khoản Thành Công</span>

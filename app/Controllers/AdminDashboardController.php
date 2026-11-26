@@ -56,10 +56,10 @@ final class AdminDashboardController extends Controller
             "SELECT 
                 COUNT(*) as total,
                 SUM(CASE WHEN status IN ('in_use', 'serving', 'awaiting_payment') THEN 1 ELSE 0 END) as active,
-                SUM(CASE WHEN status = 'empty' THEN 1 ELSE 0 END) as empty,
-                SUM(CASE WHEN status = 'reserved' THEN 1 ELSE 0 END) as reserved,
-                SUM(CASE WHEN status = 'cleaning' THEN 1 ELSE 0 END) as cleaning,
-                SUM(CASE WHEN status = 'locked' THEN 1 ELSE 0 END) as locked
+                SUM(CASE WHEN status = 'empty' THEN 1 ELSE 0 END) as empty_tables,
+                SUM(CASE WHEN status = 'reserved' THEN 1 ELSE 0 END) as reserved_tables,
+                SUM(CASE WHEN status = 'cleaning' THEN 1 ELSE 0 END) as cleaning_tables,
+                SUM(CASE WHEN status = 'locked' THEN 1 ELSE 0 END) as locked_tables
              FROM restaurant_tables"
         );
         $tableStats = $tableStmt->fetch(PDO::FETCH_ASSOC);
