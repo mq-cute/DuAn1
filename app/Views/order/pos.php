@@ -32,6 +32,11 @@ $messages = [
     'status_updated' => 'Cập nhật trạng thái đơn hàng thành công.',
     'booking_seated' => 'Đã tiếp nhận khách vào bàn và chuyển món đặt trước đến bếp.',
 ];
+$bookingConfirmations = is_array($bookingConfirmations ?? null) ? $bookingConfirmations : [];
+$activePrebill = is_array($activePrebill ?? null) ? $activePrebill : [];
+$formatCurrency = static fn (mixed $amount): string => View::currency(
+    is_int($amount) || is_string($amount) ? $amount : number_format((float) ($amount ?? 0), 2, '.', '')
+);
 ?>
 
 <!-- SUB-HEADER / ZONE & STATE FILTER BAR -->
@@ -103,7 +108,7 @@ $messages = [
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         <!-- LEFT RAIL: TABLE CARDS GRID (5 Cols, ~42%) -->
-        <section class="lg:col-span-5 space-y-4">
+        <section class="min-w-0 lg:col-span-5 space-y-4">
             <div class="flex items-center justify-between px-1">
                 <div>
                     <h2 class="text-xl font-headline font-bold text-on-surface">Danh sách bàn trực tiếp</h2>
@@ -234,7 +239,7 @@ $messages = [
         </section>
 
         <!-- RIGHT RAIL: ACTIVE TABLE ORDER DETAIL (7 Cols, ~58%) -->
-        <section class="lg:col-span-7 bg-surface-container-lowest rounded-3xl p-6 md:p-8 border border-outline-variant/30 shadow-sm flex flex-col justify-between min-h-[680px]">
+        <section class="min-w-0 lg:col-span-7 bg-surface-container-lowest rounded-3xl p-4 sm:p-6 md:p-8 border border-outline-variant/30 shadow-sm flex flex-col justify-between min-h-[680px]">
             <?php if ($selectedTable !== null): ?>
                 <div>
                     <!-- Header of Active Table -->
@@ -335,9 +340,9 @@ $messages = [
                                             </span>
                                         <?php endif; ?>
 
-                                        <div>
+                                        <div class="min-w-0">
                                             <div class="flex items-center space-x-2">
-                                                <h4 class="text-sm font-semibold text-on-surface"><?= View::escape($item['dish_name']) ?></h4>
+                                                <h4 class="min-w-0 break-words text-sm font-semibold text-on-surface"><?= View::escape($item['dish_name']) ?></h4>
                                                 <span class="text-xs bg-surface-container-highest px-2 py-0.5 rounded text-on-surface-variant font-bold">
                                                     x<?= (int) $item['quantity'] ?>
                                                 </span>
@@ -393,31 +398,52 @@ $messages = [
                         <!-- Financial Summary & Primary POS CTAs -->
                         <div class="mt-6 pt-5 border-t border-outline-variant/30 space-y-4">
                             <div class="space-y-1.5 text-xs text-on-surface-variant">
-                                <div class="flex justify-between">
-                                    <span>Tổng tiền món &amp; Rượu:</span>
-                                    <span class="font-semibold text-on-surface"><?= View::currency($activeOrder['total_amount']) ?></span>
+                                <div class="flex items-start justify-between gap-3">
+                                    <span class="min-w-0">Tổng tiền món &amp; Rượu:</span>
+                                    <span class="shrink-0 text-right font-semibold text-on-surface"><?= $formatCurrency($activePrebill['subtotal'] ?? ($activeOrder['subtotal'] ?? 0)) ?></span>
                                 </div>
-                                <div class="flex justify-between">
-                                    <span>Phí dịch vụ nhà hàng (5% Service Charge):</span>
-                                    <span class="font-semibold text-on-surface"><?= View::currency($activeOrder['service_charge']) ?></span>
+                                <?php if ((float) ($activePrebill['tableFee'] ?? 0) > 0): ?>
+                                    <div class="flex items-start justify-between gap-3"><span>Phí bàn:</span><span class="shrink-0 text-right font-semibold text-on-surface"><?= $formatCurrency($activePrebill['tableFee'] ?? 0) ?></span></div>
+                                <?php endif; ?>
+                                <?php if ((float) ($activePrebill['setupFee'] ?? 0) > 0): ?>
+                                    <div class="flex items-start justify-between gap-3"><span>Phí setup:</span><span class="shrink-0 text-right font-semibold text-on-surface"><?= $formatCurrency($activePrebill['setupFee'] ?? 0) ?></span></div>
+                                <?php endif; ?>
+                                <?php if ((float) ($activePrebill['discount'] ?? 0) > 0): ?>
+                                    <div class="flex items-start justify-between gap-3 text-secondary"><span class="min-w-0 break-words">Voucher <?= View::escape($activePrebill['voucherCode'] ?? '') ?>:</span><span class="shrink-0 text-right font-bold">-<?= $formatCurrency($activePrebill['discount'] ?? 0) ?></span></div>
+                                <?php endif; ?>
+                                <div class="flex items-start justify-between gap-3">
+                                    <span class="min-w-0">Phí dịch vụ nhà hàng (5% Service Charge):</span>
+                                    <span class="shrink-0 text-right font-semibold text-on-surface"><?= $formatCurrency($activePrebill['serviceCharge'] ?? ($activeOrder['service_charge'] ?? 0)) ?></span>
                                 </div>
-                                <div class="flex justify-between">
-                                    <span>Thuế GTGT ẩm thực (8% VAT):</span>
-                                    <span class="font-semibold text-on-surface"><?= View::currency($activeOrder['tax']) ?></span>
+                                <div class="flex items-start justify-between gap-3">
+                                    <span class="min-w-0">Thuế GTGT ẩm thực (8% VAT):</span>
+                                    <span class="shrink-0 text-right font-semibold text-on-surface"><?= $formatCurrency($activePrebill['tax'] ?? ($activeOrder['tax'] ?? 0)) ?></span>
                                 </div>
-                                <div class="flex justify-between text-base font-headline font-bold text-on-surface pt-2 border-t border-outline-variant/20">
-                                    <span>Tổng thanh toán:</span>
-                                    <span class="text-primary text-xl font-headline font-bold"><?= View::currency($activeOrder['grand_total']) ?></span>
+                                <?php if ((float) ($activePrebill['bookingDepositAmount'] ?? 0) > 0): ?>
+                                    <div class="flex items-start justify-between gap-3 <?= !empty($activePrebill['depositReceivedAt']) ? 'text-emerald-700' : 'text-amber-700' ?>">
+                                        <span class="min-w-0"><?= !empty($activePrebill['depositReceivedAt']) ? 'Tiền cọc đã nhận:' : 'Tiền cọc chờ xác nhận:' ?></span>
+                                        <span class="shrink-0 text-right font-semibold"><?= $formatCurrency($activePrebill['bookingDepositAmount'] ?? 0) ?></span>
+                                    </div>
+                                <?php endif; ?>
+                                <div class="flex items-start justify-between gap-3 text-base font-headline font-bold text-on-surface pt-2 border-t border-outline-variant/20">
+                                    <span class="min-w-0">Tổng thanh toán:</span>
+                                    <span class="shrink-0 text-right text-primary text-xl font-headline font-bold"><?= $formatCurrency($activePrebill['grandTotal'] ?? ($activeOrder['total'] ?? 0)) ?></span>
                                 </div>
+                                <?php if ((float) ($activePrebill['bookingDepositAmount'] ?? 0) > 0): ?>
+                                    <div class="flex items-start justify-between gap-3 font-bold text-on-surface">
+                                        <span class="min-w-0">Còn phải trả<?= (float) ($activePrebill['depositAmount'] ?? 0) > 0 ? ' (đã trừ cọc)' : '' ?>:</span>
+                                        <span class="shrink-0 text-right"><?= $formatCurrency($activePrebill['amountDue'] ?? ($activeOrder['total'] ?? 0)) ?></span>
+                                    </div>
+                                <?php endif; ?>
                             </div>
 
                             <!-- POS Primary Action Buttons -->
-                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 pt-2">
-                                <a href="/staff/orders/<?= (int) $activeOrder['id'] ?>/prebill" target="_blank" class="sm:col-span-4 py-3.5 px-4 rounded-xl border border-secondary text-secondary font-bold text-xs hover:bg-secondary/10 transition flex items-center justify-center space-x-2 text-center">
+                            <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 pt-2">
+                                <a href="/staff/orders/<?= (int) $activeOrder['id'] ?>/prebill" target="_blank" class="lg:col-span-4 min-h-12 py-3 px-4 rounded-xl border border-secondary text-secondary font-bold text-xs hover:bg-secondary/10 transition flex items-center justify-center gap-2 text-center leading-snug">
                                     <span class="material-symbols-outlined text-[18px]">print</span>
                                     <span>In Tạm Tính (Pre-Bill)</span>
                                 </a>
-                                <button type="button" onclick="openPaymentModal(<?= (int) $activeOrder['id'] ?>, '<?= View::escape($selectedTable['code']) ?>', '<?= View::escape(number_format((float) $activeOrder['grand_total'], 0, ',', '.')) ?> ₫')" class="sm:col-span-8 py-3.5 px-6 rounded-xl bg-primary text-on-primary font-bold text-xs hover:bg-primary-container transition shadow-md flex items-center justify-center space-x-2">
+                                <button type="button" onclick="openPaymentModal(<?= (int) $activeOrder['id'] ?>, '<?= View::escape($selectedTable['code']) ?>', '<?= View::escape(number_format((float) ($activePrebill['amountDue'] ?? ($activeOrder['total'] ?? 0)), 0, ',', '.')) ?> ₫')" class="lg:col-span-8 min-h-12 py-3 px-4 sm:px-6 rounded-xl bg-primary text-on-primary font-bold text-xs hover:bg-primary-container transition shadow-md flex items-center justify-center gap-2 text-center leading-snug">
                                     <span class="material-symbols-outlined text-[20px]">credit_card</span>
                                     <span>Xác nhận Thanh toán &amp; Xuất Hóa đơn</span>
                                 </button>

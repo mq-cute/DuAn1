@@ -100,7 +100,7 @@ $messages = [
     <?php endif; ?>
 
     <!-- Status Filter / Metrics Cards -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 2xl:grid-cols-7 gap-3">
         <?php foreach ($statusConfig as $sKey => $sVal): ?>
             <div class="p-3.5 rounded-2xl bg-white border border-outline-variant/30 shadow-sm flex flex-col justify-between">
                 <div class="flex items-center justify-between">

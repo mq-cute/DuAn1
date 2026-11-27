@@ -6,7 +6,11 @@ $items = $order['items'] ?? [];
 $totalAmount = (float)($totalAmount ?? 0);
 $vietQr = $vietQr ?? [];
 $paymentError = (string)($_GET['error'] ?? '');
+$isCustomer = (bool)($isCustomer ?? false);
 ?>
+<?php if ($isCustomer): ?>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<?php endif; ?>
 
 <div class="max-w-5xl mx-auto space-y-8 py-6">
     <?php if ($paymentError === 'merchant_not_configured'): ?>
@@ -141,8 +145,8 @@ $paymentError = (string)($_GET['error'] ?? '');
                 <!-- Action Forms -->
                 <form method="POST" action="/payment/process/<?= (int)($order['id'] ?? 0) ?>" class="space-y-3">
                     <input type="hidden" name="_csrf_token" value="<?= View::escape($csrfToken) ?>">
-                    
-                    <button type="submit" class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-blue-700 to-blue-900 text-white font-bold text-sm hover:from-blue-800 hover:to-blue-950 shadow-lg shadow-blue-900/10 transition flex items-center justify-center gap-2">
+
+                    <button type="submit" class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-blue-700 to-blue-900 text-white font-bold text-sm hover:from-blue-800 hover:to-blue-950 shadow-lg shadow-blue-900/10 transition flex items-center justify-center gap-2 border-0 cursor-pointer">
                         <span>Chuyển đến Cổng VNPAY (Thanh toán <?= View::currency((string)(int)$totalAmount) ?>)</span>
                         <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
                     </button>
@@ -201,7 +205,7 @@ $paymentError = (string)($_GET['error'] ?? '');
                 <!-- Confirm Form -->
                 <form method="POST" action="/payment/vietqr/confirm/<?= (int)($order['id'] ?? 0) ?>">
                     <input type="hidden" name="_csrf_token" value="<?= View::escape($csrfToken) ?>">
-                    <button type="submit" class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold text-sm hover:from-emerald-700 hover:to-emerald-800 shadow-lg shadow-emerald-900/10 transition flex items-center justify-center gap-2">
+                    <button type="submit" class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold text-sm hover:from-emerald-700 hover:to-emerald-800 shadow-lg shadow-emerald-900/10 transition flex items-center justify-center gap-2 border-0 cursor-pointer">
                         <span class="material-symbols-outlined text-[18px]">done_all</span>
                         <span>Tôi Đã Chuyển Khoản Thành Công</span>
                     </button>

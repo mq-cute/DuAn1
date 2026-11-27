@@ -23,6 +23,33 @@ $itemStatusConfig = [
     'served' => ['label' => 'Đã lên bàn', 'class' => 'text-secondary font-medium bg-emerald-50 border-emerald-200'],
     'cancelled' => ['label' => 'Đã hủy', 'class' => 'text-stone-400 line-through bg-stone-50 border-stone-200'],
 ];
+
+$counts = ['pending' => 0, 'preparing' => 0, 'ready' => 0, 'served' => 0];
+$activeItemsCount = 0;
+foreach ($order['items'] ?? [] as $it) {
+    $st = $it['status'] ?? 'pending';
+    if ($st === 'cancelled') {
+        continue;
+    }
+    $activeItemsCount++;
+    if ($st === 'pending') {
+        $counts['pending']++;
+    } elseif (in_array($st, ['confirmed', 'preparing'], true)) {
+        $counts['preparing']++;
+    } elseif ($st === 'ready') {
+        $counts['ready']++;
+    } elseif ($st === 'served') {
+        $counts['served']++;
+    }
+}
+
+$orderStatus = $order['status'] ?? 'pending';
+$trackerStep = match (true) {
+    in_array($orderStatus, ['served', 'completed'], true) || ($activeItemsCount > 0 && $counts['served'] === $activeItemsCount) => 4,
+    $orderStatus === 'ready' || $counts['ready'] > 0 => 3,
+    in_array($orderStatus, ['confirmed', 'preparing'], true) || $counts['preparing'] > 0 => 2,
+    default => 1,
+};
 ?>
 
 <div class="max-w-[1280px] w-full mx-auto p-4 md:p-6 lg:p-8 space-y-6">
@@ -69,6 +96,70 @@ $itemStatusConfig = [
         </div>
     </div>
 
+    <!-- Kitchen Progress Tracker for Staff -->
+    <?php if ($orderStatus !== 'cancelled'): ?>
+        <section class="staff-order-tracker">
+            <div class="tracker-head">
+                <div>
+                    <span class="tracker-eyebrow">THEO DÕI TIẾN ĐỘ BẾP · BÀN <?= View::escape($order['table_code']) ?></span>
+                    <h2 class="tracker-title">
+                        <?php if ($counts['ready'] > 0): ?>
+                            Bếp đã làm xong <?= $counts['ready'] ?> món — Sẵn sàng ra món!
+                        <?php elseif ($trackerStep === 4): ?>
+                            Tất cả món ăn đã được phục vụ ra bàn
+                        <?php elseif ($counts['preparing'] > 0): ?>
+                            Bếp đang chế biến <?= $counts['preparing'] ?> món ăn
+                        <?php else: ?>
+                            Đơn đang chờ nhà bếp tiếp nhận
+                        <?php endif; ?>
+                    </h2>
+                </div>
+                <div class="tracker-refresh">
+                    <span class="tracker-sync-time">Cập nhật: <?= date('H:i:s') ?></span>
+                    <a href="/staff/orders/<?= (int) $order['id'] ?>" class="tracker-refresh-btn">Làm mới</a>
+                </div>
+            </div>
+
+            <div class="tracker-steps">
+                <div class="tracker-step <?= $trackerStep >= 1 ? ($trackerStep > 1 ? 'is-done' : 'is-current') : '' ?>">
+                    <span class="tracker-dot">1</span>
+                    <div>
+                        <strong>Chờ tiếp nhận</strong>
+                        <span><?= $counts['pending'] ?> món chờ</span>
+                    </div>
+                </div>
+                <div class="tracker-step <?= $trackerStep >= 2 ? ($trackerStep > 2 ? 'is-done' : 'is-current') : '' ?>">
+                    <span class="tracker-dot">2</span>
+                    <div>
+                        <strong>Bếp đang làm</strong>
+                        <span><?= $counts['preparing'] ?> món đang nấu</span>
+                    </div>
+                </div>
+                <div class="tracker-step <?= $trackerStep >= 3 ? ($trackerStep > 3 ? 'is-done' : 'is-current is-ready') : '' ?>">
+                    <span class="tracker-dot">3</span>
+                    <div>
+                        <strong>Sẵn sàng ra món</strong>
+                        <span><?= $counts['ready'] ?> món đã xong</span>
+                    </div>
+                </div>
+                <div class="tracker-step <?= $trackerStep >= 4 ? 'is-done' : '' ?>">
+                    <span class="tracker-dot">4</span>
+                    <div>
+                        <strong>Đã phục vụ</strong>
+                        <span><?= $counts['served'] ?>/<?= $activeItemsCount ?> món</span>
+                    </div>
+                </div>
+            </div>
+
+            <?php if ($counts['ready'] > 0): ?>
+                <div class="tracker-ready-banner">
+                    <strong>Có <?= $counts['ready'] ?> món bếp đã hoàn thành!</strong>
+                    <span>Vui lòng nhận món tại quầy bếp và bấm "Đã mang ra bàn" bên dưới sau khi phục vụ khách.</span>
+                </div>
+            <?php endif; ?>
+        </section>
+    <?php endif; ?>
+
     <!-- Dual Layout: Items List & Order Breakdown -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         <!-- Order Items List (8 cols) -->
@@ -98,6 +189,15 @@ $itemStatusConfig = [
                             <span class="text-xs px-2.5 py-0.5 rounded-full border <?= $itConf['class'] ?>">
                                 <?= View::escape($itConf['label']) ?>
                             </span>
+                            <?php if (($item['status'] ?? '') === 'ready'): ?>
+                                <form action="/staff/order-items/<?= (int) $item['id'] ?>/status" method="post" class="inline m-0">
+                                    <input type="hidden" name="_csrf_token" value="<?= View::escape($csrfToken) ?>">
+                                    <input type="hidden" name="status" value="served">
+                                    <input type="hidden" name="table_id" value="<?= (int) $order['table_id'] ?>">
+                                    <input type="hidden" name="redirect" value="/staff/orders/<?= (int) $order['id'] ?>">
+                                    <button type="submit" class="tracker-serve-btn">Đã mang ra bàn</button>
+                                </form>
+                            <?php endif; ?>
                             <span class="text-sm font-bold text-on-surface min-w-[100px] text-right">
                                 <?= View::currency($item['subtotal']) ?>
                             </span>

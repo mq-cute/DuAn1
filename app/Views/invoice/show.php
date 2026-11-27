@@ -38,36 +38,6 @@ $canEdit = $isStaffOrAdmin && !in_array($invStatus, ['cancelled', 'refunded'], t
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script>
-        tailwind.config = {
-          theme: {
-            extend: {
-              colors: {
-                "primary": "#870000",
-                "primary-container": "#af140b",
-                "primary-fixed": "#ffdad4",
-                "on-primary": "#ffffff",
-                "secondary": "#4a6633",
-                "secondary-container": "#c8eaa9",
-                "on-secondary": "#ffffff",
-                "background": "#fff8f5",
-                "surface": "#fff8f5",
-                "surface-container-low": "#fff1e8",
-                "on-surface": "#231a11",
-                "on-surface-variant": "#5b403c",
-                "outline": "#906f6a",
-                "outline-variant": "#e4beb8",
-                "tertiary-container": "#844800",
-              },
-              fontFamily: {
-                "headline": ["Playfair Display", "Georgia", "serif"],
-                "body": ["Plus Jakarta Sans", "Arial", "sans-serif"],
-              }
-            }
-          }
-        };
-    </script>
     <style>
         .site-header { margin-bottom: 24px; }
         .material-symbols-outlined {
@@ -217,7 +187,7 @@ $canEdit = $isStaffOrAdmin && !in_array($invStatus, ['cancelled', 'refunded'], t
         </div>
 
         <!-- Metadata Grid -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-2xl bg-surface-container-low/50 text-xs text-on-surface-variant border border-outline-variant/20">
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 p-4 rounded-2xl bg-surface-container-low/50 text-xs text-on-surface-variant border border-outline-variant/20">
             <div>
                 <span class="text-stone-400 block uppercase text-[10px] tracking-wider">Bàn &amp; Khu vực:</span>
                 <strong class="text-on-surface text-sm"><?= View::escape($invoice['table_code'] ?? 'Bàn') ?></strong>

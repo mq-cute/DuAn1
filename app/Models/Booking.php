@@ -122,6 +122,10 @@ final class Booking extends BaseModel
             foreach ($cart as $dishId => $quantity) {
                 $foodSubtotal += (float) $orderableDishes[(int) $dishId]['price'] * (int) $quantity;
             }
+            $voucher = (new Voucher($this->db))->lockValidForBooking(
+                (string) ($booking['voucher_code'] ?? ''),
+                $foodSubtotal
+            );
             $depositAmount = !empty($booking['pay_deposit'])
                 ? round(($tableFee + $foodSubtotal) * 0.25)
                 : 0.0;
@@ -130,11 +134,15 @@ final class Booking extends BaseModel
                 'INSERT INTO bookings
                     (user_id, customer_name, customer_phone, customer_email,
                      booking_date, booking_time, number_of_guests, area_id, table_id,
-                     deposit_amount, notes, status)
+                     deposit_amount, voucher_code, voucher_discount_type,
+                     voucher_discount_value, voucher_min_order_amount, voucher_max_discount_amount,
+                     notes, status)
                  VALUES
                     (:user_id, :customer_name, :customer_phone, :customer_email,
                      :booking_date, :booking_time, :number_of_guests, :area_id, :table_id,
-                     :deposit_amount, :notes, :status)'
+                     :deposit_amount, :voucher_code, :voucher_discount_type,
+                     :voucher_discount_value, :voucher_min_order_amount, :voucher_max_discount_amount,
+                     :notes, :status)'
             );
             $insertBooking->execute([
                 'user_id' => $booking['user_id'],
@@ -147,6 +155,11 @@ final class Booking extends BaseModel
                 'area_id' => $table['area_id'],
                 'table_id' => $table['id'],
                 'deposit_amount' => $depositAmount,
+                'voucher_code' => $voucher['code'] ?? null,
+                'voucher_discount_type' => $voucher['discount_type'] ?? null,
+                'voucher_discount_value' => $voucher['discount_value'] ?? null,
+                'voucher_min_order_amount' => $voucher['min_order_amount'] ?? null,
+                'voucher_max_discount_amount' => $voucher['max_discount_amount'] ?? null,
                 'notes' => $booking['notes'],
                 'status' => 'pending',
             ]);
@@ -388,7 +401,7 @@ final class Booking extends BaseModel
             }
 
             $bookingStatement = $this->db->prepare(
-                'SELECT id, user_id, table_id, booking_date, status
+                'SELECT id, user_id, table_id, booking_date, status, voucher_code
                  FROM bookings WHERE id = :id FOR UPDATE'
             );
             $bookingStatement->execute(['id' => $bookingId]);
@@ -432,6 +445,13 @@ final class Booking extends BaseModel
                  WHERE id = :id'
             );
             $updateBooking->execute(['status' => $newStatus, 'id' => $bookingId]);
+
+            if (in_array($newStatus, ['cancelled', 'no_show'], true) && !empty($booking['voucher_code'])) {
+                $releaseVoucher = $this->db->prepare(
+                    'UPDATE vouchers SET used_count = GREATEST(used_count - 1, 0) WHERE code = :code'
+                );
+                $releaseVoucher->execute(['code' => $booking['voucher_code']]);
+            }
 
             $historyStatement = $this->db->prepare(
                 'INSERT INTO booking_status_histories
@@ -514,7 +534,7 @@ final class Booking extends BaseModel
 
         // Tìm các đặt bàn hôm nay có status = 'confirmed', giờ đến + minutes < thời gian hiện tại
         $findStmt = $this->db->prepare(
-            "SELECT b.id, b.table_id, b.booking_date, b.booking_time
+            "SELECT b.id, b.table_id, b.booking_date, b.booking_time, b.voucher_code
              FROM bookings b
              WHERE b.status = 'confirmed'
                AND b.table_id IS NOT NULL
@@ -528,6 +548,13 @@ final class Booking extends BaseModel
             // Chuyển sang no_show và giải phóng bàn về empty
             $upStmt = $this->db->prepare("UPDATE bookings SET status = 'no_show', updated_at = NOW() WHERE id = :id");
             $upStmt->execute(['id' => $lb['id']]);
+
+            if (!empty($lb['voucher_code'])) {
+                $releaseVoucher = $this->db->prepare(
+                    'UPDATE vouchers SET used_count = GREATEST(used_count - 1, 0) WHERE code = :code'
+                );
+                $releaseVoucher->execute(['code' => $lb['voucher_code']]);
+            }
 
             if (!empty($lb['table_id'])) {
                 $this->releaseTableIfNoOtherBooking((int)$lb['table_id'], $lb);
@@ -640,18 +667,27 @@ final class Booking extends BaseModel
             foreach ($items as $item) {
                 $foodTotal += (float) $item['unit_price'] * (int) $item['quantity'];
             }
+            $voucher = empty($booking['voucher_code']) ? null : [
+                'code' => $booking['voucher_code'],
+                'discount_type' => $booking['voucher_discount_type'],
+                'discount_value' => $booking['voucher_discount_value'],
+                'min_order_amount' => $booking['voucher_min_order_amount'],
+                'max_discount_amount' => $booking['voucher_max_discount_amount'],
+            ];
+            $discount = Voucher::calculateDiscount($voucher, $foodTotal);
             $subtotal = $foodTotal + $tableFee + $setupFee;
-            $serviceCharge = round($subtotal * 0.05, 2);
-            $tax = round(($subtotal + $serviceCharge) * 0.08, 2);
-            $grandTotal = $subtotal + $serviceCharge + $tax;
+            $billableSubtotal = max(0.0, $subtotal - $discount);
+            $serviceCharge = round($billableSubtotal * 0.05, 2);
+            $tax = round(($billableSubtotal + $serviceCharge) * 0.08, 2);
+            $grandTotal = $billableSubtotal + $serviceCharge + $tax;
 
             $insertOrder = $this->db->prepare(
                 "INSERT INTO orders
                     (booking_id, table_id, created_by, customer_name, status, payment_status,
-                     total_amount, table_fee, setup_fee, discount, service_charge, tax, grand_total,
+                     total_amount, table_fee, setup_fee, discount, voucher_code, service_charge, tax, grand_total,
                      notes, created_at, updated_at)
                  VALUES (:bid, :tid, :uid, :cname, 'confirmed', 'unpaid', :total, :tfee, :sfee,
-                         0, :service, :tax, :grand_total, :notes, NOW(), NOW())"
+                         :discount, :voucher_code, :service, :tax, :grand_total, :notes, NOW(), NOW())"
             );
             $insertOrder->execute([
                 'bid' => $bookingId,
@@ -661,6 +697,8 @@ final class Booking extends BaseModel
                 'total' => $foodTotal,
                 'tfee' => $tableFee,
                 'sfee' => $setupFee,
+                'discount' => $discount,
+                'voucher_code' => $booking['voucher_code'] ?? null,
                 'service' => $serviceCharge,
                 'tax' => $tax,
                 'grand_total' => $grandTotal,

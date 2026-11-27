@@ -9,6 +9,7 @@ use App\Core\Csrf;
 use App\Core\Database;
 use App\Models\Dish;
 use App\Models\Booking;
+use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\Table;
 use DomainException;
@@ -40,6 +41,7 @@ final class OrderController extends Controller
         $selectedTableId = isset($_GET['table_id']) && is_numeric($_GET['table_id']) ? (int) $_GET['table_id'] : null;
         $selectedTable = null;
         $activeOrder = null;
+        $activePrebill = null;
 
         if ($selectedTableId !== null) {
             foreach ($tables as $t) {
@@ -70,6 +72,9 @@ final class OrderController extends Controller
             $activeOrder = $orderModel->getActiveOrderByTableId($selectedTableId);
             if ($activeOrder !== null) {
                 $activeOrder = $orderModel->getOrderDetails((int) $activeOrder['id']);
+                if ($activeOrder !== null) {
+                    $activePrebill = (new Invoice($db))->generatePrebillData((int) $activeOrder['id']);
+                }
             }
         }
 
@@ -87,6 +92,7 @@ final class OrderController extends Controller
             'selectedTable' => $selectedTable,
             'selectedTableId' => $selectedTableId,
             'activeOrder' => $activeOrder,
+            'activePrebill' => $activePrebill,
             'allDishes' => $allDishes,
             'bookingConfirmations' => $bookingConfirmations,
             'emptyTables' => $emptyTables,
@@ -230,12 +236,19 @@ final class OrderController extends Controller
         $itemId = (int) $id;
         $newStatus = (string) ($_POST['status'] ?? 'served');
         $tableId = isset($_POST['table_id']) && is_numeric($_POST['table_id']) ? (int) $_POST['table_id'] : 0;
+        $redirectTarget = isset($_POST['redirect']) && is_string($_POST['redirect']) ? trim($_POST['redirect']) : '';
 
         $db = Database::connection();
         $orderModel = new Order($db);
         $success = $orderModel->updateOrderItemStatus($itemId, $newStatus, (int) $currentUser['id']);
+        $msg = $success ? 'item_updated' : 'update_failed';
 
-        $this->redirect('/staff/pos?table_id=' . $tableId . '&message=' . ($success ? 'item_updated' : 'update_failed'));
+        if ($redirectTarget !== '' && str_starts_with($redirectTarget, '/staff/') && !str_contains($redirectTarget, '//')) {
+            $sep = str_contains($redirectTarget, '?') ? '&' : '?';
+            $this->redirect($redirectTarget . $sep . 'message=' . $msg);
+        }
+
+        $this->redirect('/staff/pos?table_id=' . $tableId . '&message=' . $msg);
     }
 
     public function updateStatus(string $id): void
