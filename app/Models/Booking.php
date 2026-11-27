@@ -13,6 +13,13 @@ final class Booking extends BaseModel
 {
     public const DURATION_MINUTES = 120;
 
+    public static function resolveTableFee(float|string|null $configuredFee, bool $isVip): float
+    {
+        $fee = (float) $configuredFee;
+
+        return $fee > 0 ? $fee : ($isVip ? 200000.0 : 100000.0);
+    }
+
     public function availableTables(string $date, string $time, int $guestCount): array
     {
         $start = $this->bookingDateTime($date, $time);
@@ -20,7 +27,7 @@ final class Booking extends BaseModel
         $isFutureDate = $date > (new DateTimeImmutable('today'))->format('Y-m-d');
 
         $statement = $this->db->prepare(
-            'SELECT t.id, t.code, t.name, t.capacity, t.status, a.name AS area_name
+            'SELECT t.id, t.code, t.name, t.capacity, t.status, t.is_vip, t.table_fee, a.name AS area_name
              FROM restaurant_tables t
              INNER JOIN dining_areas a ON a.id = t.area_id
              WHERE t.capacity >= :guest_count
@@ -61,7 +68,7 @@ final class Booking extends BaseModel
 
         try {
             $tableStatement = $this->db->prepare(
-                'SELECT id, area_id, capacity, status
+                'SELECT id, area_id, capacity, status, is_vip, table_fee
                  FROM restaurant_tables
                  WHERE id = :id
                  FOR UPDATE'
@@ -110,15 +117,24 @@ final class Booking extends BaseModel
                 throw new DomainException('dish_unavailable');
             }
 
+            $tableFee = self::resolveTableFee($table['table_fee'] ?? 0, !empty($table['is_vip']));
+            $foodSubtotal = 0.0;
+            foreach ($cart as $dishId => $quantity) {
+                $foodSubtotal += (float) $orderableDishes[(int) $dishId]['price'] * (int) $quantity;
+            }
+            $depositAmount = !empty($booking['pay_deposit'])
+                ? round(($tableFee + $foodSubtotal) * 0.25)
+                : 0.0;
+
             $insertBooking = $this->db->prepare(
                 'INSERT INTO bookings
                     (user_id, customer_name, customer_phone, customer_email,
                      booking_date, booking_time, number_of_guests, area_id, table_id,
-                     notes, status)
+                     deposit_amount, notes, status)
                  VALUES
                     (:user_id, :customer_name, :customer_phone, :customer_email,
                      :booking_date, :booking_time, :number_of_guests, :area_id, :table_id,
-                     :notes, :status)'
+                     :deposit_amount, :notes, :status)'
             );
             $insertBooking->execute([
                 'user_id' => $booking['user_id'],
@@ -130,6 +146,7 @@ final class Booking extends BaseModel
                 'number_of_guests' => $booking['number_of_guests'],
                 'area_id' => $table['area_id'],
                 'table_id' => $table['id'],
+                'deposit_amount' => $depositAmount,
                 'notes' => $booking['notes'],
                 'status' => 'pending',
             ]);
@@ -212,7 +229,9 @@ final class Booking extends BaseModel
 
         $sql = 'SELECT b.id, b.user_id, b.customer_name, b.customer_phone, b.customer_email,
                        b.booking_date, b.booking_time, b.number_of_guests, b.notes, b.status,
-                       b.created_at, t.code AS table_code, t.name AS table_name, a.name AS area_name
+                       b.deposit_amount, b.deposit_received_at, b.estimated_total,
+                       b.created_at, t.id AS table_id, t.code AS table_code,
+                       t.name AS table_name, t.table_fee, t.is_vip, a.name AS area_name
                 FROM bookings b
                 LEFT JOIN restaurant_tables t ON t.id = b.table_id
                 LEFT JOIN dining_areas a ON a.id = b.area_id'
@@ -223,6 +242,46 @@ final class Booking extends BaseModel
         $statement->execute($parameters);
 
         return $statement->fetchAll();
+    }
+
+    public function findForStaff(int $bookingId): ?array
+    {
+        $statement = $this->db->prepare(
+            'SELECT b.*, t.code AS table_code, t.name AS table_name,
+                    t.table_fee, t.is_vip, a.name AS area_name,
+                    c.name AS combo_name, c.price AS combo_price
+             FROM bookings b
+             LEFT JOIN restaurant_tables t ON t.id = b.table_id
+             LEFT JOIN dining_areas a ON a.id = b.area_id
+             LEFT JOIN combo_setups c ON c.id = b.combo_id
+             WHERE b.id = :id
+             LIMIT 1'
+        );
+        $statement->execute(['id' => $bookingId]);
+        $booking = $statement->fetch();
+
+        return $booking === false ? null : $booking;
+    }
+
+    public function markDepositReceived(int $bookingId, int $staffId): void
+    {
+        $statement = $this->db->prepare(
+            'UPDATE bookings
+             SET deposit_received_at = COALESCE(deposit_received_at, CURRENT_TIMESTAMP),
+                 deposit_received_by = COALESCE(deposit_received_by, :staff_id),
+                 updated_at = CURRENT_TIMESTAMP
+             WHERE id = :id AND deposit_amount > 0 AND status NOT IN ("cancelled", "no_show")'
+        );
+        $statement->execute(['id' => $bookingId, 'staff_id' => $staffId]);
+        if ($statement->rowCount() === 0) {
+            $check = $this->db->prepare(
+                'SELECT deposit_received_at FROM bookings WHERE id = :id AND deposit_amount > 0 AND status NOT IN ("cancelled", "no_show")'
+            );
+            $check->execute(['id' => $bookingId]);
+            if ($check->fetchColumn() === false) {
+                throw new DomainException('deposit_not_receivable');
+            }
+        }
     }
 
     public function preordersForBookings(array $bookingIds): array
@@ -523,94 +582,144 @@ final class Booking extends BaseModel
 
     public function checkinAndOpenTable(int $bookingId, int $userId): array
     {
-        $bStmt = $this->db->prepare("SELECT b.*, t.table_fee, t.is_vip, c.price as combo_price FROM bookings b LEFT JOIN restaurant_tables t ON t.id = b.table_id LEFT JOIN combo_setups c ON c.id = b.combo_id WHERE b.id = :id LIMIT 1");
-        $bStmt->execute(['id' => $bookingId]);
-        $booking = $bStmt->fetch(\PDO::FETCH_ASSOC);
-        if (!$booking) {
-            throw new DomainException('booking_not_found');
-        }
+        $this->db->beginTransaction();
+        try {
+            $bStmt = $this->db->prepare('SELECT * FROM bookings WHERE id = :id FOR UPDATE');
+            $bStmt->execute(['id' => $bookingId]);
+            $booking = $bStmt->fetch(\PDO::FETCH_ASSOC);
+            if (!$booking) {
+                throw new DomainException('booking_not_found');
+            }
+            if (empty($booking['table_id'])) {
+                throw new DomainException('table_not_assigned');
+            }
+            if (!in_array($booking['status'], ['pending', 'confirmed', 'seated'], true)) {
+                throw new DomainException('invalid_transition');
+            }
 
-        if (empty($booking['table_id'])) {
-            throw new DomainException('table_not_assigned');
-        }
+            $tableId = (int) $booking['table_id'];
+            $tableLock = $this->db->prepare('SELECT status, table_fee, is_vip FROM restaurant_tables WHERE id = :id FOR UPDATE');
+            $tableLock->execute(['id' => $tableId]);
+            $table = $tableLock->fetch(\PDO::FETCH_ASSOC);
+            if ($table === false || $table['status'] === 'locked') {
+                throw new DomainException('table_unavailable');
+            }
+            $tableStatus = $table['status'];
 
-        $tableId = (int)$booking['table_id'];
+            $ordCheck = $this->db->prepare(
+                "SELECT id FROM orders WHERE booking_id = :bid AND status NOT IN ('completed', 'cancelled') LIMIT 1 FOR UPDATE"
+            );
+            $ordCheck->execute(['bid' => $bookingId]);
+            $existingOrderId = $ordCheck->fetchColumn();
+            if ($existingOrderId !== false) {
+                $this->setTableStatus($tableId, 'in_use');
+                $this->markBookingSeated($booking, $bookingId, $userId);
+                $this->db->commit();
 
-        // Cập nhật booking thành seated
-        $up = $this->db->prepare("UPDATE bookings SET status = 'seated', updated_at = NOW() WHERE id = :id");
-        $up->execute(['id' => $bookingId]);
+                return ['order_id' => (int) $existingOrderId, 'table_id' => $tableId];
+            }
+            if (in_array($tableStatus, ['in_use', 'serving', 'awaiting_payment'], true)) {
+                throw new DomainException('table_busy');
+            }
 
-        // Cập nhật bàn thành in_use
-        $this->setTableStatus($tableId, 'in_use');
+            $tableFee = self::resolveTableFee($table['table_fee'] ?? 0, !empty($table['is_vip']));
+            $setupFee = 0.0;
+            if (!empty($booking['combo_id'])) {
+                $comboPrice = $this->db->prepare('SELECT price FROM combo_setups WHERE id = :id');
+                $comboPrice->execute(['id' => $booking['combo_id']]);
+                $setupFee = (float) ($comboPrice->fetchColumn() ?: 0);
+            }
+            $dStmt = $this->db->prepare(
+                'SELECT bd.*, d.name AS dish_name FROM booking_details bd
+                 INNER JOIN dishes d ON d.id = bd.dish_id WHERE bd.booking_id = :bid'
+            );
+            $dStmt->execute(['bid' => $bookingId]);
+            $items = $dStmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        // Tạo Order từ đơn đặt trước (bao gồm tiền bàn, setup, pre-ordered dishes)
-        $ordCheck = $this->db->prepare("SELECT id FROM orders WHERE booking_id = :bid AND status NOT IN ('completed', 'cancelled') LIMIT 1");
-        $ordCheck->execute(['bid' => $bookingId]);
-        $existingOrderId = $ordCheck->fetchColumn();
+            $foodTotal = 0.0;
+            foreach ($items as $item) {
+                $foodTotal += (float) $item['unit_price'] * (int) $item['quantity'];
+            }
+            $subtotal = $foodTotal + $tableFee + $setupFee;
+            $serviceCharge = round($subtotal * 0.05, 2);
+            $tax = round(($subtotal + $serviceCharge) * 0.08, 2);
+            $grandTotal = $subtotal + $serviceCharge + $tax;
 
-        if ($existingOrderId) {
-            return ['order_id' => (int)$existingOrderId, 'table_id' => $tableId];
-        }
-
-        // Tính tiền bàn & setup
-        $tableFee = !empty($booking['table_fee']) ? (float)$booking['table_fee'] : 0.0;
-        $setupFee = !empty($booking['combo_price']) ? (float)$booking['combo_price'] : 0.0;
-
-        // Lấy chi tiết món đã đặt trước
-        $dStmt = $this->db->prepare("SELECT bd.*, d.name as dish_name FROM booking_details bd JOIN dishes d ON d.id = bd.dish_id WHERE bd.booking_id = :bid");
-        $dStmt->execute(['bid' => $bookingId]);
-        $items = $dStmt->fetchAll(\PDO::FETCH_ASSOC);
-
-        $foodTotal = 0.0;
-        foreach ($items as $it) {
-            $foodTotal += (float)$it['unit_price'] * (int)$it['quantity'];
-        }
-
-        $subtotal = $foodTotal + $tableFee + $setupFee;
-        $discount = 0.0;
-        $serviceCharge = round($subtotal * 0.05, 2);
-        $tax = round(($subtotal + $serviceCharge) * 0.08, 2);
-        $grandTotal = $subtotal + $serviceCharge + $tax;
-
-        $insOrd = $this->db->prepare(
-            "INSERT INTO orders (booking_id, table_id, created_by, customer_name, status, payment_status, total_amount, table_fee, setup_fee, discount, service_charge, tax, grand_total, notes, created_at, updated_at)
-             VALUES (:bid, :tid, :uid, :cname, 'confirmed', 'unpaid', :total, :tfee, :sfee, :disc, :serv, :tax, :gtotal, :notes, NOW(), NOW())"
-        );
-        $insOrd->execute([
-            'bid' => $bookingId,
-            'tid' => $tableId,
-            'uid' => $userId,
-            'cname' => $booking['customer_name'],
-            'total' => $foodTotal,
-            'tfee' => $tableFee,
-            'sfee' => $setupFee,
-            'disc' => $discount,
-            'serv' => $serviceCharge,
-            'tax' => $tax,
-            'gtotal' => $grandTotal,
-            'notes' => $booking['notes'] ?? '',
-        ]);
-        $newOrderId = (int)$this->db->lastInsertId();
-
-        // Chuyển món từ booking_details sang order_items
-        $insItem = $this->db->prepare(
-            "INSERT INTO order_items (order_id, dish_id, dish_name, quantity, unit_price, subtotal, note, status, created_at, updated_at)
-             VALUES (:oid, :did, :dname, :qty, :price, :sub, :note, 'confirmed', NOW(), NOW())"
-        );
-        foreach ($items as $it) {
-            $sub = (float)$it['unit_price'] * (int)$it['quantity'];
-            $insItem->execute([
-                'oid' => $newOrderId,
-                'did' => $it['dish_id'],
-                'dname' => $it['dish_name'],
-                'qty' => $it['quantity'],
-                'price' => $it['unit_price'],
-                'sub' => $sub,
-                'note' => $it['note'] ?? '',
+            $insertOrder = $this->db->prepare(
+                "INSERT INTO orders
+                    (booking_id, table_id, created_by, customer_name, status, payment_status,
+                     total_amount, table_fee, setup_fee, discount, service_charge, tax, grand_total,
+                     notes, created_at, updated_at)
+                 VALUES (:bid, :tid, :uid, :cname, 'confirmed', 'unpaid', :total, :tfee, :sfee,
+                         0, :service, :tax, :grand_total, :notes, NOW(), NOW())"
+            );
+            $insertOrder->execute([
+                'bid' => $bookingId,
+                'tid' => $tableId,
+                'uid' => $userId,
+                'cname' => $booking['customer_name'],
+                'total' => $foodTotal,
+                'tfee' => $tableFee,
+                'sfee' => $setupFee,
+                'service' => $serviceCharge,
+                'tax' => $tax,
+                'grand_total' => $grandTotal,
+                'notes' => $booking['notes'] ?? '',
             ]);
+            $orderId = (int) $this->db->lastInsertId();
+
+            $insertItem = $this->db->prepare(
+                "INSERT INTO order_items
+                    (order_id, dish_id, dish_name, quantity, unit_price, subtotal, note, status, created_at, updated_at)
+                 VALUES (:order_id, :dish_id, :dish_name, :quantity, :unit_price, :subtotal, :note,
+                         'confirmed', NOW(), NOW())"
+            );
+            foreach ($items as $item) {
+                $lineTotal = (float) $item['unit_price'] * (int) $item['quantity'];
+                $insertItem->execute([
+                    'order_id' => $orderId,
+                    'dish_id' => $item['dish_id'],
+                    'dish_name' => $item['dish_name'],
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $item['unit_price'],
+                    'subtotal' => $lineTotal,
+                    'note' => $item['note'] ?? '',
+                ]);
+            }
+
+            $this->setTableStatus($tableId, 'in_use');
+            $this->markBookingSeated($booking, $bookingId, $userId);
+            $this->db->commit();
+
+            return ['order_id' => $orderId, 'table_id' => $tableId];
+        } catch (Throwable $exception) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            throw $exception;
+        }
+    }
+
+    private function markBookingSeated(array $booking, int $bookingId, int $userId): void
+    {
+        if ($booking['status'] === 'seated') {
+            return;
         }
 
-        return ['order_id' => $newOrderId, 'table_id' => $tableId];
+        $update = $this->db->prepare("UPDATE bookings SET status = 'seated', updated_at = NOW() WHERE id = :id");
+        $update->execute(['id' => $bookingId]);
+        $history = $this->db->prepare(
+            'INSERT INTO booking_status_histories
+                (booking_id, old_status, new_status, changed_by, note)
+             VALUES (:booking_id, :old_status, :new_status, :changed_by, :note)'
+        );
+        $history->execute([
+            'booking_id' => $bookingId,
+            'old_status' => $booking['status'],
+            'new_status' => 'seated',
+            'changed_by' => $userId,
+            'note' => 'Đã xác nhận và chuyển đặt bàn vào POS.',
+        ]);
     }
 
     private function releaseTableIfNoOtherBooking(int $tableId, array $booking): void

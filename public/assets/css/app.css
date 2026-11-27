@@ -2034,6 +2034,17 @@ h1, h2 { font-family: "Playfair Display", Georgia, serif; font-weight: 500; }
     flex-direction: column;
 }
 .site-footer-rich { margin-top: auto; width: 100%; }
+.site-main-content { flex: 1 0 auto; }
+.booking-actions { display: flex; align-items: center; gap: 12px; }
+.deposit-page { width: 100%; flex: 1 0 auto; display: grid; place-items: center; padding: 48px 20px; background: linear-gradient(180deg,#fffaf2,#f7f4ee); }
+.deposit-card { width: min(100%, 560px); padding: clamp(24px,5vw,42px); text-align: center; border: 1px solid #e8dfd3; border-radius: 24px; background: #fff; box-shadow: 0 20px 60px rgba(37,30,20,.09); }
+.deposit-card h1 { margin: 8px 0; font-size: clamp(28px,4vw,38px); }
+.deposit-total { margin: 22px 0; color: #936c2e; font-size: 36px; font-weight: 800; }
+.deposit-qr { display: block; width: 210px; height: 210px; object-fit: contain; margin: 22px auto; padding: 8px; border: 1px solid var(--line); border-radius: 16px; }
+.deposit-card form { margin: 22px 0 14px; }
+.deposit-card .button { width: 100%; }
+.booking-actions .button { min-width: 190px; }
+@media (max-width: 640px) { .booking-actions { align-items: stretch; flex-direction: column; } .booking-actions .button { width: 100%; } }
 .payment-result-page {
     width: 100%;
     flex: 1 0 auto;

@@ -48,6 +48,8 @@ return static function (): \App\Core\Router {
     // Đặt bàn khách
     $router->get('/bookings/new', [BookingController::class, 'createForm']);
     $router->post('/bookings', [BookingController::class, 'create']);
+    $router->get('/bookings/{id}/deposit', [BookingController::class, 'deposit']);
+    $router->post('/bookings/{id}/deposit/confirm', [BookingController::class, 'confirmDeposit']);
     $router->get('/account/bookings', [BookingController::class, 'history']);
     $router->get('/account/bookings/{id}', [BookingController::class, 'show']);
     $router->post('/account/bookings/{id}/cancel', [BookingController::class, 'cancel']);
@@ -70,7 +72,10 @@ return static function (): \App\Core\Router {
 
     // Quản lý đặt bàn
     $router->get('/admin/bookings', [BookingAdminController::class, 'index']);
+    $router->get('/admin/bookings/{id}/confirm-pos', [BookingAdminController::class, 'reviewForPos']);
+    $router->post('/admin/bookings/{id}/confirm-pos', [BookingAdminController::class, 'confirmForPos']);
     $router->post('/admin/bookings/{id}/status', [BookingAdminController::class, 'updateStatus']);
+    $router->post('/admin/bookings/{id}/deposit/receive', [BookingAdminController::class, 'receiveDeposit']);
     $router->post('/admin/bookings/{id}/open-table', [BookingAdminController::class, 'openTable']);
     $router->post('/admin/bookings/{id}/change-table', [BookingAdminController::class, 'changeTable']);
 

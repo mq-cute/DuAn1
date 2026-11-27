@@ -33,7 +33,7 @@ $messages = [
                 <article class="booking-history-card">
                     <div class="history-card-top">
                         <span class="booking-reference">Đặt bàn #<?= (int) $booking['id'] ?></span>
-                        <span class="status-pill status-<?= View::escape($booking['status']) ?>"><?= View::escape($statusLabels[$booking['status']] ?? $booking['status']) ?></span>
+                        <span class="status-pill status-<?= View::escape($booking['status']) ?>"><?= $booking['status'] === 'pending' ? 'Chờ xác nhận bàn' : View::escape($statusLabels[$booking['status']] ?? $booking['status']) ?></span>
                     </div>
                     <h2><?= View::escape($booking['area_name'] ?? 'Nhà hàng') ?> · <?= View::escape($booking['table_code'] ?? 'Chưa xếp bàn') ?></h2>
                     <p><?= View::escape(date('d/m/Y', strtotime($booking['booking_date']))) ?> · <?= View::escape(substr((string) $booking['booking_time'], 0, 5)) ?></p>

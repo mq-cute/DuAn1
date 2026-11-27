@@ -72,6 +72,10 @@ final class InvoicePdfService
         $serviceCharge = (float)($invoice['service_charge'] ?? 0);
         $discount = (float)($invoice['discount'] ?? 0);
         $total = (float)($invoice['total'] ?? 0);
+        $depositReceived = !empty($invoice['booking_deposit_received_at'])
+            ? (float)($invoice['booking_deposit_amount'] ?? 0)
+            : 0.0;
+        $amountDue = max(0.0, $total - $depositReceived);
 
         // Khởi tạo các đối tượng vẽ PDF
         $commands = [];
@@ -166,6 +170,9 @@ final class InvoicePdfService
         $commands[] = "-120 -15 Td (Giam gia / Voucher:) Tj 120 0 Td (-" . self::escapePdf(number_format($discount, 0, ',', '.') . ' d') . ") Tj";
         $commands[] = "-120 -15 Td (Phi phuc vu (5%):) Tj 120 0 Td (" . self::escapePdf(number_format($serviceCharge, 0, ',', '.') . ' d') . ") Tj";
         $commands[] = "-120 -15 Td (Thue VAT (8%):) Tj 120 0 Td (" . self::escapePdf(number_format($tax, 0, ',', '.') . ' d') . ") Tj";
+        if ($depositReceived > 0) {
+            $commands[] = "-120 -15 Td (Tien coc da nhan:) Tj 120 0 Td (-" . self::escapePdf(number_format($depositReceived, 0, ',', '.') . ' d') . ") Tj";
+        }
 
         // Grand Total Row (Navy + Gold)
         $commands[] = "0.07 0.09 0.13 rg";
@@ -173,6 +180,9 @@ final class InvoicePdfService
         $commands[] = "-120 -20 Td (TONG THANH TOAN:) Tj";
         $commands[] = "0.65 0.50 0.20 rg"; // Gold color
         $commands[] = "120 0 Td (" . self::escapePdf(number_format($total, 0, ',', '.') . ' VND') . ") Tj";
+        if ($depositReceived > 0) {
+            $commands[] = "-120 -15 Td (CON PHAI TRA:) Tj 120 0 Td (" . self::escapePdf(number_format($amountDue, 0, ',', '.') . ' VND') . ") Tj";
+        }
         $commands[] = "ET";
 
         // 9. Footer & Signatures

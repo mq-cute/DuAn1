@@ -297,6 +297,12 @@ $canEdit = $isStaffOrAdmin && !in_array($invStatus, ['cancelled', 'refunded'], t
                     <span>Thuế GTGT ẩm thực (VAT):</span>
                     <strong class="text-on-surface"><?= View::currency($invoice['tax']) ?></strong>
                 </div>
+                <?php if ((float) ($invoice['booking_deposit_amount'] ?? 0) > 0): ?>
+                    <div class="flex justify-between <?= !empty($invoice['booking_deposit_received_at']) ? 'text-emerald-700' : 'text-amber-700' ?>">
+                        <span><?= !empty($invoice['booking_deposit_received_at']) ? 'Tiền đặt cọc đã nhận:' : 'Tiền cọc đang chờ xác nhận:' ?></span>
+                        <strong><?= View::currency($invoice['booking_deposit_amount']) ?></strong>
+                    </div>
+                <?php endif; ?>
                 <?php if ((float) $invoice['discount'] > 0): ?>
                     <div class="flex justify-between text-secondary">
                         <span>Giảm giá / Ưu đãi:</span>
@@ -307,6 +313,14 @@ $canEdit = $isStaffOrAdmin && !in_array($invStatus, ['cancelled', 'refunded'], t
                     <span>TỔNG THANH TOÁN:</span>
                     <span class="text-primary text-xl font-headline font-bold"><?= View::currency($invoice['total']) ?></span>
                 </div>
+                <?php if ((float) ($invoice['booking_deposit_amount'] ?? 0) > 0): ?>
+                    <div class="flex justify-between font-semibold text-on-surface">
+                        <span>CÒN PHẢI TRẢ<?= !empty($invoice['booking_deposit_received_at']) ? ' (đã trừ cọc nhận được)' : '' ?>:</span>
+                        <strong><?= View::currency(max(0, (float) $invoice['total'] - (!empty($invoice['booking_deposit_received_at']) ? (float) $invoice['booking_deposit_amount'] : 0))) ?></strong>
+                    </div>
+                <?php elseif ((float) ($invoice['booking_deposit_amount'] ?? 0) > 0): ?>
+                    <p class="text-[10px] text-amber-700">Cọc chưa được xác nhận đã nhận nên chưa trừ khỏi số phải trả.</p>
+                <?php endif; ?>
             </div>
         </div>
 

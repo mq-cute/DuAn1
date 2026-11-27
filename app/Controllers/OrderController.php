@@ -8,6 +8,7 @@ use App\Core\Controller;
 use App\Core\Csrf;
 use App\Core\Database;
 use App\Models\Dish;
+use App\Models\Booking;
 use App\Models\Order;
 use App\Models\Table;
 use DomainException;
@@ -29,6 +30,11 @@ final class OrderController extends Controller
         $areas = $tableModel->allAreas();
         $tables = $tableModel->getActiveTablesForPos($selectedAreaId, $statusFilter);
         $allDishes = $dishModel->allVisible();
+        $bookingConfirmations = array_values(array_filter(
+            (new Booking($db))->allForStaff(),
+            static fn (array $booking): bool => in_array($booking['status'], ['pending', 'confirmed'], true)
+                && !empty($booking['table_id'])
+        ));
 
         // Determine currently active table
         $selectedTableId = isset($_GET['table_id']) && is_numeric($_GET['table_id']) ? (int) $_GET['table_id'] : null;
@@ -82,6 +88,7 @@ final class OrderController extends Controller
             'selectedTableId' => $selectedTableId,
             'activeOrder' => $activeOrder,
             'allDishes' => $allDishes,
+            'bookingConfirmations' => $bookingConfirmations,
             'emptyTables' => $emptyTables,
             'selectedAreaId' => $selectedAreaId,
             'statusFilter' => $statusFilter,

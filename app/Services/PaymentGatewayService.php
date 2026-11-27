@@ -129,8 +129,8 @@ final class PaymentGatewayService
         $accountName = (string)($vietqr['account_name'] ?? 'LEPICURE GASTRONOMIE FOODIES');
         $template = (string)($vietqr['template'] ?? 'compact2');
 
-        $transferSyntax = 'FDS ORD ' . $orderId;
-        $addInfo = $orderInfo !== '' ? $orderInfo : $transferSyntax;
+        $transferSyntax = $orderInfo !== '' ? $orderInfo : 'FDS ORD ' . $orderId;
+        $addInfo = $transferSyntax;
 
         $qrUrl = sprintf(
             'https://img.vietqr.io/image/%s-%s-%s.png?amount=%d&addInfo=%s&accountName=%s',

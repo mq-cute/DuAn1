@@ -164,6 +164,8 @@ CREATE TABLE `bookings` (
   `table_id` bigint,
   `combo_id` bigint NULL,
   `deposit_amount` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `deposit_received_at` datetime DEFAULT NULL,
+  `deposit_received_by` bigint DEFAULT NULL,
   `estimated_total` decimal(12,2) NOT NULL DEFAULT 0.00,
   `notes` text COMMENT 'ghi chu chung',
   `status` ENUM ('pending', 'confirmed', 'seated', 'completed', 'cancelled', 'no_show') NOT NULL DEFAULT 'pending',
@@ -172,7 +174,8 @@ CREATE TABLE `bookings` (
   FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   FOREIGN KEY (`area_id`) REFERENCES `dining_areas` (`id`) ON DELETE SET NULL,
   FOREIGN KEY (`table_id`) REFERENCES `restaurant_tables` (`id`) ON DELETE SET NULL,
-  FOREIGN KEY (`combo_id`) REFERENCES `combo_setups` (`id`) ON DELETE SET NULL
+  FOREIGN KEY (`combo_id`) REFERENCES `combo_setups` (`id`) ON DELETE SET NULL,
+  FOREIGN KEY (`deposit_received_by`) REFERENCES `users` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 10. Booking Details (Pre-orders)

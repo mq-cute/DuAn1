@@ -6,11 +6,34 @@ use App\Core\View;
 
 $order = $prebill['order'];
 $items = $prebill['items'];
+$currency = static fn (mixed $amount): string => View::currency((string) (int) round((float) $amount));
 ?>
 
-<div class="max-w-xl w-full mx-auto p-4 md:p-8 space-y-6">
+<style>
+    .prebill-page { width: 100%; max-width: 760px; margin: 0 auto; padding: 24px; color: #231a11; }
+    .prebill-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e4beb8; }
+    .prebill-actions a, .prebill-actions button { display: inline-flex; align-items: center; gap: 7px; padding: 10px 14px; border: 1px solid #870000; border-radius: 10px; color: #870000; background: #fff; font: 600 12px "Plus Jakarta Sans", Arial, sans-serif; text-decoration: none; cursor: pointer; }
+    .prebill-actions button { color: #fff; background: #870000; }
+    .prebill-card { padding: 32px; border: 1px solid #e4beb8; border-radius: 20px; background: #fff; box-shadow: 0 10px 32px rgba(43, 33, 24, .08); }
+    .prebill-card table { width: 100%; border-collapse: collapse; }
+    .prebill-card th, .prebill-card td { padding: 10px 6px; border-bottom: 1px solid #eee7e2; }
+    .prebill-card th { color: #70645f; font-size: 10px; text-transform: uppercase; }
+    .prebill-card .prebill-total { color: #870000; font-size: 16px; font-weight: 800; }
+    @media (max-width: 600px) { .prebill-page { padding: 14px; } .prebill-card { padding: 18px 14px; } .prebill-actions { align-items: stretch; flex-direction: column; } .prebill-actions a, .prebill-actions button { justify-content: center; } .prebill-card th, .prebill-card td { padding: 8px 3px; font-size: 10px; } }
+    @media print {
+        @page { size: A4; margin: 14mm; }
+        body { min-height: 0 !important; background: #fff !important; }
+        body > * { visibility: hidden; }
+        .prebill-page, .prebill-page * { visibility: visible; }
+        .prebill-page { position: absolute; inset: 0 auto auto 0; width: 100%; max-width: none; margin: 0; padding: 0; }
+        .prebill-actions { display: none !important; }
+        .prebill-card { padding: 0; border: 0; border-radius: 0; box-shadow: none; }
+    }
+</style>
+
+<div class="prebill-page">
     <!-- Action buttons (Hidden during printing) -->
-    <div class="no-print flex items-center justify-between pb-4 border-b border-outline-variant/30">
+    <div class="prebill-actions no-print">
         <a href="/staff/pos?table_id=<?= (int) $order['table_id'] ?>" class="text-xs font-bold text-primary hover:underline flex items-center gap-1">
             <span class="material-symbols-outlined text-[16px]">arrow_back</span>
             <span>Quay lại POS</span>
@@ -24,7 +47,7 @@ $items = $prebill['items'];
     </div>
 
     <!-- Pre-bill Printable Card -->
-    <div class="print-area bg-white rounded-3xl p-6 sm:p-8 border border-outline-variant/30 shadow-md space-y-6 text-on-surface">
+    <div class="prebill-card print-area space-y-6 text-on-surface">
         <div class="text-center space-y-1 pb-4 border-b border-dashed border-outline-variant/40">
             <span class="text-2xl font-headline font-bold text-primary tracking-tight">L'Épicure Gastronomie</span>
             <p class="text-[11px] uppercase tracking-widest text-tertiary-container font-semibold">PHIẾU TẠM TÍNH (PRE-BILL)</p>
@@ -78,20 +101,37 @@ $items = $prebill['items'];
         <div class="pt-4 border-t border-dashed border-outline-variant/40 space-y-1.5 text-xs text-on-surface-variant">
             <div class="flex justify-between">
                 <span>Cộng tiền món:</span>
-                <span class="font-semibold text-on-surface"><?= View::currency($prebill['subtotal']) ?></span>
+                <span class="font-semibold text-on-surface"><?= $currency($prebill['subtotal']) ?></span>
             </div>
             <div class="flex justify-between">
                 <span>Phí dịch vụ (5%):</span>
-                <span class="font-semibold text-on-surface"><?= View::currency($prebill['serviceCharge']) ?></span>
+                <span class="font-semibold text-on-surface"><?= $currency($prebill['serviceCharge']) ?></span>
             </div>
             <div class="flex justify-between">
                 <span>Thuế GTGT (8%):</span>
-                <span class="font-semibold text-on-surface"><?= View::currency($prebill['tax']) ?></span>
+                <span class="font-semibold text-on-surface"><?= $currency($prebill['tax']) ?></span>
             </div>
+            <?php if (!empty($prebill['depositReceivedAt']) && (float) ($prebill['bookingDepositAmount'] ?? 0) > 0): ?>
+                <div class="flex justify-between text-emerald-700">
+                    <span>Tiền đặt cọc đã nhận:</span>
+                    <span class="font-bold"><?= $currency($prebill['bookingDepositAmount']) ?></span>
+                </div>
+            <?php elseif ((float) ($prebill['bookingDepositAmount'] ?? 0) > 0): ?>
+                <div class="flex justify-between text-amber-700">
+                    <span>Tiền cọc đang chờ xác nhận:</span>
+                    <span class="font-bold"><?= $currency($prebill['bookingDepositAmount']) ?></span>
+                </div>
+            <?php endif; ?>
             <div class="flex justify-between pt-2 border-t border-outline-variant/30 text-base font-headline font-bold text-on-surface">
                 <span>TỔNG TẠM TÍNH:</span>
-                <span class="text-primary font-bold"><?= View::currency($prebill['grandTotal']) ?></span>
+                <span class="prebill-total"><?= $currency($prebill['grandTotal']) ?></span>
             </div>
+            <?php if ((float) ($prebill['bookingDepositAmount'] ?? 0) > 0): ?>
+                <div class="flex justify-between font-semibold text-on-surface">
+                    <span>CÒN PHẢI TRẢ<?= (float) ($prebill['depositAmount'] ?? 0) > 0 ? ' (đã trừ cọc nhận được)' : '' ?>:</span>
+                    <span><?= $currency($prebill['amountDue']) ?></span>
+                </div>
+            <?php endif; ?>
         </div>
 
         <div class="pt-4 border-t border-dashed border-outline-variant/30 text-center space-y-1 text-[11px] text-stone-400">

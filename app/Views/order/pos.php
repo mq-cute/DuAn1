@@ -109,10 +109,16 @@ $messages = [
                     <h2 class="text-xl font-headline font-bold text-on-surface">Danh sách bàn trực tiếp</h2>
                     <p class="text-xs text-on-surface-variant">Chọn bàn để gọi món, xem tiến độ bếp hoặc thanh toán</p>
                 </div>
-                <button type="button" onclick="openNewOrderModal()" class="text-xs font-bold text-primary hover:text-primary-container flex items-center gap-1 bg-primary-fixed/40 px-2.5 py-1.5 rounded-lg transition">
-                    <span class="material-symbols-outlined text-[16px]">add_circle</span>
-                    <span>Mở bàn mới</span>
-                </button>
+                <div class="flex flex-wrap items-center justify-end gap-2">
+                    <button type="button" onclick="openBookingConfirmModal()" class="text-xs font-bold text-emerald-800 hover:text-emerald-900 flex items-center gap-1 bg-emerald-100 px-2.5 py-1.5 rounded-lg transition">
+                        <span class="material-symbols-outlined text-[16px]">event_available</span>
+                        <span>Xác nhận đặt bàn<?= $bookingConfirmations !== [] ? ' (' . count($bookingConfirmations) . ')' : '' ?></span>
+                    </button>
+                    <button type="button" onclick="openNewOrderModal()" class="text-xs font-bold text-primary hover:text-primary-container flex items-center gap-1 bg-primary-fixed/40 px-2.5 py-1.5 rounded-lg transition">
+                        <span class="material-symbols-outlined text-[16px]">add_circle</span>
+                        <span>Mở bàn mới</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Table Cards Container -->
@@ -442,6 +448,38 @@ $messages = [
     </div>
 </main>
 
+<!-- ==================== BOOKING CONFIRMATION PICKER ==================== -->
+<div id="bookingConfirmModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-inverse-surface/60 backdrop-blur-sm items-center justify-center p-4">
+    <section class="w-full max-w-3xl rounded-2xl bg-white p-5 shadow-2xl md:p-7" role="dialog" aria-modal="true" aria-labelledby="bookingConfirmTitle">
+        <div class="mb-5 flex items-start justify-between gap-4 border-b border-outline-variant/30 pb-4">
+            <div>
+                <h2 id="bookingConfirmTitle" class="text-xl font-bold text-on-surface">Đặt bàn cần xác nhận</h2>
+                <p class="mt-1 text-xs text-on-surface-variant">Chọn lượt đặt để xem thông tin khách, món, tiền cọc và hóa đơn tạm tính.</p>
+            </div>
+            <button type="button" onclick="closeBookingConfirmModal()" class="rounded-lg p-2 text-outline hover:bg-surface-container-low" aria-label="Đóng">✕</button>
+        </div>
+        <?php if ($bookingConfirmations === []): ?>
+            <div class="rounded-xl bg-slate-50 p-6 text-center text-sm text-slate-500">Hiện không có đặt bàn nào đang chờ xác nhận hoặc nhận khách.</div>
+        <?php else: ?>
+            <div class="max-h-[65vh] space-y-3 overflow-y-auto">
+                <?php foreach ($bookingConfirmations as $pendingBooking): ?>
+                    <?php $bookingTimestamp = strtotime((string) $pendingBooking['booking_date'] . ' ' . (string) $pendingBooking['booking_time']); ?>
+                    <article class="flex flex-col gap-3 rounded-xl border border-outline-variant/40 p-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <strong class="text-sm text-on-surface">#<?= (int) $pendingBooking['id'] ?> · <?= View::escape($pendingBooking['customer_name']) ?></strong>
+                            <p class="mt-1 text-xs text-on-surface-variant"><?= View::escape($pendingBooking['table_code'] ?? 'Chưa xếp bàn') ?> · <?= $bookingTimestamp === false ? '' : date('d/m/Y H:i', $bookingTimestamp) ?> · <?= (int) $pendingBooking['number_of_guests'] ?> khách</p>
+                            <p class="mt-1 text-xs font-semibold text-emerald-700">Tiền cọc: <?= View::currency((string) (int) round((float) ($pendingBooking['deposit_amount'] ?? 0))) ?></p>
+                        </div>
+                        <a href="/admin/bookings/<?= (int) $pendingBooking['id'] ?>/confirm-pos" class="inline-flex shrink-0 items-center justify-center gap-1 rounded-lg bg-emerald-700 px-3 py-2 text-xs font-bold text-white hover:bg-emerald-800">
+                            <span class="material-symbols-outlined text-[16px]">fact_check</span> Xem form xác nhận
+                        </a>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </section>
+</div>
+
 <!-- ==================== MODAL 1: MỞ BÀN MỚI / TẠO ĐƠN GỌI MÓN (Requirement 1) ==================== -->
 <div id="newOrderModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-inverse-surface/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-outline-variant/40 space-y-6 animate-in fade-in zoom-in-95 duration-150">
@@ -585,45 +623,22 @@ $messages = [
             <div>
                 <label class="block text-xs font-bold text-on-surface uppercase tracking-wider mb-2">Chọn phương thức thanh toán *</label>
                 <div class="grid grid-cols-2 gap-2.5">
-                    <label class="flex items-center space-x-2.5 p-3 rounded-xl border border-outline-variant/40 hover:border-primary cursor-pointer transition">
-                        <input type="radio" name="payment_method" value="cash" checked class="text-primary focus:ring-0">
-                        <div class="text-xs font-semibold text-on-surface flex items-center gap-1.5">
-                            <span class="material-symbols-outlined text-[18px] text-secondary">payments</span>
+                    <label class="flex min-h-[52px] w-full items-center gap-2.5 rounded-xl border border-outline-variant/40 p-3 hover:border-primary cursor-pointer transition" style="display:flex;align-items:center;justify-content:flex-start;box-sizing:border-box;">
+                        <input type="radio" name="payment_method" value="cash" checked class="text-primary focus:ring-0" style="flex:0 0 16px;width:16px;height:16px;margin:0;">
+                        <div class="flex items-center gap-1.5 text-xs font-semibold text-on-surface" style="display:flex;align-items:center;gap:6px;min-width:0;">
+                            <span class="material-symbols-outlined text-[18px] text-secondary" style="flex:0 0 auto;">payments</span>
                             <span>Tiền mặt</span>
                         </div>
                     </label>
-
-                    <label class="flex items-center space-x-2.5 p-3 rounded-xl border border-outline-variant/40 hover:border-primary cursor-pointer transition">
-                        <input type="radio" name="payment_method" value="card" class="text-primary focus:ring-0">
-                        <div class="text-xs font-semibold text-on-surface flex items-center gap-1.5">
-                            <span class="material-symbols-outlined text-[18px] text-primary">credit_card</span>
-                            <span>Thẻ POS</span>
-                        </div>
-                    </label>
-
-                    <label class="flex items-center space-x-2.5 p-3 rounded-xl border border-outline-variant/40 hover:border-primary cursor-pointer transition">
-                        <input type="radio" name="payment_method" value="transfer" class="text-primary focus:ring-0">
-                        <div class="text-xs font-semibold text-on-surface flex items-center gap-1.5">
-                            <span class="material-symbols-outlined text-[18px] text-blue-600">account_balance</span>
-                            <span>Chuyển khoản</span>
-                        </div>
-                    </label>
-
-                    <label class="flex items-center space-x-2.5 p-3 rounded-xl border border-outline-variant/40 hover:border-primary cursor-pointer transition">
-                        <input type="radio" name="payment_method" value="ewallet" class="text-primary focus:ring-0">
-                        <div class="text-xs font-semibold text-on-surface flex items-center gap-1.5">
-                            <span class="material-symbols-outlined text-[18px] text-pink-600">wallet</span>
-                            <span>Ví điện tử</span>
-                        </div>
-                    </label>
+                    <a id="posOnlineGatewayLink" href="#" target="_blank" class="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl border border-amber-300 bg-amber-50 p-3 text-center text-xs font-bold text-amber-900 hover:bg-amber-100 transition shadow-sm" style="display:flex;align-items:center;justify-content:center;box-sizing:border-box;">
+                        <span class="material-symbols-outlined text-[18px]">qr_code_scanner</span>
+                        <span>Cổng VNPAY / VietQR</span>
+                    </a>
                 </div>
             </div>
 
             <div class="pt-4 flex items-center justify-between border-t border-outline-variant/20 flex-wrap gap-2">
-                <a id="posOnlineGatewayLink" href="#" target="_blank" class="px-3.5 py-2 rounded-xl bg-amber-50 text-amber-900 border border-amber-300 text-xs font-bold hover:bg-amber-100 flex items-center gap-1.5 shadow-sm">
-                    <span class="material-symbols-outlined text-[16px]">qr_code_scanner</span>
-                    <span>Cổng VNPAY / VietQR</span>
-                </a>
+                <span></span>
                 <div class="flex items-center space-x-2">
                     <button type="button" onclick="closePaymentModal()" class="px-4 py-2 rounded-xl border border-outline-variant/40 text-xs font-semibold hover:bg-stone-100">
                         Hủy bỏ
@@ -639,6 +654,16 @@ $messages = [
 </div>
 
 <script>
+    function openBookingConfirmModal() {
+        const modal = document.getElementById('bookingConfirmModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+    function closeBookingConfirmModal() {
+        const modal = document.getElementById('bookingConfirmModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
     function openNewOrderModal() {
         document.getElementById('newOrderModal').classList.remove('hidden');
     }

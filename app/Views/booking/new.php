@@ -4,6 +4,12 @@ use App\Core\View;
 $canSubmit = $tables !== []
     && !$hasMissingCartItems
     && count(array_filter($items, static fn (array $item): bool => !$item['is_orderable'])) === 0;
+$preorderSubtotal = 0.0;
+foreach ($items as $item) {
+    if (!empty($item['is_orderable'])) {
+        $preorderSubtotal += (float) $item['price'] * (int) $item['quantity'];
+    }
+}
 ?>
 <section class="page-heading">
     <p class="eyebrow">RÉSERVATION · L'EXPÉRIENCE</p>
@@ -58,6 +64,9 @@ $canSubmit = $tables !== []
                                 <strong><?= View::escape($table['name']) ?></strong>
                                 <span><?= View::escape($table['area_name']) ?></span>
                                 <span class="capacity-label">Tối đa <?= (int) $table['capacity'] ?> khách</span>
+                                <?php $tableFee = (float) ($table['table_fee'] ?? 0) > 0 ? (float) $table['table_fee'] : (!empty($table['is_vip']) ? 200000 : 100000); ?>
+                                <?php $depositAmount = (int) round(($tableFee + $preorderSubtotal) * 0.25); ?>
+                                <span class="capacity-label">Đặt cọc 25% (bàn + món): <?= View::currency($depositAmount) ?><?= (float) ($table['table_fee'] ?? 0) <= 0 ? ' · phí bàn mặc định' : '' ?></span>
                             </span>
                         </label>
                     <?php endforeach; ?>
@@ -108,7 +117,9 @@ $canSubmit = $tables !== []
 
             <div class="booking-submit">
                 <p>Trạng thái ban đầu: <strong>Chờ xác nhận</strong>. Yêu cầu không tự động được xác nhận.</p>
-                <button class="button" type="submit" <?= $canSubmit ? '' : 'disabled' ?>>Gửi yêu cầu đặt bàn</button>
+                <div class="booking-actions">
+                    <button class="button" type="submit" name="pay_deposit" value="1" <?= $canSubmit ? '' : 'disabled' ?>>Đặt cọc</button>
+                </div>
             </div>
         </form>
     <?php endif; ?>
