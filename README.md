@@ -269,23 +269,13 @@ Hệ thống bao gồm các bảng chính:
 - MySQL 8.0 trở lên.
 - XAMPP / WampServer / Docker hoặc PHP CLI built-in server.
 
-### 2. Các bước cài đặt
+### 2. Hướng dẫn cho thành viên mới (Cài đặt từ đầu)
 
 > [!IMPORTANT]
-> **Lưu ý cài đặt quan trọng (Database Migration):**  
-> Tệp [`database/schema.sql`](./database/schema.sql) đã được hợp nhất toàn diện, bao gồm đầy đủ 24 bảng: các bảng cơ sở và toàn bộ bảng mở rộng quản trị (`activity_logs`, `restaurant_settings`, `restaurant_operating_hours`, `invoice_refunds`, `invoice_edit_histories`, `combo_setups`, `vouchers`, các cột cấu hình Bàn VIP, phụ thu, đặt cọc và enum trạng thái hóa đơn hoàn tiền).  
-> 
-> - **Cài đặt mới từ đầu:** Chỉ cần import duy nhất [`database/schema.sql`](./database/schema.sql) rồi import dữ liệu mẫu [`database/seeders/sample_data.php`](./database/seeders/sample_data.php).
-> - **Cập nhật database cũ đã có dữ liệu:** Chạy tuần tự các migration trong [`database/migrations/`](./database/migrations/):
->   1. `20261119_admin_features.sql` (bảng quản lý hoàn tiền, sửa hóa đơn, activity log, cấu hình nhà hàng)
->   2. `20261124_combos_vouchers.sql` (bảng combo setup và voucher)
->   3. `php database/migrations/update_vip_and_fees.php` (cột bàn VIP, phụ thu phí, hủy bàn muộn)
->   4. `20261127_default_table_deposit_rates.sql` (mức phí bàn mặc định cho bàn thường/VIP chưa cấu hình)
->   5. `20261127_booking_deposit_received.sql` (trạng thái xác nhận đã nhận tiền cọc)
->
-> Chạy mỗi migration **một lần trên từng database hiện có**, sau khi đã chạy các bước trước đó. Không import lại migration đã chạy vì các cột và khóa ngoại đã tồn tại. Database mới tạo từ `schema.sql` đã bao gồm cấu trúc mới nên không cần chạy hai migration ngày 27/11.
->
-> Với thay đổi voucher đặt bàn, chạy thêm `20261127_booking_voucher_snapshots.sql` một lần sau các migration hiện có.
+> **Lưu ý về Database (`schema.sql` vs `migrations/`):**  
+> Tệp [`database/schema.sql`](./database/schema.sql) đã được hợp nhất đầy đủ 24 bảng và toàn bộ cột mới nhất (bao gồm `combo_setups`, `vouchers`, `restaurant_settings`, `deposit_received_at`, `voucher_discount_type`...).  
+> - **Cài đặt mới / Reset sạch DB:** Chỉ cần import duy nhất [`database/schema.sql`](./database/schema.sql) rồi chạy seeder (không cần chạy các file trong `database/migrations/`). Lưu ý `schema.sql` có `DROP TABLE IF EXISTS`, sẽ xóa toàn bộ dữ liệu cũ nếu chạy trên DB đang dùng.
+> - **Cập nhật DB cũ sau khi `git pull`:** Xem mục **3. Quy trình cập nhật khi Pull code mới** bên dưới.
 
 1. **Clone mã nguồn dự án:**
    ```bash
@@ -294,17 +284,64 @@ Hệ thống bao gồm các bảng chính:
    ```
 2. **Tạo Database:**
    Tạo cơ sở dữ liệu MySQL mới tên `restaurant_booking` với charset `utf8mb4` và collation `utf8mb4_unicode_ci`.
-3. **Import dữ liệu chuẩn:**
-   - **Cách 1 (Khuyên dùng - Nhanh & Đầy đủ 100%):**
-     ```bash
-     # Import toàn bộ cấu trúc bảng và cài đặt hệ thống
-     mysql -u root -p restaurant_booking < database/schema.sql
+3. **Import cấu trúc & dữ liệu mẫu:**
+   ```bash
+   # Import toàn bộ cấu trúc bảng mới nhất
+   mysql -u root -p restaurant_booking < database/schema.sql
 
-     # Import dữ liệu vai trò & dữ liệu mẫu hoàn chỉnh
+   # Import dữ liệu vai trò & dữ liệu mẫu hoàn chỉnh
+   mysql -u root -p restaurant_booking < database/seeders/roles.sql
+   php database/seeders/sample_data.php
+   ```
+4. **Cấu hình môi trường (`.env`):**
+   Copy tệp `.env.example` thành `.env` (tệp `.env` nằm trong `.gitignore` nên không đồng bộ qua Git) và cập nhật thông tin MySQL của máy bạn:
+   ```ini
+   APP_ENV=local
+   APP_DEBUG=false
+   APP_URL=http://localhost:8000
+   APP_TIMEZONE=Asia/Ho_Chi_Minh
+
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=restaurant_booking
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
+   *(Các biến `VNPAY_*` và `VIETQR_*` đã có sẵn mẫu trong `.env.example`, chỉ cần điền key sandbox VNPAY khi test cổng VNPAY).*
+5. **Khởi chạy ứng dụng:**
+   Sử dụng PHP Built-in Server (không bắt buộc `composer install` vì `public/index.php` đã có autoload fallback cho `App\`):
+   ```bash
+   php -S localhost:8000 -t public
+   ```
+   Hoặc cấu hình Document Root trên Apache/Laragon/XAMPP trỏ thẳng vào thư mục `public/` và cập nhật `APP_URL` trong `.env` cho khớp.
+6. **Truy cập ứng dụng & Tài khoản mẫu:**
+   Mở trình duyệt tại `http://localhost:8000`. Nếu đã chạy `sample_data.php`, có thể đăng nhập nhanh với mật khẩu mặc định `password123`:
+   - **Admin:** `admin@lepicure.com`
+   - **Nhân viên phục vụ (Staff):** `staff@lepicure.com`
+   - **Nhân viên bếp (Kitchen):** `kitchen@lepicure.com`
+   - **Khách hàng (Customer):** `customer@lepicure.com`
+
+---
+
+### 3. Quy trình cập nhật khi Pull code mới (`git pull`)
+
+Khi thành viên trong nhóm kéo code mới về máy đã cài đặt từ trước:
+
+1. **Kéo code mới:**
+   ```bash
+   git pull
+   ```
+2. **Kiểm tra `.env`:**
+   So sánh `.env` hiện tại với `.env.example` để bổ sung các biến môi trường mới (nếu có).
+3. **Cập nhật Database (chọn 1 trong 2 cách):**
+   - **Cách 1 — Reset sạch DB (Nhanh nhất nếu không cần giữ dữ liệu test cũ):**
+     ```bash
+     mysql -u root -p restaurant_booking < database/schema.sql
      mysql -u root -p restaurant_booking < database/seeders/roles.sql
      php database/seeders/sample_data.php
      ```
-   - **Cách 2 (Nâng cấp DB cũ qua migrations):**
+   - **Cách 2 — Giữ lại dữ liệu cũ và chạy Migration:**
+     Chỉ chạy những tệp migration **chưa từng chạy** trên database của bạn (mỗi tệp chạy **1 lần duy nhất**, đúng thứ tự):
      ```bash
      mysql -u root -p restaurant_booking < database/migrations/20261119_admin_features.sql
      mysql -u root -p restaurant_booking < database/migrations/20261124_combos_vouchers.sql
@@ -313,29 +350,12 @@ Hệ thống bao gồm các bảng chính:
      mysql -u root -p restaurant_booking < database/migrations/20261127_booking_deposit_received.sql
      mysql -u root -p restaurant_booking < database/migrations/20261127_booking_voucher_snapshots.sql
      ```
-4. **Cấu hình môi trường:**
-   Tạo tệp `.env` từ `.env.example`:
-   ```ini
-   APP_NAME="FOODIES Haute Cuisine"
-   APP_ENV=local
-   APP_DEBUG=true
-   APP_URL=http://localhost:8000
-
-   DB_CONNECTION=mysql
-   DB_HOST=127.0.0.1
-   DB_PORT=3306
-   DB_DATABASE=restaurant_booking
-   DB_USERNAME=root
-   DB_PASSWORD=
-   ```
-5. **Khởi chạy ứng dụng:**
-   Sử dụng PHP Built-in Server:
+     *(Lưu ý: Không chạy lại tệp `.sql` đã từng import trước đó vì MySQL sẽ báo lỗi trùng cột/khóa ngoại).*
+4. **Kiểm tra lại hệ thống:**
    ```bash
-   php -S localhost:8000 -t public
+   php tests/RouterTest.php
+   php tests/ViewsSmokeTest.php
    ```
-   Hoặc cấu hình Document Root trên Apache/XAMPP trỏ thẳng vào thư mục `public/`.
-6. **Truy cập ứng dụng:**
-   Mở trình duyệt tại: `http://localhost:8000`
 
 ---
 
