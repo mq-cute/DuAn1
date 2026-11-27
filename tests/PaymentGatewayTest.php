@@ -16,8 +16,8 @@ echo "PASSED: VietQR generated successfully: " . $vietqr['syntax'] . "\n";
 
 // 2. Test VNPAY URL generation
 $vnpayUrl = $service->createVnPayUrl(105, 1250000.0, 'Thanh toan don tiec #105', '127.0.0.1');
-if (!str_contains($vnpayUrl, 'vnp_SecureHash=') || !str_contains($vnpayUrl, 'vnp_Amount=125000000') || !str_contains($vnpayUrl, '5WBGMYV8') || !str_contains($vnpayUrl, 'vnpaytest.vn')) {
-    echo "FAILED: VNPAY URL missing SecureHash, Amount, TmnCode 5WBGMYV8 or vnpaytest.vn host\n";
+if (!str_contains($vnpayUrl, 'vnp_SecureHash=') || !str_contains($vnpayUrl, 'vnp_Amount=125000000') || !str_contains($vnpayUrl, '5WBGMYV8') || !str_contains($vnpayUrl, 'sandbox.vnpayment.vn')) {
+    echo "FAILED: VNPAY URL missing SecureHash, Amount, TmnCode 5WBGMYV8 or official sandbox host\n";
     exit(1);
 }
 echo "PASSED: VNPAY Payment URL generated with merchant 5WBGMYV8 & HMAC-SHA512 checksum!\n";

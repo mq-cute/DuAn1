@@ -108,7 +108,7 @@ foreach ($bookings as $b) {
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
             <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">CỌC GIỮ CHỖ TỰ ĐỘNG</span>
             <div class="flex items-baseline gap-2">
-                <strong class="text-2xl font-headline font-bold text-slate-900"><?= $totalDeposit > 0 ? View::currency($totalDeposit) : '48.500.000 ₫' ?></strong>
+                <strong class="text-2xl font-headline font-bold text-slate-900"><?= $totalDeposit > 0 ? View::currency((int) round($totalDeposit)) : '48.500.000 ₫' ?></strong>
             </div>
             <span class="text-emerald-700 text-[11px] font-semibold block">VietQR / VNPAY &bull; 100% khớp lệnh tức thì</span>
         </div>
@@ -305,6 +305,11 @@ foreach ($bookings as $b) {
                                             ? 'Tiền cọc: ' . View::currency($b['deposit_amount'])
                                             : 'Chưa ghi nhận tiền cọc' ?>
                                     </span>
+                                    <?php if (!empty($b['deposit_amount']) && (float) $b['deposit_amount'] > 0): ?>
+                                        <span class="text-[10px] <?= !empty($b['deposit_received_at']) ? 'text-emerald-700' : 'text-amber-700' ?> block">
+                                            <?= !empty($b['deposit_received_at']) ? 'Đã nhận cọc' : 'Chờ xác nhận nhận cọc' ?>
+                                        </span>
+                                    <?php endif; ?>
                                 </td>
 
                                 <!-- Trạng Thái -->
@@ -317,30 +322,19 @@ foreach ($bookings as $b) {
                                 <!-- Thao Tác: Nhận bàn & Mở POS -->
                                 <td class="py-4 px-4 text-right">
                                     <div class="flex items-center justify-end gap-1.5">
-                                        <?php if ($b['status'] === 'pending' && !empty($b['table_id'])): ?>
-                                            <form action="/admin/bookings/<?= (int)$b['id'] ?>/status" method="POST" class="inline" onsubmit="return confirm('Xác nhận đặt bàn này và giữ bàn <?= View::escape($b['table_code'] ?? '') ?>?')">
+                                        <?php if (!empty($b['deposit_amount']) && (float) $b['deposit_amount'] > 0 && empty($b['deposit_received_at']) && !in_array($b['status'], ['cancelled', 'no_show'], true)): ?>
+                                            <form action="/admin/bookings/<?= (int) $b['id'] ?>/deposit/receive" method="POST" class="inline" onsubmit="return confirm('Xác nhận nhà hàng đã nhận đủ tiền cọc?')">
                                                 <input type="hidden" name="_csrf_token" value="<?= View::escape($csrfToken) ?>">
-                                                <input type="hidden" name="status" value="confirmed">
-                                                <button type="submit" class="px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white text-[10px] font-bold hover:bg-emerald-700 transition shadow-sm inline-flex items-center gap-1" title="Xác nhận đặt bàn">
-                                                    <span aria-hidden="true">✓</span>
-                                                    <span>Xác nhận</span>
-                                                </button>
+                                                <button type="submit" class="px-2.5 py-1.5 rounded-lg bg-amber-500 text-white text-[10px] font-bold hover:bg-amber-600">Xác nhận đã nhận cọc</button>
                                             </form>
+                                        <?php endif; ?>
+                                        <?php if (in_array($b['status'], ['pending', 'confirmed'], true) && !empty($b['table_id'])): ?>
+                                            <a href="/admin/bookings/<?= (int) $b['id'] ?>/confirm-pos" class="px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white text-[10px] font-bold hover:bg-emerald-700 transition shadow-sm inline-flex items-center gap-1" title="Kiểm tra thông tin rồi chuyển đặt bàn vào POS">
+                                                <span class="material-symbols-outlined text-[14px]">point_of_sale</span>
+                                                <span>Xác nhận đặt bàn</span>
+                                            </a>
                                         <?php elseif ($b['status'] === 'pending' && empty($b['table_id'])): ?>
                                             <span class="text-[9px] text-amber-700 font-semibold">Xếp bàn trước</span>
-                                        <?php endif; ?>
-
-                                        <!-- Nút Nhận Khách (Mở bàn từ đơn đặt trước) -->
-                                        <?php if (in_array($b['status'], ['pending', 'confirmed'], true) && !empty($b['table_id'])): ?>
-                                            <form action="/admin/bookings/<?= (int)$b['id'] ?>/open-table" method="POST" class="inline">
-                                                <input type="hidden" name="_csrf_token" value="<?= View::escape($csrfToken) ?>">
-                                                <button type="submit" 
-                                                        class="px-3 py-1.5 rounded-lg bg-admin-navy text-gold text-xs font-bold hover:bg-slate-800 transition shadow-sm flex items-center gap-1"
-                                                        title="Mở bàn, tính tiền bàn + setup và đưa món vào luồng bếp">
-                                                    <span class="material-symbols-outlined text-[14px]">login</span>
-                                                    <span>Nhận khách</span>
-                                                </button>
-                                            </form>
                                         <?php endif; ?>
 
                                         <!-- Hủy hoặc No-show -->

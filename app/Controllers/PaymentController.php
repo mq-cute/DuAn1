@@ -46,7 +46,7 @@ final class PaymentController extends Controller
 
         $invoiceModel = new Invoice($db);
         $prebill = $invoiceModel->generatePrebillData($id);
-        $totalAmount = (float)($prebill['grandTotal'] ?? 0);
+        $totalAmount = (float)($prebill['amountDue'] ?? 0);
         if ($totalAmount <= 0) {
             $this->redirect('/account/orders?error=invalid_order_total');
         }
@@ -87,7 +87,7 @@ final class PaymentController extends Controller
         }
 
         $prebill = (new Invoice($db))->generatePrebillData($id);
-        $totalAmount = (float)($prebill['grandTotal'] ?? 0);
+        $totalAmount = (float)($prebill['amountDue'] ?? 0);
         if ($totalAmount <= 0 || $order['payment_status'] === 'paid') {
             $this->redirect('/account/orders?error=invalid_order_total');
         }
@@ -130,7 +130,7 @@ final class PaymentController extends Controller
         $orderModel = new Order($db);
         $order = $orderId > 0 ? $orderModel->getOrderDetails($orderId) : null;
         $prebill = $order === null ? null : (new Invoice($db))->generatePrebillData($orderId);
-        $expectedTotal = (float)($prebill['grandTotal'] ?? 0);
+        $expectedTotal = (float)($prebill['amountDue'] ?? 0);
         $paymentConfig = require dirname(__DIR__, 2) . '/config/payment.php';
         $responseCode = (string)($params['vnp_ResponseCode'] ?? '');
         $transactionStatus = (string)($params['vnp_TransactionStatus'] ?? '');
@@ -294,7 +294,7 @@ final class PaymentController extends Controller
         $prebill = (new Invoice($db))->generatePrebillData($orderId);
         $paymentConfig = require dirname(__DIR__, 2) . '/config/payment.php';
         $matchesOrder = $prebill !== null
-            && abs($verify['amount'] - (float)$prebill['grandTotal']) < 0.005
+            && abs($verify['amount'] - (float)$prebill['amountDue']) < 0.005
             && $verify['merchant_code'] === (string)$paymentConfig['vnpay']['tmn_code'];
         if (!$matchesOrder) {
             echo json_encode(['RspCode' => '04', 'Message' => 'Invalid Amount']);

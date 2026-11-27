@@ -152,6 +152,94 @@ final class BookingAdminController extends Controller
         $this->redirect('/admin/bookings?message=' . ($status === 'confirmed' ? 'confirmed' : 'updated'));
     }
 
+    public function receiveDeposit(string $id): void
+    {
+        $user = $this->requireRole('admin', 'staff');
+        $bookingId = filter_var($id, FILTER_VALIDATE_INT);
+        if ($bookingId === false || $bookingId < 1 || !$this->verifyCsrf()) {
+            $this->redirect('/admin/bookings?message=invalid');
+        }
+
+        try {
+            (new Booking(Database::connection()))->markDepositReceived($bookingId, (int) $user['id']);
+            $this->redirect('/admin/bookings?message=deposit-received');
+        } catch (DomainException) {
+            $this->redirect('/admin/bookings?message=deposit-invalid');
+        }
+    }
+
+    public function reviewForPos(string $id): void
+    {
+        $user = $this->requireRole('admin', 'staff');
+        $bookingId = filter_var($id, FILTER_VALIDATE_INT);
+        if ($bookingId === false || $bookingId < 1) {
+            $this->redirect('/admin/bookings?message=missing');
+        }
+
+        $model = new Booking(Database::connection());
+        $booking = $model->findForStaff($bookingId);
+        if ($booking === null || empty($booking['table_id'])) {
+            $this->redirect('/admin/bookings?message=table-not-assigned');
+        }
+        if (!in_array($booking['status'], ['pending', 'confirmed'], true)) {
+            $this->redirect('/admin/bookings?message=invalid-transition');
+        }
+
+        $details = $model->details($bookingId);
+        $foodSubtotal = 0.0;
+        foreach ($details as $item) {
+            $foodSubtotal += (float) $item['unit_price'] * (int) $item['quantity'];
+        }
+        $tableFee = (float) ($booking['table_fee'] ?? 0);
+        $setupFee = (float) ($booking['combo_price'] ?? 0);
+        $subtotal = $foodSubtotal + $tableFee + $setupFee;
+        $serviceCharge = round($subtotal * 0.05);
+        $tax = round(($subtotal + $serviceCharge) * 0.08);
+
+        $layout = ($user['role'] ?? '') === 'admin' ? 'layouts/admin' : 'layouts/staff';
+        $this->render('booking/confirm-pos', [
+            'pageTitle' => 'Xác nhận đặt bàn vào POS',
+            'currentUser' => $user,
+            'booking' => $booking,
+            'details' => $details,
+            'foodSubtotal' => $foodSubtotal,
+            'tableFee' => $tableFee,
+            'setupFee' => $setupFee,
+            'subtotal' => $subtotal,
+            'serviceCharge' => $serviceCharge,
+            'tax' => $tax,
+            'estimatedTotal' => $subtotal + $serviceCharge + $tax,
+            'csrfToken' => Csrf::token(),
+        ], 200, $layout);
+    }
+
+    public function confirmForPos(string $id): void
+    {
+        $user = $this->requireRole('admin', 'staff');
+        $bookingId = filter_var($id, FILTER_VALIDATE_INT);
+        if ($bookingId === false || $bookingId < 1 || !$this->verifyCsrf()) {
+            $this->redirect('/admin/bookings?message=invalid');
+        }
+
+        try {
+            $result = (new Booking(Database::connection()))->checkinAndOpenTable(
+                $bookingId,
+                (int) $user['id']
+            );
+            $this->redirect(
+                '/staff/pos?table_id=' . $result['table_id']
+                . '&order_id=' . $result['order_id'] . '&message=booking_seated'
+            );
+        } catch (DomainException $exception) {
+            $message = match ($exception->getMessage()) {
+                'booking_not_found' => 'missing',
+                'table_not_assigned' => 'table-not-assigned',
+                default => 'cannot-open',
+            };
+            $this->redirect('/admin/bookings?message=' . $message);
+        }
+    }
+
     // MỞ BÀN TỪ ĐƠN ĐẶT TRƯỚC (NHẬN KHÁCH & TẠO ORDER ĐẦY ĐỦ TIỀN BÀN + SETUP + MÓN)
     public function openTable(string $id): void
     {

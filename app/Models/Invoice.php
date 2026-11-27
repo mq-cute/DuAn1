@@ -178,6 +178,8 @@ final class Invoice extends BaseModel
                     o.id AS order_id, o.notes AS order_notes, o.created_at AS order_created_at,
                     o.customer_name AS order_customer_name, o.booking_id,
                     b.user_id AS booking_user_id, b.customer_name AS booking_customer_name,
+                    COALESCE(b.deposit_amount, 0) AS booking_deposit_amount,
+                    b.deposit_received_at AS booking_deposit_received_at,
                     b.customer_email AS booking_customer_email, b.customer_phone AS booking_customer_phone,
                     t.code AS table_code, t.name AS table_name, a.name AS area_name,
                     u.name AS cashier_name, u.phone AS cashier_phone
@@ -276,6 +278,22 @@ final class Invoice extends BaseModel
         $tax = round($subtotal * $pricing['tax_rate']);
         $grandTotal = $subtotal + $serviceCharge + $tax;
 
+        $bookingDepositAmount = 0.0;
+        $depositAmount = 0.0;
+        $depositReceivedAt = null;
+        if (!empty($order['booking_id'])) {
+            $depositStmt = $this->db->prepare('SELECT deposit_amount, deposit_received_at FROM bookings WHERE id = :id LIMIT 1');
+            $depositStmt->execute(['id' => (int) $order['booking_id']]);
+            $deposit = $depositStmt->fetch(PDO::FETCH_ASSOC);
+            if ($deposit !== false) {
+                $bookingDepositAmount = (float) $deposit['deposit_amount'];
+                $depositReceivedAt = $deposit['deposit_received_at'];
+                if (!empty($depositReceivedAt)) {
+                    $depositAmount = $bookingDepositAmount;
+                }
+            }
+        }
+
         return [
             'order' => $order,
             'items' => array_values($items),
@@ -283,6 +301,10 @@ final class Invoice extends BaseModel
             'serviceCharge' => $serviceCharge,
             'tax' => $tax,
             'grandTotal' => $grandTotal,
+            'depositAmount' => $depositAmount,
+            'bookingDepositAmount' => $bookingDepositAmount,
+            'depositReceivedAt' => $depositReceivedAt,
+            'amountDue' => max(0.0, $grandTotal - $depositAmount),
             'pricing' => $pricing,
             'prebillNumber' => 'PRE-' . date('Ymd') . '-' . sprintf('%04d', $orderId),
             'generatedAt' => date('Y-m-d H:i:s'),
@@ -331,6 +353,17 @@ final class Invoice extends BaseModel
             $serviceCharge = round($subtotal * $pricing['service_charge_rate']);
             $tax = round($subtotal * $pricing['tax_rate']);
             $total = $subtotal + $serviceCharge + $tax;
+
+            $depositAmount = 0.0;
+            if (!empty($order['booking_id'])) {
+                $depositStmt = $this->db->prepare(
+                    'SELECT deposit_amount FROM bookings
+                     WHERE id = :id AND deposit_received_at IS NOT NULL LIMIT 1'
+                );
+                $depositStmt->execute(['id' => (int) $order['booking_id']]);
+                $depositAmount = (float) ($depositStmt->fetchColumn() ?: 0.0);
+            }
+            $amountDue = max(0.0, $total - $depositAmount);
 
             // Generate unique invoice number
             $invoiceNumber = 'INV-' . date('Ymd') . '-' . sprintf('%04d', $orderId);
@@ -381,7 +414,7 @@ final class Invoice extends BaseModel
             );
             $insPayment->execute([
                 'invoice_id' => $invId,
-                'amount' => $total,
+                'amount' => $amountDue,
                 'method' => $method,
                 'received_by' => $receivedBy,
                 'transaction_id' => $transactionId,

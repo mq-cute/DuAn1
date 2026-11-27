@@ -108,6 +108,7 @@ final class BookingController extends Controller
                 'booking_time' => $input['booking_time'],
                 'number_of_guests' => $input['number_of_guests'],
                 'table_id' => $input['table_id'],
+                'pay_deposit' => isset($_POST['pay_deposit']),
                 'notes' => $input['notes'] === '' ? null : $input['notes'],
             ], Cart::contents(), $input['dish_notes']);
 
@@ -155,7 +156,9 @@ final class BookingController extends Controller
         }
 
         Cart::clear();
-        $this->redirect('/account/bookings/' . $bookingId . '?message=created');
+        $this->redirect(isset($_POST['pay_deposit'])
+            ? '/bookings/' . $bookingId . '/deposit'
+            : '/account/bookings/' . $bookingId . '?message=created');
     }
 
     public function history(): void
@@ -192,6 +195,34 @@ final class BookingController extends Controller
             'message' => $this->queryString('message'),
             'csrfToken' => Csrf::token(),
         ]);
+    }
+
+    public function deposit(string $id): void
+    {
+        $user = $this->requireRole('customer');
+        $bookingId = $this->validId($id);
+        $model = new Booking(Database::connection());
+        $booking = $bookingId === null ? null : $model->findForCustomer($bookingId, (int) $user['id']);
+        if ($booking === null || (float) $booking['deposit_amount'] <= 0) {
+            $this->redirect('/account/bookings');
+        }
+        $qr = (new \App\Services\PaymentGatewayService())->generateVietQr($bookingId, (float) $booking['deposit_amount'], 'FDS DEP ' . $bookingId);
+        $this->render('booking/deposit', ['pageTitle' => 'Đặt cọc đặt bàn', 'currentUser' => $user, 'booking' => $booking, 'vietQr' => $qr, 'csrfToken' => Csrf::token()]);
+    }
+
+    public function confirmDeposit(string $id): void
+    {
+        $user = $this->requireRole('customer');
+        $bookingId = $this->validId($id);
+        if ($bookingId === null || !$this->verifyCsrf()) {
+            $this->redirect('/account/bookings?message=invalid');
+        }
+        $model = new Booking(Database::connection());
+        $booking = $model->findForCustomer($bookingId, (int) $user['id']);
+        if ($booking === null || (float) $booking['deposit_amount'] <= 0) {
+            $this->redirect('/account/bookings');
+        }
+        $this->redirect('/account/bookings/' . $bookingId . '?message=deposit-pending');
     }
 
     public function cancel(string $id): void

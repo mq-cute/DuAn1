@@ -280,6 +280,10 @@ Hệ thống bao gồm các bảng chính:
 >   1. `20261119_admin_features.sql` (bảng quản lý hoàn tiền, sửa hóa đơn, activity log, cấu hình nhà hàng)
 >   2. `20261124_combos_vouchers.sql` (bảng combo setup và voucher)
 >   3. `php database/migrations/update_vip_and_fees.php` (cột bàn VIP, phụ thu phí, hủy bàn muộn)
+>   4. `20261127_default_table_deposit_rates.sql` (mức phí bàn mặc định cho bàn thường/VIP chưa cấu hình)
+>   5. `20261127_booking_deposit_received.sql` (trạng thái xác nhận đã nhận tiền cọc)
+>
+> Chạy mỗi migration **một lần trên từng database hiện có**, sau khi đã chạy các bước trước đó. Không import lại migration đã chạy vì các cột và khóa ngoại đã tồn tại. Database mới tạo từ `schema.sql` đã bao gồm cấu trúc mới nên không cần chạy hai migration ngày 27/11.
 
 1. **Clone mã nguồn dự án:**
    ```bash
@@ -303,6 +307,8 @@ Hệ thống bao gồm các bảng chính:
      mysql -u root -p restaurant_booking < database/migrations/20261119_admin_features.sql
      mysql -u root -p restaurant_booking < database/migrations/20261124_combos_vouchers.sql
      php database/migrations/update_vip_and_fees.php
+     mysql -u root -p restaurant_booking < database/migrations/20261127_default_table_deposit_rates.sql
+     mysql -u root -p restaurant_booking < database/migrations/20261127_booking_deposit_received.sql
      ```
 4. **Cấu hình môi trường:**
    Tạo tệp `.env` từ `.env.example`:
