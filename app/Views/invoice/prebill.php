@@ -103,6 +103,18 @@ $currency = static fn (mixed $amount): string => View::currency((string) (int) r
                 <span>Cộng tiền món:</span>
                 <span class="font-semibold text-on-surface"><?= $currency($prebill['subtotal']) ?></span>
             </div>
+            <?php if ((float) ($prebill['tableFee'] ?? 0) > 0): ?>
+                <div class="flex justify-between"><span>Phí bàn:</span><span class="font-semibold text-on-surface"><?= $currency($prebill['tableFee']) ?></span></div>
+            <?php endif; ?>
+            <?php if ((float) ($prebill['setupFee'] ?? 0) > 0): ?>
+                <div class="flex justify-between"><span>Phí setup:</span><span class="font-semibold text-on-surface"><?= $currency($prebill['setupFee']) ?></span></div>
+            <?php endif; ?>
+            <?php if ((float) ($prebill['discount'] ?? 0) > 0): ?>
+                <div class="flex justify-between text-secondary">
+                    <span>Voucher <?= View::escape($prebill['voucherCode'] ?? '') ?>:</span>
+                    <span class="font-bold">-<?= $currency($prebill['discount']) ?></span>
+                </div>
+            <?php endif; ?>
             <div class="flex justify-between">
                 <span>Phí dịch vụ (5%):</span>
                 <span class="font-semibold text-on-surface"><?= $currency($prebill['serviceCharge']) ?></span>

@@ -284,6 +284,8 @@ Hệ thống bao gồm các bảng chính:
 >   5. `20261127_booking_deposit_received.sql` (trạng thái xác nhận đã nhận tiền cọc)
 >
 > Chạy mỗi migration **một lần trên từng database hiện có**, sau khi đã chạy các bước trước đó. Không import lại migration đã chạy vì các cột và khóa ngoại đã tồn tại. Database mới tạo từ `schema.sql` đã bao gồm cấu trúc mới nên không cần chạy hai migration ngày 27/11.
+>
+> Với thay đổi voucher đặt bàn, chạy thêm `20261127_booking_voucher_snapshots.sql` một lần sau các migration hiện có.
 
 1. **Clone mã nguồn dự án:**
    ```bash
@@ -309,6 +311,7 @@ Hệ thống bao gồm các bảng chính:
      php database/migrations/update_vip_and_fees.php
      mysql -u root -p restaurant_booking < database/migrations/20261127_default_table_deposit_rates.sql
      mysql -u root -p restaurant_booking < database/migrations/20261127_booking_deposit_received.sql
+     mysql -u root -p restaurant_booking < database/migrations/20261127_booking_voucher_snapshots.sql
      ```
 4. **Cấu hình môi trường:**
    Tạo tệp `.env` từ `.env.example`:

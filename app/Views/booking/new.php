@@ -7,7 +7,7 @@ $canSubmit = $tables !== []
 $preorderSubtotal = 0.0;
 foreach ($items as $item) {
     if (!empty($item['is_orderable'])) {
-        $preorderSubtotal += (float) $item['price'] * (int) $item['quantity'];
+        $preorderSubtotal += (float) $item['dish']['price'] * (int) $item['quantity'];
     }
 }
 ?>
@@ -29,6 +29,7 @@ foreach ($items as $item) {
     <section class="booking-step">
         <div class="step-heading"><span>01</span><div><h2>Thời gian & số khách</h2><p>Thời lượng giữ bàn mặc định là 2 giờ.</p></div></div>
         <form action="/bookings/new" method="get" class="booking-search">
+            <input type="hidden" name="voucher" value="<?= View::escape($input['voucher_code'] ?? '') ?>">
             <div class="form-row">
                 <div>
                     <label for="booking-date">Ngày đến</label>
@@ -91,6 +92,13 @@ foreach ($items as $item) {
 
             <section class="booking-step">
                 <div class="step-heading"><span>04</span><div><h2>Món đặt trước</h2><p>Giá được lấy lại từ CSDL và lưu thành snapshot khi xác nhận yêu cầu.</p></div></div>
+                <div class="form-row">
+                    <div>
+                        <label for="booking-voucher">Mã voucher (không trừ vào tiền cọc)</label>
+                        <input id="booking-voucher" name="voucher_code" type="text" maxlength="50" value="<?= View::escape($input['voucher_code'] ?? '') ?>" placeholder="VD: FOODIESFIRST15" autocomplete="off">
+                        <p class="muted">Voucher hợp lệ sẽ giảm trên phần món ăn khi xuất hóa đơn thanh toán.</p>
+                    </div>
+                </div>
                 <?php if ($items === []): ?>
                     <p class="muted">Bạn chưa chọn món trước. Có thể đặt bàn mà không cần món.</p>
                     <a class="text-link" href="/menu">Xem thực đơn</a>

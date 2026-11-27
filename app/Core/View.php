@@ -20,8 +20,15 @@ final class View
 
         extract($data, EXTR_SKIP);
         ob_start();
-        require $templatePath;
-        $content = (string) ob_get_clean();
+        try {
+            require $templatePath;
+            $content = (string) ob_get_clean();
+        } catch (\Throwable $exception) {
+            if (ob_get_level() > 0) {
+                ob_end_clean();
+            }
+            throw $exception;
+        }
 
         require $layoutPath;
     }

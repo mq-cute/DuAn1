@@ -8,7 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/assets/css/app.css">
+    <link rel="stylesheet" href="/assets/css/app.css?v=<?= is_file(dirname(__DIR__, 3) . '/public/assets/css/app.css') ? filemtime(dirname(__DIR__, 3) . '/public/assets/css/app.css') : '1' ?>">
+    <link rel="stylesheet" href="/assets/css/status-pages.css?v=<?= is_file(dirname(__DIR__, 3) . '/public/assets/css/status-pages.css') ? filemtime(dirname(__DIR__, 3) . '/public/assets/css/status-pages.css') : '1' ?>">
 </head>
 <body class="site-body">
     <!-- Top Global Announcement or Header Bar -->
@@ -19,6 +20,8 @@
                 <span class="brand-caption-new">HAUTE CUISINE</span>
             </a>
 
+            <?php $isStaffUser = ($currentUser['role'] ?? '') === 'staff'; ?>
+            <?php if (!$isStaffUser): ?>
             <nav class="header-nav-new" aria-label="Điều hướng chính">
                 <a href="/" class="nav-link <?= ($_SERVER['REQUEST_URI'] ?? '') === '/' ? 'is-active' : '' ?>">Trang chủ</a>
                 <a href="/menu" class="nav-link">Thực đơn</a>
@@ -31,26 +34,31 @@
                     <a href="/account/bookings" class="nav-link">Lịch sử đặt bàn</a>
                 <?php elseif (($currentUser['role'] ?? '') === 'admin'): ?>
                     <a href="/admin/dashboard" class="nav-link font-bold text-gold">Vào trang Quản Trị</a>
-                <?php elseif (($currentUser['role'] ?? '') === 'staff'): ?>
-                    <a href="/tables" class="nav-link">Sơ đồ bàn</a>
-                    <a href="/staff/pos" class="nav-link">Phục vụ</a>
-                    <a href="/staff/orders" class="nav-link">Gọi món</a>
-                    <a href="/kitchen" class="nav-link">KDS Bếp</a>
                 <?php elseif (($currentUser['role'] ?? '') === 'kitchen'): ?>
                     <a href="/kitchen" class="nav-link">Màn hình Bếp</a>
                 <?php endif; ?>
             </nav>
+            <?php endif; ?>
 
             <div class="header-actions-new">
-                <a href="/bookings/new" class="btn-book-now">
-                    <span>ĐẶT BÀN NGAY</span>
-                </a>
+                <?php if ($isStaffUser): ?>
+                    <a href="/staff/pos" class="btn-book-now">
+                        <span>VÀO POS PHỤC VỤ</span>
+                    </a>
+                    <span class="staff-header-id">ID: #ST-<?= sprintf('%04d', (int) ($currentUser['id'] ?? 1)) ?></span>
+                <?php else: ?>
+                    <a href="/bookings/new" class="btn-book-now">
+                        <span>ĐẶT BÀN NGAY</span>
+                    </a>
+                <?php endif; ?>
 
                 <?php if (!empty($currentUser)): ?>
+                    <?php if (!$isStaffUser): ?>
                     <a href="/account/notifications" class="relative p-2 text-gold hover:text-white transition flex items-center" title="Thông báo của tôi">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
                         <span id="guestNotifBadge" class="hidden absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-red-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center">0</span>
                     </a>
+                    <?php endif; ?>
                     <div class="user-dropdown-wrap">
                         <a href="/account" class="btn-user-profile" title="Tài khoản">
                             <span class="user-initial"><?= mb_substr(\App\Core\View::escape($currentUser['name'] ?? 'U'), 0, 1) ?></span>

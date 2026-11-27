@@ -49,7 +49,21 @@ final class Router
         }
 
         http_response_code(404);
-        View::render('errors/404', [], 'layouts/guest');
+        $currentUser = Auth::user();
+        $role = $currentUser['role'] ?? '';
+        $layout = match ($role) {
+            'admin' => 'layouts/admin',
+            'staff', 'kitchen' => 'layouts/staff',
+            default => 'layouts/guest',
+        };
+        View::render('errors/404', [
+            'currentUser' => $currentUser,
+            'homeUrl' => match ($role) {
+                'kitchen' => '/kitchen',
+                'staff', 'admin' => '/staff/pos',
+                default => '/',
+            },
+        ], $layout);
     }
 
     private function add(string $method, string $path, array $action): void

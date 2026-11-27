@@ -17,8 +17,9 @@ final class NotificationController extends Controller
         $db = Database::connection();
         $notifModel = new Notification($db);
 
-        $notifications = $notifModel->forUser((int) $currentUser['id']);
-        $unreadCount = $notifModel->unreadCount((int) $currentUser['id']);
+        $includeBroadcast = ($currentUser['role'] ?? '') !== 'customer';
+        $notifications = $notifModel->forUser((int) $currentUser['id'], $includeBroadcast);
+        $unreadCount = $notifModel->unreadCount((int) $currentUser['id'], $includeBroadcast);
 
         $this->render('account/notifications', [
             'pageTitle' => 'Thông Báo Của Tôi — L\'Épicure Gastronomie',
@@ -40,7 +41,8 @@ final class NotificationController extends Controller
         $notifId = (int) $id;
         $db = Database::connection();
         $notifModel = new Notification($db);
-        $notifModel->markAsRead($notifId, (int) $currentUser['id']);
+        $includeBroadcast = ($currentUser['role'] ?? '') !== 'customer';
+        $notifModel->markAsRead($notifId, (int) $currentUser['id'], $includeBroadcast);
 
         $redirect = isset($_POST['redirect']) && is_string($_POST['redirect']) ? $_POST['redirect'] : '/account/notifications';
         $this->redirect($redirect);
@@ -55,7 +57,8 @@ final class NotificationController extends Controller
 
         $db = Database::connection();
         $notifModel = new Notification($db);
-        $notifModel->markAllAsRead((int) $currentUser['id']);
+        $includeBroadcast = ($currentUser['role'] ?? '') !== 'customer';
+        $notifModel->markAllAsRead((int) $currentUser['id'], $includeBroadcast);
 
         $this->redirect('/account/notifications?message=all_marked_read');
     }
@@ -65,7 +68,8 @@ final class NotificationController extends Controller
         $currentUser = $this->requireAuthenticated();
         $db = Database::connection();
         $notifModel = new Notification($db);
-        $count = $notifModel->unreadCount((int) $currentUser['id']);
+        $includeBroadcast = ($currentUser['role'] ?? '') !== 'customer';
+        $count = $notifModel->unreadCount((int) $currentUser['id'], $includeBroadcast);
 
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode(['unread_count' => $count], JSON_UNESCAPED_UNICODE);
@@ -85,8 +89,9 @@ final class NotificationController extends Controller
         $db = Database::connection();
         $notifModel = new Notification($db);
 
-        $unreadCount = $notifModel->unreadCount($userId);
-        $recentRows = $notifModel->recentForUser($userId, 6);
+        $includeBroadcast = ($currentUser['role'] ?? '') !== 'customer';
+        $unreadCount = $notifModel->unreadCount($userId, $includeBroadcast);
+        $recentRows = $notifModel->recentForUser($userId, 6, $includeBroadcast);
 
         $items = [];
         foreach ($recentRows as $r) {

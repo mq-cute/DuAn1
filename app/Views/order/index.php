@@ -34,7 +34,7 @@ $paymentStatusLabels = [
             <h1 class="text-2xl sm:text-3xl font-headline font-bold text-on-surface mt-1">Quản Lý Đơn Gọi Món Tại Bàn</h1>
             <p class="text-sm text-on-surface-variant">Theo dõi toàn diện các đơn gọi món, tiến độ bếp và lịch sử thanh toán.</p>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center gap-3">
             <a href="/staff/pos" class="px-5 py-2.5 rounded-xl bg-primary text-on-primary text-xs font-bold hover:bg-primary-container shadow-sm transition flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-[18px]">point_of_sale</span>
                 <span>Màn hình phục vụ POS</span>

@@ -270,13 +270,19 @@ final class Invoice extends BaseModel
             $subtotal += (float) $item['subtotal'];
         }
 
+        $voucher = $this->bookingVoucherSnapshot(isset($order['booking_id']) ? (int) $order['booking_id'] : null);
+        $discount = Voucher::calculateDiscount($voucher, $subtotal);
+        $tableFee = (float) ($order['table_fee'] ?? 0);
+        $setupFee = (float) ($order['setup_fee'] ?? 0);
+        $billableSubtotal = max(0.0, $subtotal + $tableFee + $setupFee - $discount);
+
         // Lấy cấu hình thuế và phí động từ RestaurantSetting
         $settingModel = new RestaurantSetting($this->db);
         $pricing = $settingModel->getPricingRates();
 
-        $serviceCharge = round($subtotal * $pricing['service_charge_rate']);
-        $tax = round($subtotal * $pricing['tax_rate']);
-        $grandTotal = $subtotal + $serviceCharge + $tax;
+        $serviceCharge = round($billableSubtotal * $pricing['service_charge_rate']);
+        $tax = round($billableSubtotal * $pricing['tax_rate']);
+        $grandTotal = $billableSubtotal + $serviceCharge + $tax;
 
         $bookingDepositAmount = 0.0;
         $depositAmount = 0.0;
@@ -298,6 +304,10 @@ final class Invoice extends BaseModel
             'order' => $order,
             'items' => array_values($items),
             'subtotal' => $subtotal,
+            'discount' => $discount,
+            'voucherCode' => $voucher['code'] ?? null,
+            'tableFee' => $tableFee,
+            'setupFee' => $setupFee,
             'serviceCharge' => $serviceCharge,
             'tax' => $tax,
             'grandTotal' => $grandTotal,
@@ -346,13 +356,19 @@ final class Invoice extends BaseModel
             $itemStmt->execute(['order_id' => $orderId]);
             $subtotal = (float) ($itemStmt->fetchColumn() ?: 0.0);
 
+            $voucher = $this->bookingVoucherSnapshot(isset($order['booking_id']) ? (int) $order['booking_id'] : null);
+            $discount = Voucher::calculateDiscount($voucher, $subtotal);
+            $tableFee = (float) ($order['table_fee'] ?? 0);
+            $setupFee = (float) ($order['setup_fee'] ?? 0);
+            $billableSubtotal = max(0.0, $subtotal + $tableFee + $setupFee - $discount);
+
             // Dynamic rates from settings
             $settingModel = new RestaurantSetting($this->db);
             $pricing = $settingModel->getPricingRates();
 
-            $serviceCharge = round($subtotal * $pricing['service_charge_rate']);
-            $tax = round($subtotal * $pricing['tax_rate']);
-            $total = $subtotal + $serviceCharge + $tax;
+            $serviceCharge = round($billableSubtotal * $pricing['service_charge_rate']);
+            $tax = round($billableSubtotal * $pricing['tax_rate']);
+            $total = $billableSubtotal + $serviceCharge + $tax;
 
             $depositAmount = 0.0;
             if (!empty($order['booking_id'])) {
@@ -374,13 +390,14 @@ final class Invoice extends BaseModel
                 $invId = (int) $existingInv['id'];
                 $updInv = $this->db->prepare(
                     'UPDATE invoices 
-                     SET subtotal = :subtotal, service_charge = :service_charge, tax = :tax,
+                     SET subtotal = :subtotal, discount = :discount, service_charge = :service_charge, tax = :tax,
                          total = :total, payment_method = :method, status = "paid",
                          issued_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
                      WHERE id = :id'
                 );
                 $updInv->execute([
                     'subtotal' => $subtotal,
+                    'discount' => $discount,
                     'service_charge' => $serviceCharge,
                     'tax' => $tax,
                     'total' => $total,
@@ -392,13 +409,14 @@ final class Invoice extends BaseModel
                     'INSERT INTO invoices (order_id, invoice_number, customer_name, issued_at, subtotal,
                                            discount, service_charge, tax, total, payment_method, status)
                      VALUES (:order_id, :invoice_number, :customer_name, CURRENT_TIMESTAMP, :subtotal,
-                             0, :service_charge, :tax, :total, :payment_method, "paid")'
+                             :discount, :service_charge, :tax, :total, :payment_method, "paid")'
                 );
                 $insInv->execute([
                     'order_id' => $orderId,
                     'invoice_number' => $invoiceNumber,
                     'customer_name' => $order['customer_name'] ?: 'Khách hàng',
                     'subtotal' => $subtotal,
+                    'discount' => $discount,
                     'service_charge' => $serviceCharge,
                     'tax' => $tax,
                     'total' => $total,
@@ -426,6 +444,7 @@ final class Invoice extends BaseModel
                  SET payment_status = "paid",
                      status = "completed",
                      total_amount = :subtotal,
+                     discount = :discount,
                      service_charge = :service_charge,
                      tax = :tax,
                      grand_total = :total,
@@ -434,6 +453,7 @@ final class Invoice extends BaseModel
             );
             $updOrder->execute([
                 'subtotal' => $subtotal,
+                'discount' => $discount,
                 'service_charge' => $serviceCharge,
                 'tax' => $tax,
                 'total' => $total,
@@ -695,5 +715,24 @@ final class Invoice extends BaseModel
             $this->db->rollBack();
             throw $e;
         }
+    }
+
+    private function bookingVoucherSnapshot(?int $bookingId): ?array
+    {
+        if ($bookingId === null || $bookingId < 1) {
+            return null;
+        }
+
+        $stmt = $this->db->prepare(
+            'SELECT voucher_code AS code, voucher_discount_type AS discount_type,
+                    voucher_discount_value AS discount_value,
+                    voucher_min_order_amount AS min_order_amount,
+                    voucher_max_discount_amount AS max_discount_amount
+             FROM bookings WHERE id = :id LIMIT 1'
+        );
+        $stmt->execute(['id' => $bookingId]);
+        $voucher = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $voucher === false || empty($voucher['code']) ? null : $voucher;
     }
 }

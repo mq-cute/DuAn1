@@ -64,10 +64,12 @@ $error = $error ?? '';
                 <span class="material-symbols-outlined text-[20px]" id="refreshIcon">sync</span>
             </button>
 
+            <?php if (($currentUser['role'] ?? '') !== 'kitchen'): ?>
             <a href="/staff/pos" class="px-4 py-2 rounded-xl bg-primary text-on-primary text-xs font-bold hover:bg-primary-container shadow-sm transition flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-[18px]">room_service</span>
                 <span>Phục vụ POS</span>
             </a>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -85,7 +87,7 @@ $error = $error ?? '';
     <?php endif; ?>
 
     <!-- KPI Metrics Strip -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3.5">
+    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-3 2xl:grid-cols-6 gap-3.5">
         <div class="bg-white p-4 rounded-2xl border border-outline-variant/30 shadow-sm space-y-1">
             <span class="text-[10px] font-bold uppercase tracking-wider text-outline block">Món đang đợi bếp</span>
             <div class="flex items-baseline justify-between">
@@ -253,12 +255,14 @@ $error = $error ?? '';
                     <p class="text-xs text-on-surface-variant max-w-md mx-auto">
                         Tất cả các món ăn đã được phục vụ ra bàn hoặc chưa có đơn gọi món mới. Khi phục vụ tạo đơn tại bàn, phiếu chế biến sẽ tự động xuất hiện kèm âm thanh thông báo.
                     </p>
+                    <?php if (($currentUser['role'] ?? '') !== 'kitchen'): ?>
                     <div class="pt-2">
                         <a href="/staff/pos" class="px-4 py-2.5 rounded-xl bg-primary text-on-primary text-xs font-bold inline-flex items-center gap-1.5 shadow-sm">
                             <span class="material-symbols-outlined text-[18px]">add_circle</span>
                             <span>Mở bàn &amp; Gọi món tại POS</span>
                         </a>
                     </div>
+                    <?php endif; ?>
                 </div>
             <?php else: ?>
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" id="ticketsGrid">

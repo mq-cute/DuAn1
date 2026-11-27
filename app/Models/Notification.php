@@ -30,12 +30,13 @@ final class Notification extends BaseModel
         }
     }
 
-    public function forUser(int $userId): array
+    public function forUser(int $userId, bool $includeBroadcast = false): array
     {
+        $recipientCondition = $includeBroadcast
+            ? '(user_id = :user_id OR user_id IS NULL)'
+            : 'user_id = :user_id';
         $stmt = $this->db->prepare(
-            'SELECT * FROM notifications
-             WHERE user_id = :user_id OR user_id IS NULL
-             ORDER BY created_at DESC'
+            'SELECT * FROM notifications WHERE ' . $recipientCondition . ' ORDER BY created_at DESC'
         );
         $stmt->execute(['user_id' => $userId]);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -47,25 +48,27 @@ final class Notification extends BaseModel
         return $rows;
     }
 
-    public function unreadCount(int $userId): int
+    public function unreadCount(int $userId, bool $includeBroadcast = false): int
     {
+        $recipientCondition = $includeBroadcast
+            ? '(user_id = :user_id OR user_id IS NULL)'
+            : 'user_id = :user_id';
         $stmt = $this->db->prepare(
-            'SELECT COUNT(*) FROM notifications
-             WHERE (user_id = :user_id OR user_id IS NULL)
-               AND is_read = 0'
+            'SELECT COUNT(*) FROM notifications WHERE ' . $recipientCondition . ' AND is_read = 0'
         );
         $stmt->execute(['user_id' => $userId]);
 
         return (int) $stmt->fetchColumn();
     }
 
-    public function recentForUser(int $userId, int $limit = 5): array
+    public function recentForUser(int $userId, int $limit = 5, bool $includeBroadcast = false): array
     {
         $lim = max(1, (int) $limit);
+        $recipientCondition = $includeBroadcast
+            ? '(user_id = :user_id OR user_id IS NULL)'
+            : 'user_id = :user_id';
         $stmt = $this->db->prepare(
-            "SELECT * FROM notifications
-             WHERE user_id = :user_id OR user_id IS NULL
-             ORDER BY created_at DESC
+            "SELECT * FROM notifications WHERE $recipientCondition ORDER BY created_at DESC
              LIMIT $lim"
         );
         $stmt->execute(['user_id' => $userId]);
@@ -78,23 +81,25 @@ final class Notification extends BaseModel
         return $rows;
     }
 
-    public function markAsRead(int $id, int $userId): bool
+    public function markAsRead(int $id, int $userId, bool $includeBroadcast = false): bool
     {
+        $recipientCondition = $includeBroadcast
+            ? '(user_id = :user_id OR user_id IS NULL)'
+            : 'user_id = :user_id';
         $stmt = $this->db->prepare(
-            'UPDATE notifications
-             SET is_read = 1
-             WHERE id = :id AND (user_id = :user_id OR user_id IS NULL)'
+            'UPDATE notifications SET is_read = 1 WHERE id = :id AND ' . $recipientCondition
         );
 
         return $stmt->execute(['id' => $id, 'user_id' => $userId]);
     }
 
-    public function markAllAsRead(int $userId): bool
+    public function markAllAsRead(int $userId, bool $includeBroadcast = false): bool
     {
+        $recipientCondition = $includeBroadcast
+            ? '(user_id = :user_id OR user_id IS NULL)'
+            : 'user_id = :user_id';
         $stmt = $this->db->prepare(
-            'UPDATE notifications
-             SET is_read = 1
-             WHERE (user_id = :user_id OR user_id IS NULL) AND is_read = 0'
+            'UPDATE notifications SET is_read = 1 WHERE ' . $recipientCondition . ' AND is_read = 0'
         );
 
         return $stmt->execute(['user_id' => $userId]);

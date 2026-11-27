@@ -51,6 +51,7 @@ final class BookingController extends Controller
             'customer_name' => $user['name'],
             'customer_phone' => '',
             'notes' => '',
+            'voucher_code' => $this->queryString('voucher'),
             'dish_notes' => [],
         ], $errors, $tables);
     }
@@ -109,6 +110,7 @@ final class BookingController extends Controller
                 'number_of_guests' => $input['number_of_guests'],
                 'table_id' => $input['table_id'],
                 'pay_deposit' => isset($_POST['pay_deposit']),
+                'voucher_code' => $input['voucher_code'],
                 'notes' => $input['notes'] === '' ? null : $input['notes'],
             ], Cart::contents(), $input['dish_notes']);
 
@@ -151,6 +153,15 @@ final class BookingController extends Controller
                 'dish_unavailable' => 'Món trong giỏ vừa hết hoặc bị ẩn. Hãy cập nhật giỏ rồi thử lại.',
                 default => 'Không thể tạo lượt đặt bàn. Vui lòng kiểm tra lại thông tin.',
             };
+            $message = match ($exception->getMessage()) {
+                'voucher_invalid' => 'Mã voucher không hợp lệ, đã hết hạn hoặc không còn hoạt động.',
+                'voucher_unavailable' => 'Voucher đã hết lượt sử dụng.',
+                default => $message,
+            };
+            if (str_starts_with($exception->getMessage(), 'voucher_minimum:')) {
+                $minimum = (float) substr($exception->getMessage(), strlen('voucher_minimum:'));
+                $message = 'Voucher requires at least ' . number_format($minimum, 0, ',', '.') . ' VND of preordered food.';
+            }
             $this->renderForm($user, $input, [$message], $this->availableTablesFor($input), 409);
             return;
         }
@@ -324,6 +335,7 @@ final class BookingController extends Controller
             'customer_name' => trim($this->stringInput($input, 'customer_name') ?: $user['name']),
             'customer_phone' => trim($this->stringInput($input, 'customer_phone')),
             'notes' => trim($this->stringInput($input, 'notes')),
+            'voucher_code' => strtoupper(trim($this->stringInput($input, 'voucher_code'))),
             'dish_notes' => $notes,
         ];
     }

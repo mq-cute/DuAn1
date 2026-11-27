@@ -78,7 +78,15 @@ $typeIcons = [
 
                         <div class="notif-actions">
                             <?php if ($orderId !== null): ?>
-                                <a class="button button-small button-outline" href="/account/orders/<?= (int) $orderId ?>">
+                                <?php
+                                $userRole = $currentUser['role'] ?? 'customer';
+                                $orderTrackUrl = match ($userRole) {
+                                    'staff', 'admin' => '/staff/orders/' . (int) $orderId,
+                                    'kitchen' => '/kitchen',
+                                    default => '/account/orders/' . (int) $orderId,
+                                };
+                                ?>
+                                <a class="button button-small button-outline" href="<?= $orderTrackUrl ?>">
                                     Theo dõi đơn #<?= (int) $orderId ?> →
                                 </a>
                             <?php elseif ($bookingId !== null): ?>

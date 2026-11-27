@@ -37,10 +37,15 @@ abstract class Controller
         $user = $this->requireAuthenticated();
         if (!in_array($user['role'] ?? '', $roles, true)) {
             http_response_code(403);
+            $layout = match ($user['role'] ?? '') {
+                'admin' => 'layouts/admin',
+                'staff', 'kitchen' => 'layouts/staff',
+                default => 'layouts/guest',
+            };
             $this->render('errors/403', [
                 'pageTitle' => 'Không có quyền truy cập',
                 'currentUser' => $user,
-            ], 403);
+            ], 403, $layout);
             exit;
         }
 
