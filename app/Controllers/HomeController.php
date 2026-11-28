@@ -34,7 +34,7 @@ final class HomeController extends Controller
         $vouchers = $voucherModel->allActive();
 
         $this->render('home/index', [
-            'pageTitle' => "L'Épicure Gastronomie — Nghệ Thuật Ẩm Thực Đương Đại",
+            'pageTitle' => "FOODIES — Nghệ Thuật Ẩm Thực Đương Đại",
             'currentUser' => Auth::user(),
             'csrfToken' => Csrf::token(),
             'featuredDishes' => $featuredDishes,

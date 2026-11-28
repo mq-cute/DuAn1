@@ -3,12 +3,12 @@ use App\Core\View;
 ?>
 <section class="auth-shell">
     <div class="auth-aside">
-        <p class="eyebrow">L'EXPÉRIENCE L'ÉPICURE</p>
+        <p class="eyebrow">TRẢI NGHIỆM TẠI FOODIES</p>
         <h1>Khởi đầu<br>một trải nghiệm.</h1>
         <p>Tạo tài khoản khách hàng để sẵn sàng sử dụng các dịch vụ trực tuyến.</p>
     </div>
     <div class="auth-card">
-        <p class="eyebrow">HỘI VIÊN L'ÉPICURE</p>
+        <p class="eyebrow">HỘI VIÊN FOODIES</p>
         <h2>Tạo tài khoản</h2>
         <p class="muted">Đăng ký dành cho khách hàng. Tài khoản nhân viên do quản trị viên cấp.</p>
         <?php if ($errors !== []): ?>

@@ -26,7 +26,7 @@ final class KitchenController extends Controller
         $stats = $orderModel->getKitchenStats();
 
         $this->render('kitchen/index', [
-            'pageTitle' => 'Hàng Đợi Bếp & Màn Hình KDS — L\'Épicure Gastronomie',
+            'pageTitle' => 'Hàng Đợi Bếp & Màn Hình KDS — FOODIES',
             'currentUser' => $currentUser,
             'tickets' => $tickets,
             'summary' => $summary,

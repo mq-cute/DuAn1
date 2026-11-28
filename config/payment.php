@@ -25,7 +25,7 @@ return [
     'vietqr' => [
         'bank_id' => getenv('VIETQR_BANK_ID') ?: 'MB',
         'account_no' => getenv('VIETQR_ACCOUNT_NO') ?: '0314892341',
-        'account_name' => getenv('VIETQR_ACCOUNT_NAME') ?: 'LEPICURE GASTRONOMIE FOODIES',
+        'account_name' => getenv('VIETQR_ACCOUNT_NAME') ?: 'FOODIES HAUTE CUISINE',
         'template' => 'compact2',
     ],
 ];

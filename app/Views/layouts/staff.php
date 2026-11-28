@@ -9,7 +9,7 @@ $statusCssVer = is_file($statusCssPath) ? (string) filemtime($statusCssPath) : '
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title><?= \App\Core\View::escape($pageTitle ?? "L'Épicure Gastronomie — Quản lý Vận hành & Phục vụ") ?></title>
+    <title><?= \App\Core\View::escape($pageTitle ?? "FOODIES — Quản lý Vận hành & Phục vụ") ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
@@ -24,7 +24,7 @@ $statusCssVer = is_file($statusCssPath) ? (string) filemtime($statusCssPath) : '
             <!-- Brand -->
             <div class="flex items-center space-x-3 2xl:space-x-6 shrink-0">
                 <a href="<?= ($currentUser['role'] ?? '') === 'kitchen' ? '/kitchen' : '/staff/pos' ?>" class="flex items-baseline space-x-3 text-decoration-none">
-                    <span class="text-2xl lg:text-3xl font-headline font-bold text-primary tracking-tight">L'Épicure</span>
+                    <span class="text-2xl lg:text-3xl font-headline font-bold text-primary tracking-tight">FOODIES</span>
                     <span class="text-[11px] font-bold text-tertiary-container tracking-widest border-l border-outline-variant/50 pl-3 uppercase"><?= ($currentUser['role'] ?? '') === 'kitchen' ? 'Nhà bếp' : 'Phục vụ bàn' ?></span>
                 </a>
                 <div class="hidden lg:flex items-center bg-surface-container-low px-3.5 py-1.5 rounded-full border border-outline-variant/30 space-x-2">
@@ -103,7 +103,7 @@ $statusCssVer = is_file($statusCssPath) ? (string) filemtime($statusCssPath) : '
     <footer class="bg-inverse-surface mt-12 border-t border-outline-variant/20">
         <div class="w-full max-w-7xl mx-auto px-6 md:px-12 py-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-surface-container-highest">
             <div class="flex items-center space-x-3">
-                <span class="font-headline text-lg font-semibold text-inverse-on-surface">L'Épicure Gastronomie</span>
+                <span class="font-headline text-lg font-semibold text-inverse-on-surface">FOODIES Haute Cuisine</span>
                 <span>•</span>
                 <span>Hệ thống Quản lý Vận hành Bàn & Gọi món POS</span>
             </div>

@@ -126,7 +126,7 @@ final class PaymentGatewayService
         $vietqr = $this->config['vietqr'] ?? [];
         $bankId = (string)($vietqr['bank_id'] ?? 'MB');
         $accountNo = (string)($vietqr['account_no'] ?? '0314892341');
-        $accountName = (string)($vietqr['account_name'] ?? 'LEPICURE GASTRONOMIE FOODIES');
+        $accountName = (string)($vietqr['account_name'] ?? 'FOODIES HAUTE CUISINE');
         $template = (string)($vietqr['template'] ?? 'compact2');
 
         $transferSyntax = $orderInfo !== '' ? $orderInfo : 'FDS ORD ' . $orderId;

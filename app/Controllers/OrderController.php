@@ -85,7 +85,7 @@ final class OrderController extends Controller
         );
 
         $this->render('order/pos', [
-            'pageTitle' => 'Quản lý Phục vụ tại bàn & POS — L\'Épicure',
+            'pageTitle' => 'Quản lý Phục vụ tại bàn & POS — FOODIES',
             'currentUser' => $currentUser,
             'areas' => $areas,
             'tables' => $tables,
@@ -306,7 +306,7 @@ final class OrderController extends Controller
         $orders = $orderModel->allOrders($status, $date);
 
         $this->render('order/index', [
-            'pageTitle' => 'Quản lý Gọi món & Tiến độ ẩm thực — L\'Épicure',
+            'pageTitle' => 'Quản lý Gọi món & Tiến độ ẩm thực — FOODIES',
             'currentUser' => $currentUser,
             'orders' => $orders,
             'selectedStatus' => $status,
@@ -331,7 +331,7 @@ final class OrderController extends Controller
         }
 
         $this->render('order/show', [
-            'pageTitle' => 'Chi tiết Đơn gọi món #' . $orderId . ' — L\'Épicure',
+            'pageTitle' => 'Chi tiết Đơn gọi món #' . $orderId . ' — FOODIES',
             'currentUser' => $currentUser,
             'order' => $order,
             'csrfToken' => Csrf::token(),
@@ -363,7 +363,7 @@ final class OrderController extends Controller
         }
 
         $this->render('order/customer-index', [
-            'pageTitle' => 'Đơn Của Tôi — L\'Épicure Gastronomie',
+            'pageTitle' => 'Đơn Của Tôi — FOODIES',
             'currentUser' => $currentUser,
             'orders' => $orders,
             'selectedStatus' => $status,
@@ -393,7 +393,7 @@ final class OrderController extends Controller
         }
 
         $this->render('order/customer-tracking', [
-            'pageTitle' => 'Theo Dõi Đơn Hàng #' . $orderId . ' — L\'Épicure Gastronomie',
+            'pageTitle' => 'Theo Dõi Đơn Hàng #' . $orderId . ' — FOODIES',
             'currentUser' => $currentUser,
             'order' => $order,
             'orderStatuses' => Order::ORDER_STATUSES,

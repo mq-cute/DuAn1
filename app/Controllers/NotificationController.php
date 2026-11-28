@@ -22,7 +22,7 @@ final class NotificationController extends Controller
         $unreadCount = $notifModel->unreadCount((int) $currentUser['id'], $includeBroadcast);
 
         $this->render('account/notifications', [
-            'pageTitle' => 'Thông Báo Của Tôi — L\'Épicure Gastronomie',
+            'pageTitle' => 'Thông Báo Của Tôi — FOODIES',
             'currentUser' => $currentUser,
             'notifications' => $notifications,
             'unreadCount' => $unreadCount,

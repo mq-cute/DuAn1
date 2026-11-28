@@ -211,7 +211,7 @@ $isLive = in_array($order['status'], ['pending', 'confirmed', 'preparing', 'read
                             <span class="check-icon">✓</span>
                             <div>
                                 <strong>Đơn hàng đã thanh toán thành công</strong>
-                                <p class="text-xs">Cảm ơn quý khách đã thưởng thức ẩm thực tại L'Épicure.</p>
+                                <p class="text-xs">Cảm ơn quý khách đã thưởng thức ẩm thực tại FOODIES.</p>
                             </div>
                         </div>
                         <a class="button button-outline button-block" href="/account/orders/<?= (int) $order['id'] ?>/invoice" target="_blank">

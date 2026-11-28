@@ -21,7 +21,7 @@ final class TableController extends Controller
         $floorData = $tableModel->getFloorPlanData($selectedAreaId);
 
         $this->render('table/index', [
-            'pageTitle' => 'Sơ đồ bàn & Quản lý chỗ ngồi — L\'Épicure',
+            'pageTitle' => 'Sơ đồ bàn & Quản lý chỗ ngồi — FOODIES',
             'currentUser' => $currentUser,
             'areas' => $floorData['areas'],
             'tablesByArea' => $floorData['tablesByArea'],

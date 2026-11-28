@@ -99,7 +99,7 @@ final class InvoiceController extends Controller
         $layout = $isCustomer ? 'layouts/guest' : 'layouts/staff';
 
         $this->render('invoice/show', [
-            'pageTitle' => 'Hóa Đơn #' . $invoice['invoice_number'] . ' — L\'Épicure',
+            'pageTitle' => 'Hóa Đơn #' . $invoice['invoice_number'] . ' — FOODIES',
             'currentUser' => $currentUser,
             'invoice' => $invoice,
             'paymentMethods' => Invoice::PAYMENT_METHODS,

@@ -49,7 +49,7 @@ $currency = static fn (mixed $amount): string => View::currency((string) (int) r
     <!-- Pre-bill Printable Card -->
     <div class="prebill-card print-area space-y-6 text-on-surface">
         <div class="text-center space-y-1 pb-4 border-b border-dashed border-outline-variant/40">
-            <span class="text-2xl font-headline font-bold text-primary tracking-tight">L'Épicure Gastronomie</span>
+            <span class="text-2xl font-headline font-bold text-primary tracking-tight">FOODIES Haute Cuisine</span>
             <p class="text-[11px] uppercase tracking-widest text-tertiary-container font-semibold">PHIẾU TẠM TÍNH (PRE-BILL)</p>
             <p class="text-xs text-stone-500">Bàn: <strong><?= View::escape($order['table_code']) ?></strong> • <?= View::escape($order['area_name']) ?></p>
             <p class="text-[10px] text-stone-400">Mã: <?= View::escape($prebill['prebillNumber']) ?> • Thời gian in: <?= date('H:i - d/m/Y', strtotime($prebill['generatedAt'])) ?></p>

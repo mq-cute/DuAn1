@@ -91,7 +91,7 @@ final class InvoicePdfService
         // 3. Header Text
         $commands[] = "BT";
         $commands[] = "1 1 1 rg"; // White
-        $commands[] = "/F2 18 Tf 55 780 Td (FOODIES - L'EPICURE GASTRONOMIE) Tj";
+        $commands[] = "/F2 18 Tf 55 780 Td (FOODIES HAUTE CUISINE) Tj";
         $commands[] = "/F1 9 Tf 0 -16 Td (Haute Cuisine Francaise & Grand Cru Wine Cellar) Tj";
         $commands[] = "0 -13 Td (Dia chi: 18 Le Duan, Ben Nghe, Quan 1, TP. Ho Chi Minh | Hotline: (+84) 28 3822 8899) Tj";
         $commands[] = "ET";
@@ -199,7 +199,7 @@ final class InvoicePdfService
         $commands[] = "330 0 Td ((Ky, dong dau va xac nhan)) Tj";
 
         $commands[] = "/F1 8 Tf 0.5 0.5 0.5 rg";
-        $commands[] = "-250 -70 Td (Cam on Quy khach da lua chon FOODIES - L'Epicure Gastronomie. Hen gap lai Quy khach!) Tj";
+        $commands[] = "-250 -70 Td (Cam on Quy khach da lua chon FOODIES Haute Cuisine. Hen gap lai Quy khach!) Tj";
         $commands[] = "0 -11 Td (He thong hoa don dien tu truc tuyen theo Nghi dinh 123/2020/ND-CP - FDS e-Invoice Platform) Tj";
         $commands[] = "ET";
 

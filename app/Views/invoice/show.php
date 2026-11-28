@@ -164,8 +164,8 @@ $canEdit = $isStaffOrAdmin && !in_array($invStatus, ['cancelled', 'refunded'], t
         <div class="flex flex-col sm:flex-row justify-between items-start border-b border-outline-variant/30 pb-6 gap-6">
             <div class="space-y-1">
                 <div class="flex items-baseline space-x-3">
-                    <span class="text-3xl font-headline font-bold text-primary tracking-tight">L'Épicure</span>
-                    <span class="text-xs font-bold uppercase tracking-widest text-tertiary-container">Gastronomie</span>
+                    <span class="text-3xl font-headline font-bold text-primary tracking-tight">FOODIES</span>
+                    <span class="text-xs font-bold uppercase tracking-widest text-tertiary-container">Haute Cuisine</span>
                 </div>
                 <p class="text-xs text-stone-600 font-medium">Ẩm thực Pháp Đương đại &amp; Hầm rượu Thượng hạng</p>
                 <p class="text-xs text-on-surface-variant mt-2">
@@ -297,7 +297,7 @@ $canEdit = $isStaffOrAdmin && !in_array($invStatus, ['cancelled', 'refunded'], t
         <!-- Footer Sign Off -->
         <div class="pt-8 border-t border-dashed border-outline-variant/40 text-center space-y-2">
             <p class="font-headline italic text-on-surface text-sm">
-                Cảm ơn Quý khách đã trải nghiệm ẩm thực tại L'Épicure Gastronomie!
+                Cảm ơn Quý khách đã trải nghiệm ẩm thực tại FOODIES Haute Cuisine!
             </p>
             <p class="text-[11px] text-stone-400">
                 Hóa đơn đã được lưu trữ trên hệ thống điện tử.<br/>

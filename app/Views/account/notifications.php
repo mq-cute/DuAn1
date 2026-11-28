@@ -21,7 +21,7 @@ $typeIcons = [
 <section class="page-heading">
     <div class="heading-with-actions">
         <div>
-            <p class="eyebrow">NOTIFICATIONS · L'ÉPICURE</p>
+            <p class="eyebrow">NOTIFICATIONS · FOODIES</p>
             <h1>Thông báo của tôi</h1>
             <p class="muted">Cập nhật nhanh chóng về trạng thái đặt bàn, tiếp nhận đơn gọi món và tiến độ từ nhà bếp.</p>
         </div>
