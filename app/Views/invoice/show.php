@@ -286,7 +286,7 @@ $canEdit = $isStaffOrAdmin && !in_array($invStatus, ['cancelled', 'refunded'], t
                 <?php if ((float) ($invoice['booking_deposit_amount'] ?? 0) > 0): ?>
                     <div class="flex justify-between font-semibold text-on-surface">
                         <span>CÒN PHẢI TRẢ<?= !empty($invoice['booking_deposit_received_at']) ? ' (đã trừ cọc nhận được)' : '' ?>:</span>
-                        <strong><?= View::currency(max(0, (float) $invoice['total'] - (!empty($invoice['booking_deposit_received_at']) ? (float) $invoice['booking_deposit_amount'] : 0))) ?></strong>
+                        <strong><?= View::currency((string) (int) round(max(0, (float) $invoice['total'] - (!empty($invoice['booking_deposit_received_at']) ? (float) $invoice['booking_deposit_amount'] : 0)))) ?></strong>
                     </div>
                 <?php elseif ((float) ($invoice['booking_deposit_amount'] ?? 0) > 0): ?>
                     <p class="text-[10px] text-amber-700">Cọc chưa được xác nhận đã nhận nên chưa trừ khỏi số phải trả.</p>

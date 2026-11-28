@@ -14,7 +14,7 @@ final class KitchenController extends Controller
 {
     public function index(): void
     {
-        $currentUser = $this->requireRole('kitchen', 'staff', 'admin');
+        $currentUser = $this->requireRole('kitchen');
         $db = Database::connection();
         $orderModel = new Order($db);
 
@@ -41,7 +41,7 @@ final class KitchenController extends Controller
 
     public function apiQueue(): void
     {
-        $currentUser = $this->requireRole('kitchen', 'staff', 'admin');
+        $currentUser = $this->requireRole('kitchen');
         $db = Database::connection();
         $orderModel = new Order($db);
 
@@ -74,7 +74,7 @@ final class KitchenController extends Controller
 
     public function updateItemStatus(string $id): void
     {
-        $currentUser = $this->requireRole('kitchen', 'staff', 'admin');
+        $currentUser = $this->requireRole('kitchen');
         $itemId = (int) $id;
         $targetStatus = isset($_POST['status']) && is_string($_POST['status']) ? trim($_POST['status']) : null;
 
@@ -107,7 +107,7 @@ final class KitchenController extends Controller
 
     public function updateTicketStatus(string $id): void
     {
-        $currentUser = $this->requireRole('kitchen', 'staff', 'admin');
+        $currentUser = $this->requireRole('kitchen');
         $orderId = (int) $id;
         $targetStatus = isset($_POST['status']) && is_string($_POST['status']) ? trim($_POST['status']) : 'preparing';
 
@@ -139,7 +139,7 @@ final class KitchenController extends Controller
 
     public function apiReadyItems(): void
     {
-        $currentUser = $this->requireRole('kitchen', 'staff', 'admin');
+        $currentUser = $this->requireRole('staff', 'kitchen');
         $db = Database::connection();
 
         $stmt = $db->query(

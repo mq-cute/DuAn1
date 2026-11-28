@@ -9,6 +9,7 @@ use App\Core\Csrf;
 use App\Core\Database;
 use App\Models\Invoice;
 use App\Models\Order;
+use App\Models\Voucher;
 use DomainException;
 use Throwable;
 
@@ -23,7 +24,11 @@ final class InvoiceController extends Controller
         $search = isset($_GET['search']) && is_string($_GET['search']) ? trim($_GET['search']) : '';
         $dateFrom = isset($_GET['date_from']) && is_string($_GET['date_from']) ? trim($_GET['date_from']) : '';
         $dateTo = isset($_GET['date_to']) && is_string($_GET['date_to']) ? trim($_GET['date_to']) : '';
-        $status = isset($_GET['status']) && is_string($_GET['status']) ? trim($_GET['status']) : '';
+        if ($dateFrom === '' && $dateTo === '') {
+            $dateFrom = date('Y-m-d', strtotime('-3 days'));
+            $dateTo = date('Y-m-d');
+        }
+        $status = isset($_GET['status']) && is_string($_GET['status']) ? trim($_GET['status']) : 'paid';
         $paymentMethod = isset($_GET['payment_method']) && is_string($_GET['payment_method']) ? trim($_GET['payment_method']) : '';
         $page = isset($_GET['page']) && is_numeric($_GET['page']) ? max(1, (int) $_GET['page']) : 1;
         $perPage = 15;
@@ -255,8 +260,30 @@ final class InvoiceController extends Controller
             'pageTitle' => 'Phiếu Tạm Tính — Bàn ' . ($prebill['order']['table_code'] ?? ''),
             'currentUser' => $currentUser,
             'prebill' => $prebill,
+            'vouchers' => (new Voucher($db))->allActive(),
             'csrfToken' => Csrf::token(),
+            'error' => is_string($_GET['error'] ?? null) ? $_GET['error'] : '',
+            'message' => is_string($_GET['message'] ?? null) ? $_GET['message'] : '',
         ], 200, 'layouts/staff');
+    }
+
+    public function applyVoucher(string $orderId): void
+    {
+        $this->requireRole('staff', 'admin');
+        $id = (int) $orderId;
+        if (!$this->verifyCsrf()) {
+            $this->redirect('/staff/orders/' . $id . '/prebill?error=csrf_expired');
+        }
+        $code = isset($_POST['voucher_code']) && is_string($_POST['voucher_code'])
+            ? trim($_POST['voucher_code']) : '';
+        try {
+            (new Invoice(Database::connection()))->updateOrderVoucher($id, $code);
+            $this->redirect('/staff/orders/' . $id . '/prebill?message=' . ($code === '' ? 'voucher_removed' : 'voucher_applied'));
+        } catch (DomainException $e) {
+            $this->redirect('/staff/orders/' . $id . '/prebill?error=' . urlencode($e->getMessage()));
+        } catch (Throwable $e) {
+            $this->redirect('/staff/orders/' . $id . '/prebill?error=voucher_apply_failed');
+        }
     }
 
     public function showByOrder(string $orderId): void

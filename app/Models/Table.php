@@ -75,15 +75,17 @@ final class Table extends BaseModel
     {
         $stmt = $this->db->prepare(
             'INSERT INTO restaurant_tables 
-             (area_id, code, name, capacity, status, position_x, position_y, is_vip, table_fee, vip_privileges, description, created_at, updated_at)
-             VALUES (:area_id, :code, :name, :capacity, :status, :position_x, :position_y, :is_vip, :table_fee, :vip_privileges, :description, NOW(), NOW())'
+             (area_id, room_id, code, name, capacity, status, is_active, position_x, position_y, is_vip, table_fee, vip_privileges, description, created_at, updated_at)
+             VALUES (:area_id, :room_id, :code, :name, :capacity, :status, :is_active, :position_x, :position_y, :is_vip, :table_fee, :vip_privileges, :description, NOW(), NOW())'
         );
         $stmt->execute([
             'area_id' => (int)$data['area_id'],
+            'room_id' => (int)($data['room_id'] ?? 0),
             'code' => strtoupper(trim((string)$data['code'])),
             'name' => trim((string)$data['name']),
             'capacity' => max(1, (int)$data['capacity']),
             'status' => in_array($data['status'] ?? '', array_keys(self::VALID_STATUSES), true) ? $data['status'] : 'empty',
+            'is_active' => !empty($data['is_active']) ? 1 : 0,
             'position_x' => isset($data['position_x']) ? (int)$data['position_x'] : 50,
             'position_y' => isset($data['position_y']) ? (int)$data['position_y'] : 50,
             'is_vip' => !empty($data['is_vip']) ? 1 : 0,
@@ -100,10 +102,12 @@ final class Table extends BaseModel
         $stmt = $this->db->prepare(
             'UPDATE restaurant_tables
              SET area_id = :area_id,
+                 room_id = :room_id,
                  code = :code,
                  name = :name,
                  capacity = :capacity,
                  status = :status,
+                 is_active = :is_active,
                  position_x = :position_x,
                  position_y = :position_y,
                  is_vip = :is_vip,
@@ -116,10 +120,12 @@ final class Table extends BaseModel
 
         return $stmt->execute([
             'area_id' => (int)$data['area_id'],
+            'room_id' => (int)($data['room_id'] ?? 0),
             'code' => strtoupper(trim((string)$data['code'])),
             'name' => trim((string)$data['name']),
             'capacity' => max(1, (int)$data['capacity']),
             'status' => in_array($data['status'] ?? '', array_keys(self::VALID_STATUSES), true) ? $data['status'] : 'empty',
+            'is_active' => !empty($data['is_active']) ? 1 : 0,
             'position_x' => isset($data['position_x']) ? (int)$data['position_x'] : 50,
             'position_y' => isset($data['position_y']) ? (int)$data['position_y'] : 50,
             'is_vip' => !empty($data['is_vip']) ? 1 : 0,
@@ -175,12 +181,72 @@ final class Table extends BaseModel
     public function allAreas(): array
     {
         $stmt = $this->db->query(
-            'SELECT id, name, description, sort_order
+            'SELECT id, name, description, sort_order, is_active
              FROM dining_areas
              ORDER BY sort_order ASC, name ASC'
         );
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function allRooms(?int $roomTypeId = null): array
+    {
+        $sql = 'SELECT r.*, a.name AS room_type_name
+                FROM rooms r
+                INNER JOIN dining_areas a ON a.id = r.room_type_id';
+        $params = [];
+        if ($roomTypeId !== null) {
+            $sql .= ' WHERE r.room_type_id = :room_type_id';
+            $params['room_type_id'] = $roomTypeId;
+        }
+        $sql .= ' ORDER BY r.sort_order ASC, r.name ASC';
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function createRoom(array $data): int
+    {
+        $code = strtoupper(trim((string)($data['code'] ?? '')));
+        $stmt = $this->db->prepare(
+            'INSERT INTO rooms
+                (room_type_id, code, name, description, is_active, sort_order, created_at, updated_at)
+             VALUES
+                (:room_type_id, :code, :name, :description, :is_active, :sort_order, NOW(), NOW())'
+        );
+        $stmt->execute([
+            'room_type_id' => (int)$data['room_type_id'],
+            'code' => $code,
+            'name' => trim((string)$data['name']),
+            'description' => trim((string)($data['description'] ?? '')),
+            'is_active' => !empty($data['is_active']) ? 1 : 0,
+            'sort_order' => (int)($data['sort_order'] ?? 0),
+        ]);
+        return (int)$this->db->lastInsertId();
+    }
+
+    public function updateRoom(int $id, array $data): bool
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE rooms
+             SET room_type_id = :room_type_id,
+                 code = :code,
+                 name = :name,
+                 description = :description,
+                 is_active = :is_active,
+                 sort_order = :sort_order,
+                 updated_at = NOW()
+             WHERE id = :id'
+        );
+        return $stmt->execute([
+            'room_type_id' => (int)$data['room_type_id'],
+            'code' => strtoupper(trim((string)$data['code'])),
+            'name' => trim((string)$data['name']),
+            'description' => trim((string)($data['description'] ?? '')),
+            'is_active' => !empty($data['is_active']) ? 1 : 0,
+            'sort_order' => (int)($data['sort_order'] ?? 0),
+            'id' => $id,
+        ]);
     }
 
     public function allWithAreas(?int $areaId = null, ?string $status = null): array
@@ -198,9 +264,11 @@ final class Table extends BaseModel
             $params['status'] = $status;
         }
 
-        $sql = 'SELECT t.*, a.name AS area_name, a.sort_order AS area_sort
+        $sql = 'SELECT t.*, a.name AS area_name, a.sort_order AS area_sort,
+                       r.code AS room_code, r.name AS room_name
                 FROM restaurant_tables t
-                INNER JOIN dining_areas a ON a.id = t.area_id'
+                INNER JOIN dining_areas a ON a.id = t.area_id
+                LEFT JOIN rooms r ON r.id = t.room_id'
             . ($conditions !== [] ? ' WHERE ' . implode(' AND ', $conditions) : '')
             . ' ORDER BY a.sort_order ASC, t.code ASC';
 

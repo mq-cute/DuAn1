@@ -87,7 +87,7 @@ final class Invoice extends BaseModel
                 INNER JOIN restaurant_tables t ON t.id = o.table_id
                 INNER JOIN dining_areas a ON a.id = t.area_id
                 {$whereClause}
-                ORDER BY i.id DESC
+                ORDER BY i.issued_at DESC, i.id DESC
                 LIMIT :limit OFFSET :offset";
 
         $stmt = $this->db->prepare($sql);
@@ -176,6 +176,7 @@ final class Invoice extends BaseModel
         $stmt = $this->db->prepare(
             'SELECT i.*, 
                     o.id AS order_id, o.notes AS order_notes, o.created_at AS order_created_at,
+                    o.voucher_code AS order_voucher_code,
                     o.customer_name AS order_customer_name, o.booking_id,
                     b.user_id AS booking_user_id, b.customer_name AS booking_customer_name,
                     COALESCE(b.deposit_amount, 0) AS booking_deposit_amount,
@@ -270,7 +271,7 @@ final class Invoice extends BaseModel
             $subtotal += (float) $item['subtotal'];
         }
 
-        $voucher = $this->bookingVoucherSnapshot(isset($order['booking_id']) ? (int) $order['booking_id'] : null);
+        $voucher = $this->orderVoucherSnapshot($order);
         $discount = Voucher::calculateDiscount($voucher, $subtotal);
         $tableFee = (float) ($order['table_fee'] ?? 0);
         $setupFee = (float) ($order['setup_fee'] ?? 0);
@@ -334,6 +335,7 @@ final class Invoice extends BaseModel
 
         $this->db->beginTransaction();
         try {
+            $this->db->prepare('SELECT id FROM orders WHERE id = :id FOR UPDATE')->execute(['id' => $orderId]);
             $orderModel = new Order($this->db);
             $order = $orderModel->findById($orderId);
 
@@ -356,7 +358,7 @@ final class Invoice extends BaseModel
             $itemStmt->execute(['order_id' => $orderId]);
             $subtotal = (float) ($itemStmt->fetchColumn() ?: 0.0);
 
-            $voucher = $this->bookingVoucherSnapshot(isset($order['booking_id']) ? (int) $order['booking_id'] : null);
+            $voucher = $this->orderVoucherSnapshot($order, true, $subtotal);
             $discount = Voucher::calculateDiscount($voucher, $subtotal);
             $tableFee = (float) ($order['table_fee'] ?? 0);
             $setupFee = (float) ($order['setup_fee'] ?? 0);
@@ -390,7 +392,7 @@ final class Invoice extends BaseModel
                 $invId = (int) $existingInv['id'];
                 $updInv = $this->db->prepare(
                     'UPDATE invoices 
-                     SET subtotal = :subtotal, discount = :discount, service_charge = :service_charge, tax = :tax,
+                     SET subtotal = :subtotal, discount = :discount, voucher_id = :voucher_id, service_charge = :service_charge, tax = :tax,
                          total = :total, payment_method = :method, status = "paid",
                          issued_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
                      WHERE id = :id'
@@ -398,6 +400,7 @@ final class Invoice extends BaseModel
                 $updInv->execute([
                     'subtotal' => $subtotal,
                     'discount' => $discount,
+                    'voucher_id' => $voucher['id'] ?? null,
                     'service_charge' => $serviceCharge,
                     'tax' => $tax,
                     'total' => $total,
@@ -407,9 +410,9 @@ final class Invoice extends BaseModel
             } else {
                 $insInv = $this->db->prepare(
                     'INSERT INTO invoices (order_id, invoice_number, customer_name, issued_at, subtotal,
-                                           discount, service_charge, tax, total, payment_method, status)
+                                           discount, voucher_id, service_charge, tax, total, payment_method, status)
                      VALUES (:order_id, :invoice_number, :customer_name, CURRENT_TIMESTAMP, :subtotal,
-                             :discount, :service_charge, :tax, :total, :payment_method, "paid")'
+                             :discount, :voucher_id, :service_charge, :tax, :total, :payment_method, "paid")'
                 );
                 $insInv->execute([
                     'order_id' => $orderId,
@@ -417,6 +420,7 @@ final class Invoice extends BaseModel
                     'customer_name' => $order['customer_name'] ?: 'Khách hàng',
                     'subtotal' => $subtotal,
                     'discount' => $discount,
+                    'voucher_id' => $voucher['id'] ?? null,
                     'service_charge' => $serviceCharge,
                     'tax' => $tax,
                     'total' => $total,
@@ -437,6 +441,17 @@ final class Invoice extends BaseModel
                 'received_by' => $receivedBy,
                 'transaction_id' => $transactionId,
             ]);
+
+            if ($voucher !== null) {
+                $used = $this->db->prepare(
+                    'UPDATE vouchers SET used_count = used_count + 1
+                     WHERE id = :id AND (usage_limit IS NULL OR used_count < usage_limit)'
+                );
+                $used->execute(['id' => (int) $voucher['id']]);
+                if ($used->rowCount() !== 1) {
+                    throw new DomainException('voucher_unavailable');
+                }
+            }
 
             // Update order
             $updOrder = $this->db->prepare(
@@ -717,22 +732,73 @@ final class Invoice extends BaseModel
         }
     }
 
-    private function bookingVoucherSnapshot(?int $bookingId): ?array
+    public function updateOrderVoucher(int $orderId, string $code): void
     {
-        if ($bookingId === null || $bookingId < 1) {
+        $this->db->beginTransaction();
+        try {
+            $lock = $this->db->prepare('SELECT id, payment_status FROM orders WHERE id = :id FOR UPDATE');
+            $lock->execute(['id' => $orderId]);
+            $order = $lock->fetch(PDO::FETCH_ASSOC);
+            if ($order === false) {
+                throw new DomainException('order_not_found');
+            }
+            if ($order['payment_status'] === 'paid') {
+                throw new DomainException('invoice_already_paid');
+            }
+
+            if (trim($code) === '') {
+                $this->db->prepare('UPDATE orders SET voucher_id = NULL, voucher_code = NULL, discount = 0 WHERE id = :id')
+                    ->execute(['id' => $orderId]);
+                $this->db->commit();
+                return;
+            }
+
+            $sum = $this->db->prepare(
+                'SELECT COALESCE(SUM(subtotal), 0) FROM order_items WHERE order_id = :id AND status <> "cancelled"'
+            );
+            $sum->execute(['id' => $orderId]);
+            $foodTotal = (float) $sum->fetchColumn();
+            $voucher = (new Voucher($this->db))->validateForBill($code, $foodTotal);
+            $discount = Voucher::calculateDiscount($voucher, $foodTotal);
+            $update = $this->db->prepare(
+                'UPDATE orders SET voucher_id = :voucher_id, voucher_code = :code, discount = :discount, updated_at = CURRENT_TIMESTAMP WHERE id = :id'
+            );
+            $update->execute([
+                'voucher_id' => (int) $voucher['id'], 'code' => $voucher['code'],
+                'discount' => $discount, 'id' => $orderId,
+            ]);
+            $this->db->commit();
+        } catch (Throwable $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            throw $e;
+        }
+    }
+
+    private function orderVoucherSnapshot(array $order, bool $lock = false, ?float $eligibleAmount = null): ?array
+    {
+        $voucherId = (int) ($order['voucher_id'] ?? 0);
+        if ($voucherId < 1 || empty($order['voucher_code'])) {
             return null;
         }
-
+        if ($lock) {
+            $voucher = (new Voucher($this->db))->validateForBill(
+                (string) $order['voucher_code'],
+                max(0.0, (float) $eligibleAmount),
+                true
+            );
+            if ((int) $voucher['id'] !== $voucherId) {
+                throw new DomainException('voucher_invalid');
+            }
+            return $voucher;
+        }
         $stmt = $this->db->prepare(
-            'SELECT voucher_code AS code, voucher_discount_type AS discount_type,
-                    voucher_discount_value AS discount_value,
-                    voucher_min_order_amount AS min_order_amount,
-                    voucher_max_discount_amount AS max_discount_amount
-             FROM bookings WHERE id = :id LIMIT 1'
+            'SELECT * FROM vouchers WHERE id = :id AND code = :code LIMIT 1'
         );
-        $stmt->execute(['id' => $bookingId]);
+        $stmt->execute(['id' => $voucherId, 'code' => $order['voucher_code']]);
         $voucher = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $voucher === false || empty($voucher['code']) ? null : $voucher;
+        return $voucher === false ? null : $voucher;
     }
 }

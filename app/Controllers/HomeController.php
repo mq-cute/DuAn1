@@ -32,6 +32,7 @@ final class HomeController extends Controller
         $areas = $tableModel->allAreas();
         $combos = $comboModel->allActive();
         $vouchers = $voucherModel->allActive();
+        $customerVouchers = $voucherModel->allForCustomer();
 
         $this->render('home/index', [
             'pageTitle' => "L'Épicure Gastronomie — Nghệ Thuật Ẩm Thực Đương Đại",
@@ -42,6 +43,7 @@ final class HomeController extends Controller
             'areas' => $areas,
             'combos' => $combos,
             'vouchers' => $vouchers,
+            'customerVouchers' => $customerVouchers,
             'selectedCategorySlug' => $selectedCategorySlug,
         ]);
     }

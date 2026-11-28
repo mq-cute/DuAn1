@@ -34,10 +34,12 @@ $currency = static fn (mixed $amount): string => View::currency((string) (int) r
 <div class="prebill-page">
     <!-- Action buttons (Hidden during printing) -->
     <div class="prebill-actions no-print">
+        <?php if (($currentUser['role'] ?? '') === 'staff'): ?>
         <a href="/staff/pos?table_id=<?= (int) $order['table_id'] ?>" class="text-xs font-bold text-primary hover:underline flex items-center gap-1">
             <span class="material-symbols-outlined text-[16px]">arrow_back</span>
             <span>Quay lại POS</span>
         </a>
+        <?php endif; ?>
         <div class="flex items-center space-x-2">
             <button type="button" onclick="window.print()" class="px-5 py-2.5 rounded-xl bg-primary text-on-primary text-xs font-bold hover:bg-primary-container shadow-sm transition flex items-center space-x-1.5">
                 <span class="material-symbols-outlined text-[18px]">print</span>
@@ -45,6 +47,56 @@ $currency = static fn (mixed $amount): string => View::currency((string) (int) r
             </button>
         </div>
     </div>
+
+    <?php if (!empty($error)): ?>
+        <?php $voucherErrors = [
+            'voucher_invalid' => 'Mã voucher không tồn tại hoặc đã bị tắt.',
+            'voucher_expired' => 'Voucher chưa đến hạn hoặc đã hết hạn.',
+            'voucher_unavailable' => 'Voucher đã hết lượt sử dụng.',
+            'voucher_minimum' => 'Hóa đơn chưa đạt giá trị tối thiểu của voucher.',
+            'csrf_expired' => 'Phiên thao tác đã hết hạn. Vui lòng tải lại trang.',
+        ]; ?>
+        <div class="no-print mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800" role="alert">
+            <?= View::escape($voucherErrors[$error] ?? 'Không thể áp dụng voucher. Vui lòng thử lại.') ?>
+        </div>
+    <?php elseif (!empty($message)): ?>
+        <div class="no-print mb-4 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800" role="status">
+            <?= $message === 'voucher_removed' ? 'Đã gỡ voucher khỏi hóa đơn.' : 'Đã áp dụng voucher vào hóa đơn.' ?>
+        </div>
+    <?php endif; ?>
+
+    <section class="no-print mb-5 rounded-2xl border border-outline-variant/30 bg-white p-4 shadow-sm">
+        <h2 class="mb-3 text-sm font-bold">Áp dụng voucher cho hóa đơn</h2>
+        <div class="grid gap-4 md:grid-cols-2">
+            <form action="/staff/orders/<?= (int) ($order['id'] ?? 0) ?>/voucher" method="post" class="flex gap-2">
+                <input type="hidden" name="_csrf_token" value="<?= View::escape($csrfToken) ?>">
+                <select name="voucher_code" class="min-w-0 flex-1 rounded-lg border border-outline-variant/50 px-3 py-2 text-xs">
+                    <option value="">Chọn voucher đang hiệu lực</option>
+                    <?php foreach (($vouchers ?? []) as $voucher): ?>
+                        <option value="<?= View::escape($voucher['code']) ?>" <?= ($prebill['voucherCode'] ?? '') === $voucher['code'] ? 'selected' : '' ?>>
+                            <?= View::escape($voucher['title']) ?> · <?= View::escape($voucher['code']) ?>
+                            (<?= $voucher['discount_type'] === 'percentage' ? View::escape($voucher['discount_value']) . '%' : View::currency($voucher['discount_value']) ?>)
+                            · tối thiểu <?= View::currency($voucher['min_order_amount']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <button type="submit" class="rounded-lg bg-primary px-4 py-2 text-xs font-bold text-white">Áp dụng</button>
+            </form>
+            <form action="/staff/orders/<?= (int) ($order['id'] ?? 0) ?>/voucher" method="post" class="flex gap-2">
+                <input type="hidden" name="_csrf_token" value="<?= View::escape($csrfToken) ?>">
+                <input name="voucher_code" maxlength="50" autocomplete="off" placeholder="Nhập mã khách cung cấp" class="min-w-0 flex-1 rounded-lg border border-outline-variant/50 px-3 py-2 text-xs">
+                <button type="submit" class="rounded-lg border border-primary px-4 py-2 text-xs font-bold text-primary">Kiểm tra mã</button>
+            </form>
+        </div>
+        <?php if (!empty($prebill['voucherCode'])): ?>
+            <form action="/staff/orders/<?= (int) ($order['id'] ?? 0) ?>/voucher" method="post" class="mt-3">
+                <input type="hidden" name="_csrf_token" value="<?= View::escape($csrfToken) ?>">
+                <input type="hidden" name="voucher_code" value="">
+                <button type="submit" class="text-xs font-semibold text-red-700 underline">Gỡ voucher</button>
+            </form>
+        <?php endif; ?>
+        <p class="mt-2 text-[11px] text-stone-500">Voucher chỉ giảm tiền hóa đơn cuối cùng. Tiền đặt cọc đã nhận không thay đổi.</p>
+    </section>
 
     <!-- Pre-bill Printable Card -->
     <div class="prebill-card print-area space-y-6 text-on-surface">

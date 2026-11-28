@@ -380,8 +380,8 @@ foreach ($bookings as $b) {
 
             <div>
                 <label class="block font-bold text-slate-700 mb-1">CHỌN BÀN THAY THẾ</label>
-                <select name="new_table_id" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold">
-                    <option value="">-- Danh sách bàn trống --</option>
+                <select name="new_table_ids[]" multiple required size="6" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold">
+                    <option value="" disabled>-- Chọn một hoặc nhiều bàn cùng phòng --</option>
                     <?php foreach ($allTables as $at): 
                         if (in_array($at['status'], ['in_use', 'serving', 'locked'])) continue;
                     ?>

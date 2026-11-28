@@ -27,6 +27,7 @@ final class TableAdminController extends Controller
         $selectedAreaId = isset($_GET['area_id']) && is_numeric($_GET['area_id']) ? (int) $_GET['area_id'] : null;
         $floorData = $tableModel->getFloorPlanData($selectedAreaId);
         $allTables = $tableModel->allWithAreas();
+        $rooms = $tableModel->allRooms();
 
         // Lấy danh sách yêu cầu setup riêng từ các booking hôm nay
         $setupStmt = $db->query(
@@ -49,6 +50,7 @@ final class TableAdminController extends Controller
             'totalTables' => $floorData['totalTables'],
             'counts' => $floorData['counts'],
             'allTables' => $allTables,
+            'rooms' => $rooms,
             'selectedAreaId' => $selectedAreaId,
             'setupRequests' => $setupRequests,
             'csrfToken' => Csrf::token(),
@@ -120,6 +122,64 @@ final class TableAdminController extends Controller
         $this->redirect('/admin/tables?message=area_deleted');
     }
 
+    public function createRoom(): void
+    {
+        $this->requireRole('admin');
+        if (!$this->verifyCsrf()) {
+            $this->redirect('/admin/tables?message=invalid_csrf');
+        }
+
+        $name = trim((string)($_POST['name'] ?? ''));
+        $code = strtoupper(trim((string)($_POST['code'] ?? '')));
+        $roomTypeId = (int)($_POST['room_type_id'] ?? 0);
+        if ($name === '' || $code === '' || $roomTypeId <= 0) {
+            $this->redirect('/admin/tables?message=room_info_required');
+        }
+
+        try {
+            (new Table(Database::connection()))->createRoom([
+                'room_type_id' => $roomTypeId,
+                'code' => $code,
+                'name' => $name,
+                'description' => trim((string)($_POST['description'] ?? '')),
+                'is_active' => !empty($_POST['is_active']),
+                'sort_order' => (int)($_POST['sort_order'] ?? 0),
+            ]);
+            $this->redirect('/admin/tables?message=room_created');
+        } catch (\PDOException) {
+            $this->redirect('/admin/tables?message=room_code_exists');
+        }
+    }
+
+    public function updateRoom(string $id): void
+    {
+        $this->requireRole('admin');
+        if (!$this->verifyCsrf()) {
+            $this->redirect('/admin/tables?message=invalid_csrf');
+        }
+
+        $name = trim((string)($_POST['name'] ?? ''));
+        $code = strtoupper(trim((string)($_POST['code'] ?? '')));
+        $roomTypeId = (int)($_POST['room_type_id'] ?? 0);
+        if ($name === '' || $code === '' || $roomTypeId <= 0) {
+            $this->redirect('/admin/tables?message=room_info_required');
+        }
+
+        try {
+            (new Table(Database::connection()))->updateRoom((int)$id, [
+                'room_type_id' => $roomTypeId,
+                'code' => $code,
+                'name' => $name,
+                'description' => trim((string)($_POST['description'] ?? '')),
+                'is_active' => !empty($_POST['is_active']),
+                'sort_order' => (int)($_POST['sort_order'] ?? 0),
+            ]);
+            $this->redirect('/admin/tables?message=room_updated');
+        } catch (\PDOException) {
+            $this->redirect('/admin/tables?message=room_code_exists');
+        }
+    }
+
     public function createTable(): void
     {
         $this->requireRole('admin');
@@ -130,9 +190,10 @@ final class TableAdminController extends Controller
         $code = strtoupper(trim((string)($_POST['code'] ?? '')));
         $name = trim((string)($_POST['name'] ?? ''));
         $areaId = (int)($_POST['area_id'] ?? 0);
+        $roomId = (int)($_POST['room_id'] ?? 0);
         $capacity = max(1, (int)($_POST['capacity'] ?? 4));
 
-        if ($code === '' || $name === '' || $areaId <= 0) {
+        if ($code === '' || $name === '' || $areaId <= 0 || $roomId <= 0) {
             $this->redirect('/admin/tables?message=table_info_required');
         }
 
@@ -146,10 +207,13 @@ final class TableAdminController extends Controller
 
         $tableModel->createTable([
             'area_id' => $areaId,
+            'room_id' => $roomId,
             'code' => $code,
             'name' => $name,
             'capacity' => $capacity,
             'status' => (string)($_POST['status'] ?? 'empty'),
+            'is_active' => !isset($_POST['is_active']) || $_POST['is_active'] === '1',
+            'is_active' => !isset($_POST['is_active']) || $_POST['is_active'] === '1',
             'position_x' => (int)($_POST['position_x'] ?? 50),
             'position_y' => (int)($_POST['position_y'] ?? 50),
             'is_vip' => !empty($_POST['is_vip']) ? 1 : 0,
@@ -172,9 +236,10 @@ final class TableAdminController extends Controller
         $code = strtoupper(trim((string)($_POST['code'] ?? '')));
         $name = trim((string)($_POST['name'] ?? ''));
         $areaId = (int)($_POST['area_id'] ?? 0);
+        $roomId = (int)($_POST['room_id'] ?? 0);
         $capacity = max(1, (int)($_POST['capacity'] ?? 4));
 
-        if ($code === '' || $name === '' || $areaId <= 0) {
+        if ($code === '' || $name === '' || $areaId <= 0 || $roomId <= 0) {
             $this->redirect('/admin/tables?message=table_info_required');
         }
 
@@ -189,6 +254,7 @@ final class TableAdminController extends Controller
 
         $tableModel->updateTable($tableId, [
             'area_id' => $areaId,
+            'room_id' => $roomId,
             'code' => $code,
             'name' => $name,
             'capacity' => $capacity,

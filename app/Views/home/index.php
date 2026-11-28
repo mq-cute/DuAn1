@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 use App\Core\View;
 
 $activeVoucher = !empty($vouchers) ? $vouchers[0] : null;
@@ -422,6 +422,7 @@ $selectedCategorySlug = $selectedCategorySlug ?? null;
 <!-- ================= BANNER VOUCHER ƯU ĐÃI ================= -->
 <section class="hp-section hp-voucher-section">
     <div class="hp-container">
+        <?php if ($activeVoucher !== null): ?>
         <div class="hp-voucher-banner">
             <div class="hp-voucher-badge">ƯU ĐÃI ĐẶC QUYỀN HỘI VIÊN</div>
             <h2 class="hp-voucher-title">
@@ -436,14 +437,12 @@ $selectedCategorySlug = $selectedCategorySlug ?? null;
                     <span class="hp-code-label">MÃ ĐẶC QUYỀN TRỰC TUYẾN:</span>
                     <strong class="hp-code-value"><?= View::escape($activeVoucher['code'] ?? 'FOODIESFIRST15') ?></strong>
                 </div>
-                <span class="hp-code-condition">
-                    Áp dụng cho hóa đơn từ 2.000.000 ₫ • Hạn dùng đến 31/12/2026
-                </span>
+                <span class="hp-code-condition">Mã ưu đãi chỉ áp dụng tại bước thanh toán hóa đơn cuối cùng.</span>
             </div>
 
             <div class="hp-voucher-actions">
-                <a href="/bookings/new?voucher=<?= urlencode($activeVoucher['code'] ?? 'FOODIESFIRST15') ?>" class="hp-btn-voucher">
-                    ÁP DỤNG MÃ & ĐẶT BÀN NGAY
+                <a href="/bookings/new" class="hp-btn-voucher">
+                    XEM THÔNG TIN ĐẶT BÀN
                 </a>
                 <a href="/bookings/new" class="hp-voucher-sublink">
                     <span>XEM TẤT CẢ VOUCHER THÀNH VIÊN VIP</span>
@@ -451,5 +450,21 @@ $selectedCategorySlug = $selectedCategorySlug ?? null;
                 </a>
             </div>
         </div>
+        <?php endif; ?>
+        <?php if (!empty($customerVouchers)): ?>
+            <div class="mt-5 grid gap-3 md:grid-cols-2">
+                <?php foreach ($customerVouchers as $voucher): ?>
+                    <?php $voucherIsUsable = strtotime((string) $voucher['start_date']) <= time() && strtotime((string) $voucher['end_date']) >= time() && ($voucher['usage_limit'] === null || (int) $voucher['used_count'] < (int) $voucher['usage_limit']); ?>
+                    <article class="rounded-xl border border-outline-variant/30 bg-white p-4">
+                        <h3 class="font-bold"><?= View::escape($voucher['title']) ?> · <?= View::escape($voucher['code']) ?></h3>
+                        <?php if (!empty($voucher['description'])): ?><p class="mt-1 text-sm"><?= View::escape($voucher['description']) ?></p><?php endif; ?>
+                        <p class="mt-1 text-xs">Giảm <?= $voucher['discount_type'] === 'percentage' ? View::escape($voucher['discount_value']) . '%' : View::currency($voucher['discount_value']) ?> · Đơn tối thiểu <?= View::currency($voucher['min_order_amount']) ?></p>
+                        <p class="text-xs">Hạn dùng: <?= date('d/m/Y H:i', strtotime($voucher['end_date'])) ?> · <?= $voucherIsUsable ? 'Còn hiệu lực' : 'Hết hiệu lực' ?></p>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
     </div>
 </section>
+
+\n

@@ -19,10 +19,25 @@ final class BookingController extends Controller
     public function createForm(): void
     {
         $user = $this->requireRole('customer');
-        $date = $this->queryString('date');
-        $time = $this->queryString('time');
-        $guestCount = $this->integerQuery('number_of_guests');
-        $searchRequested = isset($_GET['date']) || isset($_GET['time']) || isset($_GET['number_of_guests']);
+        $date = $this->queryString('booking_date');
+        if ($date === '') {
+            $date = $this->queryString('date');
+        }
+        $time = $this->queryString('booking_time');
+        if ($time === '') {
+            $time = $this->queryString('time');
+        }
+        $guestCount = $this->integerQuery('party_size');
+        if ($guestCount === null) {
+            $guestCount = $this->integerQuery('number_of_guests');
+        }
+        $areaId = $this->integerQuery('area_id');
+        $searchRequested = isset($_GET['booking_date'])
+            || isset($_GET['booking_time'])
+            || isset($_GET['party_size'])
+            || isset($_GET['date'])
+            || isset($_GET['time'])
+            || isset($_GET['number_of_guests']);
 
         if ($date === '') {
             $date = date('Y-m-d');
@@ -32,13 +47,19 @@ final class BookingController extends Controller
         }
 
         $errors = [];
-        $tables = [];
+        $rooms = [];
         if ($searchRequested) {
             $errors = $this->validateSlot($date, $time, $guestCount);
             if ($errors === []) {
-                $tables = (new Booking(Database::connection()))->availableTables($date, $time, $guestCount);
-                if ($tables === []) {
-                    $errors[] = 'Không có bàn phù hợp trong khung giờ này. Vui lòng chọn giờ khác.';
+                $rooms = (new Booking(Database::connection()))->availableTables($date, $time, $guestCount);
+                if ($areaId !== null && $areaId > 0) {
+                    $rooms = array_values(array_filter(
+                        $rooms,
+                        static fn(array $room): bool => (int)($room['area_id'] ?? 0) === $areaId
+                    ));
+                }
+                if ($rooms === []) {
+                    $errors[] = 'Không có phòng có đủ bàn khả dụng trong khung giờ này. Vui lòng chọn giờ khác.';
                 }
             }
         }
@@ -47,13 +68,14 @@ final class BookingController extends Controller
             'booking_date' => $date,
             'booking_time' => $time,
             'number_of_guests' => $guestCount,
-            'table_id' => $this->integerQuery('table_id'),
+            'room_id' => $this->integerQuery('room_id') ?? 0,
+            'table_ids' => [],
             'customer_name' => $user['name'],
             'customer_phone' => '',
             'notes' => '',
             'voucher_code' => $this->queryString('voucher'),
             'dish_notes' => [],
-        ], $errors, $tables);
+        ], $errors, $rooms);
     }
 
     public function create(): void
@@ -88,8 +110,10 @@ final class BookingController extends Controller
                 break;
             }
         }
-        if ($input['table_id'] < 1) {
-            $errors[] = 'Vui lòng tìm và chọn một bàn còn trống.';
+        if ($input['room_id'] < 1 || $input['table_ids'] === []) {
+            $errors[] = 'Vui lòng chọn một phòng và ít nhất một bàn còn trống.';
+        } elseif (count($input['table_ids']) !== count(array_unique($input['table_ids']))) {
+            $errors[] = 'Không được chọn trùng bàn trong một lượt đặt.';
         }
         if ($this->unavailableCartDishes(Cart::contents()) !== []) {
             $errors[] = 'Một hoặc nhiều món trong giỏ đã hết hoặc bị ẩn. Hãy cập nhật giỏ trước khi đặt bàn.';
@@ -108,7 +132,9 @@ final class BookingController extends Controller
                 'booking_date' => $input['booking_date'],
                 'booking_time' => $input['booking_time'],
                 'number_of_guests' => $input['number_of_guests'],
-                'table_id' => $input['table_id'],
+                'room_id' => $input['room_id'],
+                'table_ids' => $input['table_ids'],
+                'table_id' => $input['table_ids'][0],
                 'pay_deposit' => isset($_POST['pay_deposit']),
                 'voucher_code' => $input['voucher_code'],
                 'notes' => $input['notes'] === '' ? null : $input['notes'],
@@ -151,6 +177,8 @@ final class BookingController extends Controller
             $message = match ($exception->getMessage()) {
                 'table_unavailable' => 'Bàn vừa được đặt hoặc không còn phù hợp. Hãy chọn bàn khác.',
                 'dish_unavailable' => 'Món trong giỏ vừa hết hoặc bị ẩn. Hãy cập nhật giỏ rồi thử lại.',
+                'insufficient_capacity' => 'Tổng sức chứa của các bàn đã chọn chưa đủ số lượng khách.',
+                'table_room_mismatch' => 'Tất cả bàn phải thuộc cùng một phòng.',
                 default => 'Không thể tạo lượt đặt bàn. Vui lòng kiểm tra lại thông tin.',
             };
             $message = match ($exception->getMessage()) {
@@ -202,6 +230,7 @@ final class BookingController extends Controller
             'currentUser' => $user,
             'booking' => $booking,
             'details' => $model->details($bookingId),
+            'bookedTables' => $model->tablesForBooking($bookingId),
             'histories' => $model->histories($bookingId),
             'message' => $this->queryString('message'),
             'csrfToken' => Csrf::token(),
@@ -277,7 +306,7 @@ final class BookingController extends Controller
         array $user,
         array $input,
         array $errors,
-        array $tables,
+        array $rooms,
         int $status = 200
     ): void {
         $cart = Cart::contents();
@@ -302,7 +331,7 @@ final class BookingController extends Controller
             'currentUser' => $user,
             'input' => $input,
             'errors' => $errors,
-            'tables' => $tables,
+            'rooms' => $rooms,
             'items' => $items,
             'hasMissingCartItems' => count($availableDishIds) !== count($cart),
             'csrfToken' => Csrf::token(),
@@ -315,7 +344,16 @@ final class BookingController extends Controller
         $date = $this->stringInput($input, 'booking_date');
         $time = $this->stringInput($input, 'booking_time');
         $guestCount = filter_var($input['number_of_guests'] ?? null, FILTER_VALIDATE_INT);
-        $tableId = filter_var($input['table_id'] ?? null, FILTER_VALIDATE_INT);
+        $roomId = filter_var($input['room_id'] ?? null, FILTER_VALIDATE_INT);
+        $tableIds = [];
+        if (isset($input['table_ids']) && is_array($input['table_ids'])) {
+            foreach ($input['table_ids'] as $tableId) {
+                $validated = filter_var($tableId, FILTER_VALIDATE_INT);
+                if ($validated !== false && $validated > 0) {
+                    $tableIds[] = (int) $validated;
+                }
+            }
+        }
         $dishNotes = $input['dish_notes'] ?? [];
         $notes = [];
         if (is_array($dishNotes)) {
@@ -331,7 +369,8 @@ final class BookingController extends Controller
             'booking_date' => $date,
             'booking_time' => $time,
             'number_of_guests' => $guestCount !== false && $guestCount !== null ? $guestCount : 0,
-            'table_id' => $tableId !== false && $tableId !== null ? $tableId : 0,
+            'room_id' => $roomId !== false && $roomId !== null ? (int) $roomId : 0,
+            'table_ids' => array_values(array_unique($tableIds)),
             'customer_name' => trim($this->stringInput($input, 'customer_name') ?: $user['name']),
             'customer_phone' => trim($this->stringInput($input, 'customer_phone')),
             'notes' => trim($this->stringInput($input, 'notes')),

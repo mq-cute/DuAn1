@@ -40,6 +40,7 @@ $routes = array_map(
     $routesProperty->getValue($bookingRouter)
 );
 foreach ([
+    'GET /bookings',
     'GET /bookings/new',
     'POST /bookings',
     'GET /account/bookings',

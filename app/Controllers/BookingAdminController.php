@@ -19,6 +19,7 @@ final class BookingAdminController extends Controller
         'pending',
         'confirmed',
         'seated',
+        'waiting_pending',
         'completed',
         'cancelled',
         'no_show',
@@ -168,6 +169,33 @@ final class BookingAdminController extends Controller
         }
     }
 
+    public function recordLateContact(string $id): void
+    {
+        $user = $this->requireRole('admin', 'staff');
+        $bookingId = filter_var($id, FILTER_VALIDATE_INT);
+        $note = trim($this->stringInput($_POST, 'late_contact_note'));
+        if (
+            $bookingId === false
+            || $bookingId < 1
+            || !$this->verifyCsrf()
+            || $note === ''
+            || mb_strlen($note) > 2000
+        ) {
+            $this->redirect('/admin/bookings?message=invalid');
+        }
+
+        try {
+            (new Booking(Database::connection()))->recordLateContact(
+                (int)$bookingId,
+                (int)$user['id'],
+                $note
+            );
+            $this->redirect('/admin/bookings?message=late-contact-recorded');
+        } catch (DomainException) {
+            $this->redirect('/admin/bookings?message=invalid');
+        }
+    }
+
     public function reviewForPos(string $id): void
     {
         $user = $this->requireRole('admin', 'staff');
@@ -201,6 +229,7 @@ final class BookingAdminController extends Controller
             'pageTitle' => 'Xác nhận đặt bàn vào POS',
             'currentUser' => $user,
             'booking' => $booking,
+            'bookedTables' => $model->tablesForBooking($bookingId),
             'details' => $details,
             'foodSubtotal' => $foodSubtotal,
             'tableFee' => $tableFee,
@@ -282,21 +311,41 @@ final class BookingAdminController extends Controller
     {
         $user = $this->requireRole('admin', 'staff');
         $bookingId = filter_var($id, FILTER_VALIDATE_INT);
-        $newTableId = filter_var($_POST['new_table_id'] ?? null, FILTER_VALIDATE_INT);
+        $newTableIds = [];
+        if (isset($_POST['new_table_ids']) && is_array($_POST['new_table_ids'])) {
+            foreach ($_POST['new_table_ids'] as $value) {
+                $validated = filter_var($value, FILTER_VALIDATE_INT);
+                if ($validated !== false && $validated > 0) {
+                    $newTableIds[] = (int)$validated;
+                }
+            }
+        } elseif (isset($_POST['new_table_id'])) {
+            $validated = filter_var($_POST['new_table_id'], FILTER_VALIDATE_INT);
+            if ($validated !== false && $validated > 0) {
+                $newTableIds[] = (int)$validated;
+            }
+        }
         $reason = trim($this->stringInput($_POST, 'reason'));
 
-        if ($bookingId === false || $newTableId === false || !$this->verifyCsrf()) {
+        if ($bookingId === false || $newTableIds === [] || $reason === '' || !$this->verifyCsrf()) {
             $this->redirect('/admin/bookings?message=invalid');
         }
 
         try {
             $bookingModel = new Booking(Database::connection());
-            $bookingModel->changeBookingTable($bookingId, $newTableId, (int)$user['id'], $reason);
+            $bookingModel->replaceBookingTables(
+                $bookingId,
+                $newTableIds,
+                (int)$user['id'],
+                $reason,
+                trim($this->stringInput($_POST, 'note'))
+            );
             $this->redirect('/admin/bookings?message=table-changed');
         } catch (DomainException $e) {
             $msg = match ($e->getMessage()) {
                 'table_busy' => 'table-busy',
                 'booking_not_found' => 'missing',
+                'insufficient_capacity' => 'insufficient-capacity',
                 default => 'cannot-change',
             };
             $this->redirect('/admin/bookings?message=' . $msg);
