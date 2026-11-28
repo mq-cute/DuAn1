@@ -23,9 +23,9 @@ $statusCssVer = is_file($statusCssPath) ? (string) filemtime($statusCssPath) : '
         <div class="flex justify-between items-center w-full px-4 md:px-6 2xl:px-10 max-w-[1536px] mx-auto min-h-20 gap-3">
             <!-- Brand -->
             <div class="flex items-center space-x-3 2xl:space-x-6 shrink-0">
-                <a href="<?= ($currentUser['role'] ?? '') === 'kitchen' ? '/kitchen' : '/staff/pos' ?>" class="flex items-baseline space-x-3 text-decoration-none">
+                <a href="<?= ($currentUser['role'] ?? '') === 'kitchen' ? '/kitchen' : ((($currentUser['role'] ?? '') === 'admin') ? '/admin/dashboard' : '/staff/pos') ?>" class="flex items-baseline space-x-3 text-decoration-none">
                     <span class="text-2xl lg:text-3xl font-headline font-bold text-primary tracking-tight">FOODIES</span>
-                    <span class="text-[11px] font-bold text-tertiary-container tracking-widest border-l border-outline-variant/50 pl-3 uppercase"><?= ($currentUser['role'] ?? '') === 'kitchen' ? 'Nhà bếp' : 'Phục vụ bàn' ?></span>
+                    <span class="text-[11px] font-bold text-tertiary-container tracking-widest border-l border-outline-variant/50 pl-3 uppercase"><?= ($currentUser['role'] ?? '') === 'kitchen' ? 'Nhà bếp' : ((($currentUser['role'] ?? '') === 'admin') ? 'Quản trị' : 'Phục vụ bàn') ?></span>
                 </a>
                 <div class="hidden lg:flex items-center bg-surface-container-low px-3.5 py-1.5 rounded-full border border-outline-variant/30 space-x-2">
                     <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
@@ -34,7 +34,7 @@ $statusCssVer = is_file($statusCssPath) ? (string) filemtime($statusCssPath) : '
             </div>
 
             <!-- Navigation Links -->
-            <?php if (($currentUser['role'] ?? '') !== 'kitchen'): ?>
+            <?php if (($currentUser['role'] ?? '') === 'staff'): ?>
             <nav class="hidden 2xl:flex items-center space-x-3 text-base font-semibold text-on-surface-variant whitespace-nowrap shrink-0">
                 <a href="/tables" class="hover:text-primary transition-colors flex items-center gap-1.5 <?= str_starts_with($_SERVER['REQUEST_URI'] ?? '', '/tables') ? 'text-primary border-b-2 border-primary pb-0.5' : '' ?>">
                     <span class="material-symbols-outlined text-[18px]">table_restaurant</span>
@@ -48,10 +48,12 @@ $statusCssVer = is_file($statusCssPath) ? (string) filemtime($statusCssPath) : '
                     <span class="material-symbols-outlined text-[18px]">receipt_long</span>
                     <span>Quản lý gọi món</span>
                 </a>
+                <?php if (($currentUser['role'] ?? '') === 'kitchen'): ?>
                 <a href="/kitchen" class="hover:text-primary transition-colors flex items-center gap-1.5 <?= str_starts_with($_SERVER['REQUEST_URI'] ?? '', '/kitchen') ? 'text-primary border-b-2 border-primary pb-0.5' : '' ?>">
                     <span class="material-symbols-outlined text-[18px]">soup_kitchen</span>
                     <span>Màn hình bếp</span>
                 </a>
+                <?php endif; ?>
                 <a href="/invoices" class="hover:text-primary transition-colors flex items-center gap-1.5 <?= str_starts_with($_SERVER['REQUEST_URI'] ?? '', '/invoices') && !str_starts_with($_SERVER['REQUEST_URI'] ?? '', '/admin/invoices') ? 'text-primary border-b-2 border-primary pb-0.5' : '' ?>">
                     <span class="material-symbols-outlined text-[18px]">receipt</span>
                     <span>Hóa đơn</span>
@@ -72,13 +74,13 @@ $statusCssVer = is_file($statusCssPath) ? (string) filemtime($statusCssPath) : '
                 </div>
 
                 <div class="flex items-center space-x-2">
-                    <?php if (($currentUser['role'] ?? '') !== 'kitchen'): ?>
+                    <?php if (($currentUser['role'] ?? '') === 'staff'): ?>
                     <a href="/account/notifications" class="relative p-2 rounded-xl border border-outline-variant/40 text-on-surface-variant hover:text-primary hover:border-primary transition" title="Thông báo hệ thống">
                         <span class="material-symbols-outlined text-[20px]">notifications</span>
                         <span id="staffNotifBadge" class="hidden absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-red-600 text-white text-[9px] font-bold flex items-center justify-center">0</span>
                     </a>
                     <?php endif; ?>
-                    <?php if (($currentUser['role'] ?? '') !== 'kitchen'): ?>
+                    <?php if (($currentUser['role'] ?? '') === 'staff'): ?>
                     <a href="/staff/pos" class="bg-primary text-on-primary text-xs font-bold px-3.5 py-2 rounded-xl hover:bg-primary-container transition flex items-center space-x-1.5 shadow-sm">
                         <span class="material-symbols-outlined text-[18px]">add_circle</span>
                         <span class="hidden md:inline">Mở bàn mới</span>
@@ -114,7 +116,7 @@ $statusCssVer = is_file($statusCssPath) ? (string) filemtime($statusCssPath) : '
         </div>
     </footer>
 
-    <?php if (($currentUser['role'] ?? '') !== 'kitchen'): ?>
+    <?php if (($currentUser['role'] ?? '') === 'staff'): ?>
     <script>
     (function() {
         function checkStaffNotifs() {

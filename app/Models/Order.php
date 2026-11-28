@@ -554,15 +554,8 @@ final class Order extends BaseModel
                 $subtotal += $unitPrice * (int) $po['quantity'];
             }
 
-            $voucher = empty($booking['voucher_code']) ? null : [
-                'code' => $booking['voucher_code'],
-                'discount_type' => $booking['voucher_discount_type'],
-                'discount_value' => $booking['voucher_discount_value'],
-                'min_order_amount' => $booking['voucher_min_order_amount'],
-                'max_discount_amount' => $booking['voucher_max_discount_amount'],
-            ];
-            $discount = Voucher::calculateDiscount($voucher, $subtotal);
-            $billableSubtotal = max(0.0, $subtotal - $discount);
+            $discount = 0.0;
+            $billableSubtotal = $subtotal;
 
             $pricing = $this->getPricingRates();
             $serviceCharge = round($billableSubtotal * $pricing['service_charge_rate']);
@@ -572,9 +565,9 @@ final class Order extends BaseModel
             // Create Order
             $orderStmt = $this->db->prepare(
                 'INSERT INTO orders (booking_id, table_id, created_by, customer_name, status, payment_status,
-                                     total_amount, discount, voucher_code, service_charge, tax, grand_total, notes)
+                                     total_amount, discount, service_charge, tax, grand_total, notes)
                  VALUES (:booking_id, :table_id, :created_by, :customer_name, "confirmed", "unpaid",
-                         :total_amount, :discount, :voucher_code, :service_charge, :tax, :grand_total, :notes)'
+                         :total_amount, :discount, :service_charge, :tax, :grand_total, :notes)'
             );
             $orderStmt->execute([
                 'booking_id' => $bookingId,
@@ -583,7 +576,6 @@ final class Order extends BaseModel
                 'customer_name' => $booking['customer_name'],
                 'total_amount' => $subtotal,
                 'discount' => $discount,
-                'voucher_code' => $booking['voucher_code'] ?? null,
                 'service_charge' => $serviceCharge,
                 'tax' => $tax,
                 'grand_total' => $grandTotal,
@@ -726,13 +718,12 @@ final class Order extends BaseModel
         $stmt->execute(['order_id' => $orderId]);
         $foodSubtotal = (float) ($stmt->fetchColumn() ?: 0.0);
 
-        // Lấy phí bàn, phí setup và voucher discount từ bảng orders
+        // Chỉ voucher được nhân viên chọn tại hóa đơn mới được áp dụng.
         $ordStmt = $this->db->prepare(
             'SELECT o.table_fee, o.setup_fee, o.discount, o.voucher_code,
-                    b.voucher_discount_type, b.voucher_discount_value,
-                    b.voucher_min_order_amount, b.voucher_max_discount_amount
+                    v.discount_type, v.discount_value, v.min_order_amount, v.max_discount_amount
              FROM orders o
-             LEFT JOIN bookings b ON b.id = o.booking_id
+             LEFT JOIN vouchers v ON v.id = o.voucher_id
              WHERE o.id = :id LIMIT 1'
         );
         $ordStmt->execute(['id' => $orderId]);
@@ -741,14 +732,16 @@ final class Order extends BaseModel
         $tableFee = !empty($ordData['table_fee']) ? (float)$ordData['table_fee'] : 0.0;
         $setupFee = !empty($ordData['setup_fee']) ? (float)$ordData['setup_fee'] : 0.0;
         $discount = !empty($ordData['discount']) ? (float)$ordData['discount'] : 0.0;
-        if (!empty($ordData['voucher_code']) && !empty($ordData['voucher_discount_type'])) {
+        if (!empty($ordData['voucher_code']) && !empty($ordData['discount_type'])) {
             $discount = Voucher::calculateDiscount([
                 'code' => $ordData['voucher_code'],
-                'discount_type' => $ordData['voucher_discount_type'],
-                'discount_value' => $ordData['voucher_discount_value'],
-                'min_order_amount' => $ordData['voucher_min_order_amount'],
-                'max_discount_amount' => $ordData['voucher_max_discount_amount'],
+                'discount_type' => $ordData['discount_type'],
+                'discount_value' => $ordData['discount_value'],
+                'min_order_amount' => $ordData['min_order_amount'],
+                'max_discount_amount' => $ordData['max_discount_amount'],
             ], $foodSubtotal);
+        } else {
+            $discount = 0.0;
         }
 
         // Tổng phụ thu + đồ ăn trước thuế & phí dịch vụ

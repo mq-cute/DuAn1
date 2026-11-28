@@ -102,6 +102,53 @@ foreach ($allTables as $t) {
         </div>
     </div>
 
+    <details class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+        <summary class="cursor-pointer text-sm font-bold text-slate-800">Quản lý loại phòng & phòng</summary>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+            <form action="/admin/rooms" method="post" class="space-y-3">
+                <input type="hidden" name="_csrf_token" value="<?= View::escape($csrfToken) ?>">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold mb-1">Loại phòng</label>
+                        <select name="room_type_id" required class="w-full border rounded-lg p-2 text-sm">
+                            <?php foreach ($areas as $area): ?>
+                                <option value="<?= (int) $area['id'] ?>"><?= View::escape($area['name']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1">Mã phòng</label>
+                        <input name="code" required maxlength="30" class="w-full border rounded-lg p-2 text-sm" placeholder="VIP-01">
+                    </div>
+                </div>
+                <label class="block text-xs font-bold">Tên phòng</label>
+                <input name="name" required maxlength="150" class="w-full border rounded-lg p-2 text-sm" placeholder="Phòng VIP 01">
+                <label class="flex items-center gap-2 text-xs"><input type="checkbox" name="is_active" value="1" checked> Đang hoạt động</label>
+                <button class="px-3 py-2 rounded-lg bg-admin-navy text-gold text-xs font-bold" type="submit">Thêm phòng</button>
+            </form>
+            <div>
+                <h3 class="text-xs font-bold uppercase text-slate-500 mb-2">Danh sách phòng</h3>
+                <div class="space-y-2 max-h-64 overflow-auto">
+                    <?php foreach (($rooms ?? []) as $room): ?>
+                        <form action="/admin/rooms/<?= (int) $room['id'] ?>/edit" method="post" class="grid grid-cols-12 gap-2 items-center border rounded-lg p-2">
+                            <input type="hidden" name="_csrf_token" value="<?= View::escape($csrfToken) ?>">
+                            <input name="code" value="<?= View::escape($room['code']) ?>" class="col-span-3 border rounded p-1 text-xs">
+                            <input name="name" value="<?= View::escape($room['name']) ?>" class="col-span-4 border rounded p-1 text-xs">
+                            <select name="room_type_id" class="col-span-3 border rounded p-1 text-xs">
+                                <?php foreach ($areas as $area): ?>
+                                    <option value="<?= (int) $area['id'] ?>" <?= (int) $area['id'] === (int) $room['room_type_id'] ? 'selected' : '' ?>><?= View::escape($area['name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label class="col-span-1 text-center text-xs"><input type="checkbox" name="is_active" value="1" <?= (int) $room['is_active'] === 1 ? 'checked' : '' ?>></label>
+                            <button class="col-span-1 text-xs font-bold text-admin-navy" type="submit">Lưu</button>
+                        </form>
+                    <?php endforeach; ?>
+                    <?php if (($rooms ?? []) === []): ?><p class="text-xs text-slate-500">Chưa có phòng.</p><?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </details>
+
     <!-- Status KPI Bar -->
     <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs">
         <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">

@@ -1,7 +1,15 @@
-<?php
+﻿<?php
 use App\Core\View;
 
-$canSubmit = $tables !== []
+$rooms = $rooms ?? [];
+$input = $input ?? [];
+$items = $items ?? [];
+$errors = $errors ?? [];
+$hasMissingCartItems = $hasMissingCartItems ?? false;
+$csrfToken = $csrfToken ?? '';
+$today = $today ?? date('Y-m-d');
+
+$canSubmit = $rooms !== []
     && !$hasMissingCartItems
     && count(array_filter($items, static fn (array $item): bool => !$item['is_orderable'])) === 0;
 $preorderSubtotal = 0.0;
@@ -29,7 +37,6 @@ foreach ($items as $item) {
     <section class="booking-step">
         <div class="step-heading"><span>01</span><div><h2>Thời gian & số khách</h2><p>Thời lượng giữ bàn mặc định là 2 giờ.</p></div></div>
         <form action="/bookings/new" method="get" class="booking-search">
-            <input type="hidden" name="voucher" value="<?= View::escape($input['voucher_code'] ?? '') ?>">
             <div class="form-row">
                 <div>
                     <label for="booking-date">Ngày đến</label>
@@ -48,29 +55,47 @@ foreach ($items as $item) {
         </form>
     </section>
 
-    <?php if ($tables !== []): ?>
+    <?php if ($rooms !== []): ?>
         <form action="/bookings" method="post" class="booking-confirm-form">
             <input type="hidden" name="_csrf_token" value="<?= View::escape($csrfToken) ?>">
             <input type="hidden" name="booking_date" value="<?= View::escape($input['booking_date']) ?>">
             <input type="hidden" name="booking_time" value="<?= View::escape($input['booking_time']) ?>">
             <input type="hidden" name="number_of_guests" value="<?= (int) $input['number_of_guests'] ?>">
             <section class="booking-step">
-                <div class="step-heading"><span>02</span><div><h2>Chọn bàn</h2><p>Bàn sẽ được kiểm tra lại ở máy chủ khi bạn xác nhận.</p></div></div>
+                <div class="step-heading"><span>02</span><div><h2>Chọn một phòng và nhiều bàn</h2><p>Tổng sức chứa phải đạt số lượng khách. Bàn sẽ được kiểm tra lại ở máy chủ.</p></div></div>
+                <input type="hidden" name="room_id" id="selected-room-id" value="<?= (int) $input['room_id'] ?>">
                 <div class="available-table-grid">
-                    <?php foreach ($tables as $table): ?>
-                        <label class="available-table">
-                            <input type="radio" name="table_id" value="<?= (int) $table['id'] ?>" required <?= (string) $input['table_id'] === (string) $table['id'] ? 'checked' : '' ?>>
-                            <span class="available-table-body">
-                                <span class="table-code"><?= View::escape($table['code']) ?></span>
-                                <strong><?= View::escape($table['name']) ?></strong>
-                                <span><?= View::escape($table['area_name']) ?></span>
-                                <span class="capacity-label">Tối đa <?= (int) $table['capacity'] ?> khách</span>
-                                <?php $tableFee = (float) ($table['table_fee'] ?? 0) > 0 ? (float) $table['table_fee'] : (!empty($table['is_vip']) ? 200000 : 100000); ?>
-                                <?php $depositAmount = (int) round(($tableFee + $preorderSubtotal) * 0.25); ?>
-                                <span class="capacity-label">Đặt cọc 25% (bàn + món): <?= View::currency($depositAmount) ?><?= (float) ($table['table_fee'] ?? 0) <= 0 ? ' · phí bàn mặc định' : '' ?></span>
-                            </span>
-                        </label>
+                    <?php foreach ($rooms as $room): ?>
+                        <?php $roomId = (int) $room['room_id']; ?>
+                        <div class="available-table" data-room-id="<?= $roomId ?>">
+                            <label>
+                                <input type="radio" name="room_choice" value="<?= $roomId ?>" class="room-choice" <?= (int) $input['room_id'] === $roomId ? 'checked' : '' ?>>
+                                <strong><?= View::escape($room['room_name']) ?></strong>
+                                <span><?= View::escape($room['area_name']) ?></span>
+                            </label>
+                            <div class="room-table-options">
+                                <?php foreach ($room['tables'] as $table): ?>
+                                    <?php $tableId = (int) $table['id']; ?>
+                                    <?php $tableFee = (float) ($table['table_fee'] ?? 0) > 0 ? (float) $table['table_fee'] : (!empty($table['is_vip']) ? 200000 : 100000); ?>
+                                    <label class="available-table table-option" data-room-id="<?= $roomId ?>" data-capacity="<?= (int) $table['capacity'] ?>" data-fee="<?= $tableFee ?>">
+                                        <input type="checkbox" name="table_ids[]" value="<?= $tableId ?>" class="table-choice" data-room-id="<?= $roomId ?>" <?= in_array($tableId, $input['table_ids'], true) ? 'checked' : '' ?>>
+                                        <span class="available-table-body">
+                                            <span class="table-code"><?= View::escape($table['code']) ?></span>
+                                            <strong><?= View::escape($table['name']) ?></strong>
+                                            <span class="capacity-label">Sức chứa <?= (int) $table['capacity'] ?> khách</span>
+                                            <span class="capacity-label"><?= View::currency((int) round($tableFee)) ?></span>
+                                        </span>
+                                    </label>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
                     <?php endforeach; ?>
+                </div>
+                <div class="alert" id="multi-table-summary" role="status">
+                    Tổng bàn: <strong id="selected-table-count">0</strong>
+                    · Tổng sức chứa: <strong id="selected-capacity">0</strong>
+                    · Tổng tiền bàn: <strong id="selected-table-fee">0 đ</strong>
+                    · Cần thêm: <strong id="remaining-guests">0</strong> khách
                 </div>
             </section>
 
@@ -92,13 +117,6 @@ foreach ($items as $item) {
 
             <section class="booking-step">
                 <div class="step-heading"><span>04</span><div><h2>Món đặt trước</h2><p>Giá được lấy lại từ CSDL và lưu thành snapshot khi xác nhận yêu cầu.</p></div></div>
-                <div class="form-row">
-                    <div>
-                        <label for="booking-voucher">Mã voucher (không trừ vào tiền cọc)</label>
-                        <input id="booking-voucher" name="voucher_code" type="text" maxlength="50" value="<?= View::escape($input['voucher_code'] ?? '') ?>" placeholder="VD: FOODIESFIRST15" autocomplete="off">
-                        <p class="muted">Voucher hợp lệ sẽ giảm trên phần món ăn khi xuất hóa đơn thanh toán.</p>
-                    </div>
-                </div>
                 <?php if ($items === []): ?>
                     <p class="muted">Bạn chưa chọn món trước. Có thể đặt bàn mà không cần món.</p>
                     <a class="text-link" href="/menu">Xem thực đơn</a>
@@ -132,3 +150,43 @@ foreach ($items as $item) {
         </form>
     <?php endif; ?>
 </section>
+
+<script>
+(() => {
+    const guestCount = <?= (int) $input['number_of_guests'] ?>;
+    const roomChoices = document.querySelectorAll('.room-choice');
+    const tableChoices = document.querySelectorAll('.table-choice');
+    const roomInput = document.getElementById('selected-room-id');
+    const submitButton = document.querySelector('.booking-submit button[type="submit"]');
+
+    function refreshSelection() {
+        const selectedRoom = roomInput.value;
+        let count = 0;
+        let capacity = 0;
+        let fee = 0;
+        tableChoices.forEach((choice) => {
+            if (choice.dataset.roomId !== selectedRoom) {
+                choice.checked = false;
+            } else if (choice.checked) {
+                count++;
+                capacity += Number(choice.closest('[data-capacity]').dataset.capacity || 0);
+                fee += Number(choice.closest('[data-fee]').dataset.fee || 0);
+            }
+        });
+        document.getElementById('selected-table-count').textContent = String(count);
+        document.getElementById('selected-capacity').textContent = String(capacity);
+        document.getElementById('selected-table-fee').textContent = new Intl.NumberFormat('vi-VN').format(fee) + ' đ';
+        document.getElementById('remaining-guests').textContent = String(Math.max(0, guestCount - capacity));
+        if (submitButton) {
+            submitButton.disabled = count === 0 || capacity < guestCount;
+        }
+    }
+
+    roomChoices.forEach((choice) => choice.addEventListener('change', () => {
+        roomInput.value = choice.value;
+        refreshSelection();
+    }));
+    tableChoices.forEach((choice) => choice.addEventListener('change', refreshSelection));
+    refreshSelection();
+})();
+</script>

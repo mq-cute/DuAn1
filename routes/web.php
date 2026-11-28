@@ -46,6 +46,7 @@ return static function (): \App\Core\Router {
     $router->post('/cart/items/{id}/remove', [MenuController::class, 'removeFromCart']);
 
     // Đặt bàn khách
+    $router->get('/bookings', [BookingController::class, 'createForm']);
     $router->get('/bookings/new', [BookingController::class, 'createForm']);
     $router->post('/bookings', [BookingController::class, 'create']);
     $router->get('/bookings/{id}/deposit', [BookingController::class, 'deposit']);
@@ -76,6 +77,7 @@ return static function (): \App\Core\Router {
     $router->post('/admin/bookings/{id}/confirm-pos', [BookingAdminController::class, 'confirmForPos']);
     $router->post('/admin/bookings/{id}/status', [BookingAdminController::class, 'updateStatus']);
     $router->post('/admin/bookings/{id}/deposit/receive', [BookingAdminController::class, 'receiveDeposit']);
+    $router->post('/admin/bookings/{id}/late-contact', [BookingAdminController::class, 'recordLateContact']);
     $router->post('/admin/bookings/{id}/open-table', [BookingAdminController::class, 'openTable']);
     $router->post('/admin/bookings/{id}/change-table', [BookingAdminController::class, 'changeTable']);
 
@@ -92,6 +94,10 @@ return static function (): \App\Core\Router {
     $router->post('/admin/dining-areas', [TableAdminController::class, 'createArea']);
     $router->post('/admin/dining-areas/{id}/edit', [TableAdminController::class, 'updateArea']);
     $router->post('/admin/dining-areas/{id}/delete', [TableAdminController::class, 'deleteArea']);
+
+    // Quản lý loại phòng / phòng / bàn
+    $router->post('/admin/rooms', [TableAdminController::class, 'createRoom']);
+    $router->post('/admin/rooms/{id}/edit', [TableAdminController::class, 'updateRoom']);
 
     // Quản lý Combo, Setup & Vouchers
     $router->get('/admin/combos', [PromotionAdminController::class, 'combos']);
@@ -132,6 +138,7 @@ return static function (): \App\Core\Router {
     // Staff Orders Management (Quản lý gọi món)
     $router->get('/staff/orders', [OrderController::class, 'index']);
     $router->get('/staff/orders/{id}', [OrderController::class, 'show']);
+    $router->get('/invoices', [InvoiceController::class, 'index']);
 
     // CHỨC NĂNG 4: Quản lý Luồng Bếp KDS & Hàng đợi thời gian thực
     $router->get('/kitchen', [KitchenController::class, 'index']);
@@ -152,6 +159,7 @@ return static function (): \App\Core\Router {
     $router->get('/account/invoices/{id}', [InvoiceController::class, 'show']);
     $router->get('/account/invoices/{id}/pdf', [InvoiceController::class, 'pdf']);
     $router->get('/staff/orders/{id}/prebill', [InvoiceController::class, 'prebill']);
+    $router->post('/staff/orders/{id}/voucher', [InvoiceController::class, 'applyVoucher']);
     $router->post('/staff/orders/{id}/pay', [InvoiceController::class, 'confirmPayment']);
     $router->get('/staff/orders/{id}/invoice', [InvoiceController::class, 'showByOrder']);
     $router->get('/invoices/{id}', [InvoiceController::class, 'show']);
