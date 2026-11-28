@@ -3,7 +3,7 @@ use App\Core\View;
 ?>
 <section class="auth-shell">
     <div class="auth-aside">
-        <p class="eyebrow">BIENVENUE CHEZ L'ÉPICURE</p>
+        <p class="eyebrow">CHÀO MỪNG ĐẾN VỚI FOODIES</p>
         <h1>Chào mừng<br>trở lại.</h1>
         <p>Đăng nhập để tiếp tục hành trình ẩm thực của bạn.</p>
     </div>

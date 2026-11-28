@@ -188,7 +188,7 @@ $isCustomer = (bool)($isCustomer ?? false);
                         </div>
                         <div>
                             <span class="text-slate-400 block text-[10px] uppercase font-bold">CHỦ TÀI KHOẢN</span>
-                            <strong class="text-slate-800 uppercase"><?= View::escape($vietQr['account_name'] ?? 'LEPICURE GASTRONOMIE') ?></strong>
+                            <strong class="text-slate-800 uppercase"><?= View::escape($vietQr['account_name'] ?? 'FOODIES HAUTE CUISINE') ?></strong>
                         </div>
                         <div>
                             <span class="text-slate-400 block text-[10px] uppercase font-bold">NỘI DUNG CHUYỂN KHOẢN DUY NHẤT</span>

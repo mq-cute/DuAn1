@@ -47,7 +47,7 @@ final class UserAdminController extends Controller
         $roles = $userModel->allRoles();
 
         $this->render('admin/users/index', [
-            'pageTitle' => 'Quản Lý Tài Khoản & Phân Quyền — L\'Épicure',
+            'pageTitle' => 'Quản Lý Tài Khoản & Phân Quyền — FOODIES',
             'currentUser' => $currentUser,
             'users' => $users,
             'roles' => $roles,
@@ -227,7 +227,7 @@ final class UserAdminController extends Controller
         $logs = $logModel->all($filters, $page, $perPage);
 
         $this->render('admin/users/logs', [
-            'pageTitle' => 'Nhật Ký Hoạt Động Hệ Thống — L\'Épicure',
+            'pageTitle' => 'Nhật Ký Hoạt Động Hệ Thống — FOODIES',
             'currentUser' => $currentUser,
             'logs' => $logs,
             'totalLogs' => $totalLogs,

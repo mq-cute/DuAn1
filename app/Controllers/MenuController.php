@@ -34,7 +34,7 @@ final class MenuController extends Controller
         $categories = new Category($db);
         $selectedCategory = $categorySlug === '' ? null : $categories->findBySlug($categorySlug);
         $this->render('menu/index', [
-            'pageTitle' => 'Thực đơn | L’Épicure',
+            'pageTitle' => 'Thực đơn | FOODIES',
             'currentUser' => Auth::user(),
             'categories' => $categories->allVisible(),
             'selectedCategory' => $selectedCategory,
@@ -71,7 +71,7 @@ final class MenuController extends Controller
         }
 
         $this->render('menu/show', [
-            'pageTitle' => $dish['name'] . ' | L’Épicure',
+            'pageTitle' => $dish['name'] . ' | FOODIES',
             'currentUser' => Auth::user(),
             'dish' => $dish,
             'csrfToken' => Csrf::token(),
@@ -112,7 +112,7 @@ final class MenuController extends Controller
         }
 
         $this->render('menu/cart', [
-            'pageTitle' => 'Giỏ chọn món | L’Épicure',
+            'pageTitle' => 'Giỏ chọn món | FOODIES',
             'currentUser' => Auth::user(),
             'items' => $items,
             'subtotalCents' => $subtotalCents,

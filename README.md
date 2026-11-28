@@ -373,3 +373,4 @@ php tests/ViewsSmokeTest.php
 **Kết quả kiểm thử:**
 - `RouterTest.php`: **Passed 100%** (Tất cả route cho Admin, Bàn ăn, Bếp KDS, POS, Đặt bàn đều đăng ký chuẩn xác).
 - `ViewsSmokeTest.php`: **Passed 100% (38/38 trang view)** (Đảm bảo không phát sinh lỗi PHP, không vỡ layout, tuân thủ escape dữ liệu chống XSS).
+**Tự Động Cập Nhật File README.md Mỗi Khi Có Dữ Liệu Mới**

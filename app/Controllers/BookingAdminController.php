@@ -122,7 +122,7 @@ final class BookingAdminController extends Controller
                                 $userId,
                                 'booking_confirmed',
                                 'Đặt Bàn Đã Được Xác Nhận',
-                                "Đơn đặt bàn ngày {$bookingData['booking_date']} lúc {$bookingData['booking_time']} cho {$bookingData['number_of_guests']} khách đã được L'Épicure xác nhận thành công.",
+                                "Đơn đặt bàn ngày {$bookingData['booking_date']} lúc {$bookingData['booking_time']} cho {$bookingData['number_of_guests']} khách đã được FOODIES xác nhận thành công.",
                                 ['booking_id' => $bookingId, 'status' => 'confirmed']
                             );
                         }

@@ -31,7 +31,7 @@ final class AccountController extends Controller
         $bookings = $bookingModel->allForCustomer((int) $user['id']);
 
         $this->render('account/index', [
-            'pageTitle' => 'Tài Khoản & Hồ Sơ Cá Nhân — L\'Épicure',
+            'pageTitle' => 'Tài Khoản & Hồ Sơ Cá Nhân — FOODIES',
             'currentUser' => $user,
             'bookings' => $bookings,
             'csrfToken' => Csrf::token(),

@@ -260,7 +260,7 @@ $statusBadges = [
 
             <div>
                 <label for="create-email" class="block font-bold text-on-surface uppercase mb-1">Địa chỉ Email *</label>
-                <input id="create-email" type="email" name="email" required placeholder="user@lepicure.com" class="w-full text-xs py-2 px-3 rounded-xl border border-outline-variant/40 focus:ring-1 focus:ring-primary">
+                <input id="create-email" type="email" name="email" required placeholder="user@foodies.com" class="w-full text-xs py-2 px-3 rounded-xl border border-outline-variant/40 focus:ring-1 focus:ring-primary">
             </div>
 
             <div>

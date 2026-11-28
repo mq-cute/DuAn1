@@ -54,7 +54,7 @@ $message = match ($error) {
                         <?php if (!empty($dish['image'])): ?>
                             <img src="<?= View::escape($dish['image']) ?>" alt="<?= View::escape($dish['name']) ?>" loading="lazy">
                         <?php else: ?>
-                            <span class="image-placeholder">L'ÉPICURE</span>
+                            <span class="image-placeholder">FOODIES</span>
                         <?php endif; ?>
                     </a>
                     <div class="dish-card-body">

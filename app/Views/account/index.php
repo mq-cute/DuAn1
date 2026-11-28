@@ -18,7 +18,7 @@ $bookingCount = is_countable($bookings ?? null) ? count($bookings) : 0;
 ?>
 
 <section class="page-heading">
-    <p class="eyebrow">MON PROFIL · L'ÉPICURE GASTRONOMIE</p>
+    <p class="eyebrow">MON PROFIL · FOODIES HAUTE CUISINE</p>
     <h1>Thông tin tài khoản</h1>
     <p class="muted">Quản lý hồ sơ cá nhân, lịch sử ẩm thực và thiết lập bảo mật tài khoản thành viên.</p>
 </section>

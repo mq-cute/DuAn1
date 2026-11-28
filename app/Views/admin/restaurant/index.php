@@ -14,7 +14,7 @@ $activeTab = $activeTab ?? 'general';
             <div class="flex items-center space-x-2">
                 <span class="text-xs font-bold uppercase tracking-wider text-secondary">THIẾT LẬP HỆ THỐNG</span>
                 <span class="text-stone-300">•</span>
-                <span class="text-xs text-on-surface-variant">L'Épicure Gastronomie</span>
+                <span class="text-xs text-on-surface-variant">FOODIES Haute Cuisine</span>
             </div>
             <h1 class="text-2xl sm:text-3xl font-headline font-bold text-on-surface mt-1">Thông Tin Nhà Hàng &amp; Thiết Lập Vận Hành</h1>
             <p class="text-sm text-on-surface-variant">Cấu hình định danh thương hiệu, khung giờ phục vụ, chính sách đặt bàn, thuế VAT và phí dịch vụ.</p>
@@ -91,7 +91,7 @@ $activeTab = $activeTab ?? 'general';
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label for="restaurant_name" class="block font-bold text-on-surface uppercase mb-1">Tên nhà hàng *</label>
-                        <input id="restaurant_name" type="text" name="restaurant_name" value="<?= View::escape($settings['restaurant_name'] ?? "L'Épicure Gastronomie") ?>" required class="w-full text-xs py-2.5 px-3 rounded-xl border border-outline-variant/40 focus:ring-1 focus:ring-primary font-semibold">
+                        <input id="restaurant_name" type="text" name="restaurant_name" value="<?= View::escape($settings['restaurant_name'] ?? "FOODIES Haute Cuisine") ?>" required class="w-full text-xs py-2.5 px-3 rounded-xl border border-outline-variant/40 focus:ring-1 focus:ring-primary font-semibold">
                     </div>
 
                     <div>
